@@ -31,6 +31,7 @@ export type Stats = {
 export type Player = {
   identity: Identity;
   stats: Stats;
+  createdAt: Date;
 };
 
 export type Players = {
@@ -77,6 +78,7 @@ const createDefaultPlayer: (battleTag: string) => Player = battleTag => {
         },
       },
     },
+    createdAt: new Date(),
   };
 };
 
