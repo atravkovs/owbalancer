@@ -1,6 +1,6 @@
 <template>
   <div class="input-group">
-    <span class="input-group-text cursor-pointer">
+    <span class="input-group-text cursor-pointer sortable-handler">
       <TankIcon v-if="rtype === 'tank'" />
       <DamageIcon v-if="rtype === 'dps'" />
       <SupportIcon v-if="rtype === 'support'" />

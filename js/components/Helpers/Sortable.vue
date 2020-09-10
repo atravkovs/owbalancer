@@ -10,7 +10,10 @@ import Sortable, { SortableEvent } from 'sortablejs';
 
 export default defineComponent({
   name: 'Sortable',
-  setup(_, { emit }) {
+  props: {
+    handle: String,
+  },
+  setup(props, { emit }) {
     const container = ref(null);
 
     const onUpdate = (e: SortableEvent) => {
@@ -19,7 +22,11 @@ export default defineComponent({
 
     onMounted(() => {
       if (container.value) {
-        Sortable.create(container.value, { onUpdate });
+        Sortable.create(container.value, {
+          onUpdate,
+          direction: 'vertical',
+          handle: props.handle,
+        });
       }
     });
 

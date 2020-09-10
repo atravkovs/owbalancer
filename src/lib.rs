@@ -16,6 +16,6 @@ pub fn main_js() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn greet(name: &str) {
-    console::log_1(&JsValue::from_str(&format!("Hello, {}!", name)));
+pub fn greet(name: &str) -> String {
+    format!("Hello, {}!", name)
 }

@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <h2>Overwatch Balancer :)</h2>
     <div class="row">
-      <div class="col">
+      <div class="w-25r">
         <Lobby />
       </div>
       <div class="col">
@@ -24,3 +24,9 @@ export default defineComponent({
   components: { Lobby, Teams },
 });
 </script>
+
+<style lang="scss" scoped>
+.w-25r {
+  width: 25rem !important;
+}
+</style>

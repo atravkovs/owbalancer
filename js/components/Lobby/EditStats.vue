@@ -7,7 +7,7 @@
       <input type="number" id="level" class="form-control" v-model="playerStats.level" />
     </div>
   </div>
-  <Sortable v-on:update-position="updatePosition">
+  <Sortable v-on:update-position="updatePosition" handle=".sortable-handler">
     <EditRole
       v-for="role in roles"
       :key="role.role"
@@ -28,8 +28,8 @@ import {
   Stats,
 } from '@/objects/player';
 
-import Sortable from '@/components/Sortable.vue';
-import EditRole from '@/components/EditRole.vue';
+import Sortable from '@/components/Helpers/Sortable.vue';
+import EditRole from '@/components/Lobby/EditRole.vue';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 

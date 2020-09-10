@@ -23,9 +23,9 @@ import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 import PlayerEditor from '@/objects/player';
 
-import Modal from '@/components/Modal.vue';
-import EditStats from '@/components/EditStats.vue';
-import EditIdentity from '@/components/EditIdentity.vue';
+import Modal from '@/components/Helpers/Modal.vue';
+import EditStats from '@/components/Lobby/EditStats.vue';
+import EditIdentity from '@/components/Lobby/EditIdentity.vue';
 
 export default defineComponent({
   name: 'EditPlayer',
@@ -34,7 +34,9 @@ export default defineComponent({
     const store = useStore();
     const emptyPlayer = PlayerEditor.createDefaultPlayer('');
 
-    const playerData = computed(() => store.state.players[store.state.editPlayer] || emptyPlayer);
+    const playerData = computed(
+      () => store.state.players[store.state.editPlayer] || emptyPlayer
+    );
 
     const player = ref(playerData);
 

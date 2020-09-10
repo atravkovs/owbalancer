@@ -6,7 +6,8 @@ const wasm = import("../pkg/index.js");
 
 wasm.then(lib => {
   console.log('Hi!');
-  lib.greet('Bob');
+  const text = lib.greet('Bob');
+  console.log('Received: ', text);
 }).catch(console.error);
 
 createApp(App)

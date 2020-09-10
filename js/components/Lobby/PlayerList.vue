@@ -1,17 +1,17 @@
 <template>
-  <div>
-    <div class="row mw-25r">
-      <div class="col-sm-8">
+  <div class="w-100">
+    <div class="d-flex justify-content-end">
+      <div>
         <ImportFile />
       </div>
-      <div class="col-4 col-sm-2">
+      <div class="mr-1">
         <Export />
       </div>
-      <div class="col-4 col-sm-2">
+      <div>
         <DeletePlayers />
       </div>
     </div>
-    <div class="overflow-auto mw-25r h40r bg-secondary border p-1">
+    <div class="overflow-auto h40r bg-secondary border p-1">
       <PlayerCard class="bg-light mb-1" v-for="player in players" :player="player" :key="player" />
     </div>
   </div>
@@ -23,9 +23,9 @@ import { defineComponent, computed } from 'vue';
 import { useStore } from '@/store';
 
 import PlayerCard from '@/components/PlayerCard.vue';
-import Export from '@/components/Export.vue';
-import ImportFile from '@/components/Import.vue';
-import DeletePlayers from '@/components/DeletePlayers.vue';
+import Export from '@/components/Lobby/Export.vue';
+import ImportFile from '@/components/Lobby/Import.vue';
+import DeletePlayers from '@/components/Lobby/DeletePlayers.vue';
 
 export default defineComponent({
   name: 'App',
@@ -43,9 +43,5 @@ export default defineComponent({
 <style lang="scss" scoped>
 .h40r {
   height: 40rem;
-}
-
-.mw-25r {
-  max-width: 25rem;
 }
 </style>

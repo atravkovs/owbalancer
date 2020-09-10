@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-100">
     <h3>Lobby</h3>
 
     <AddPlayer />
@@ -12,10 +12,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import AddPlayer from '@/components/AddPlayer.vue';
-import PlayerList from '@/components/PlayerList.vue';
-import DeletePlayer from '@/components/DeletePlayer.vue';
-import EditPlayer from '@/components/EditPlayer.vue';
+import AddPlayer from '@/components/Lobby/AddPlayer.vue';
+import PlayerList from '@/components/Lobby/PlayerList.vue';
+import DeletePlayer from '@/components/Lobby/DeletePlayer.vue';
+import EditPlayer from '@/components/Lobby/EditPlayer.vue';
 
 export default defineComponent({
   name: 'Lobby',

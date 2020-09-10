@@ -1,5 +1,5 @@
 <template>
-  <button @click="deletePlayers" type="button" class="btn btn-danger">
+  <button @click="deletePlayers" type="button" class="btn btn-sm btn-danger">
     <svg
       width="1em"
       height="1em"

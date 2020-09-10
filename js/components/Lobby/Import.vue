@@ -1,8 +1,7 @@
 <template>
-  <div class="form-file form-file-sm">
-    <input type="file" id="importFile" class="form-file-input" @change="onChange" />
-    <label for="importFile" class="form-file-label">
-      <span class="form-file-text">Choose file...</span>
+  <div class="form-file form-file-sm wf">
+    <input type="file" id="importFile" class="form-file-input d-none" @change="onChange" />
+    <label for="importFile" class="form-file-label w-100">
       <span class="form-file-button">Import</span>
     </label>
   </div>
@@ -41,3 +40,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.wf {
+  width: 4rem;
+}
+</style>
