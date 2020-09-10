@@ -8,7 +8,10 @@ import { useStore } from '@/store';
 
 function download(filename: string, text: string) {
   const element = document.createElement('a');
-  element.setAttribute('href', `data:application/json;charset=utf-8,${encodeURIComponent(text)}`);
+  element.setAttribute(
+    'href',
+    `data:application/json;charset=utf-8,${encodeURIComponent(text)}`
+  );
   element.setAttribute('download', filename);
 
   element.style.display = 'none';
@@ -27,7 +30,10 @@ export default defineComponent({
 
     const onClick = () => {
       const data = players.value;
-      download(`balancer-${new Date().toLocaleString('ru-RU')}.json`, JSON.stringify(data));
+      download(
+        `balancer-${new Date().toLocaleString('ru-RU')}.json`,
+        JSON.stringify(data)
+      );
     };
 
     return { onClick };

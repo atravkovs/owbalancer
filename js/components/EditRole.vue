@@ -12,11 +12,7 @@
       <img v-else-if="mRole.rating < 3000" class="s-2em" src="@/assets/rank_icons/Platinum.png" />
       <img v-else-if="mRole.rating < 3500" class="s-2em" src="@/assets/rank_icons/Diamond.png" />
       <img v-else-if="mRole.rating < 4000" class="s-2em" src="@/assets/rank_icons/Master.png" />
-      <img
-        v-else-if="mRole.rating < 5000"
-        class="s-2em"
-        src="@/assets/rank_icons/Grandmaster.png"
-      />
+      <img v-else-if="mRole.rating < 5000" class="s-2em" src="@/assets/rank_icons/Grandmaster.png" />
     </span>
     <span class="input-group-text">
       <input

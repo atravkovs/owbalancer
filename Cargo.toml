@@ -1,0 +1,33 @@
+[package]
+name = "owbalancer"
+description = "Overwatch tournament balancer in Rust, WASM"
+version = "0.1.0"
+authors = ["Artjoms Travkovs <atravkovs@gmail.com>"]
+categories = ["wasm"]
+readme = "README.md"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+
+[features]
+
+[dependencies]
+wasm-bindgen = "0.2.45"
+wee_alloc = { version = "0.4.2", optional = true }
+
+[dependencies.web-sys]
+version = "0.3.22"
+features = ["console"]
+
+[target."cfg(debug_assertions)".dependencies]
+console_error_panic_hook = "0.1.5"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.2.45"
+futures = "0.1.27"
+js-sys = "0.3.22"
+wasm-bindgen-futures = "0.3.22"

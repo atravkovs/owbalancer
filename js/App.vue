@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <h2>Overwatch Balancer</h2>
+    <h2>Overwatch Balancer :)</h2>
     <div class="row">
       <div class="col">
         <Lobby />

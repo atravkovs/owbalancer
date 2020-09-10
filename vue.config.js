@@ -11,7 +11,7 @@ module.exports = {
     },
     plugins: [
       new WasmPackPlugin({
-        createDirectory: __dirname,
+        crateDirectory: __dirname,
       }),
     ],
     devServer: {
