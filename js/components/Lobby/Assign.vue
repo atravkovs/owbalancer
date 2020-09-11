@@ -23,11 +23,13 @@ export default defineComponent({
     const store = useStore();
 
     const assignCaptains = () => {
+      // eslint-disable-next-line
       const captainSR = +(prompt("Enter captain's minimum SR", '3600') || 0);
       store.commit(MutationTypes.ASSIGN_CAPTAINS, captainSR);
     };
 
     const assignSquires = () => {
+      // eslint-disable-next-line
       const squireSR = +(prompt("Enter suire's maximum SR", '1700') || 0);
       store.commit(MutationTypes.ASSIGN_SQUIRES, squireSR);
     };

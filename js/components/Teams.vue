@@ -1,5 +1,8 @@
 <template>
   <h3>Teams</h3>
+  <div>
+    <button class="btn btn-sm btn-danger">Add Team</button>
+  </div>
 </template>
 
 <script lang="ts">

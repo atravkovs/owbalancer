@@ -37,6 +37,8 @@ export type Players = {
   [tag: string]: Player;
 };
 
+export type ReservedPlayers = string[];
+
 const createDefaultPlayer: (name: string) => Player = name => {
   return {
     identity: {

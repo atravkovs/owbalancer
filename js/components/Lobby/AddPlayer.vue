@@ -13,6 +13,7 @@
     </div>
     <div class="col-auto">
       <button @click="addPlayer" class="btn btn-sm btn-danger">Add Player</button>
+      <button @click="generateRandom" class="btn btn-sm btn-secondary ml-1">+ Randoms</button>
     </div>
   </div>
 </template>
@@ -21,8 +22,19 @@
 import { defineComponent, ref } from 'vue';
 
 import { useStore } from '@/store';
+import { MIN_SR, MAX_SR } from '@/constants';
 import MutationTypes from '@/store/mutation-types';
 import PlayerEditor from '@/objects/player';
+
+function getRandomInt(min: number, max: number) {
+  const minCeil = Math.ceil(min);
+  const maxFloor = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloor - minCeil) + minCeil);
+}
+
+function flipCoin(): boolean {
+  return getRandomInt(0, 2) === 0;
+}
 
 export default defineComponent({
   name: 'AddPlayer',
@@ -38,9 +50,56 @@ export default defineComponent({
       playerTag.value = '';
     }
 
+    const generateRandom = () => {
+      // eslint-disable-next-line
+      const playerCount = +(prompt('Enter players amoun', '20') || 0);
+
+      for (let i = 0; i < playerCount; i += 1) {
+        const roleSelect = ['dps', 'support', 'tank'];
+        const player = PlayerEditor.createDefaultPlayer(`Player ${i + 1}`);
+        player.stats.rank = getRandomInt(MIN_SR, MAX_SR);
+
+        const firstRole = getRandomInt(0, 3);
+        // eslint-disable-next-line
+        player.stats.classes[roleSelect[firstRole]].isActive = true;
+        // eslint-disable-next-line
+        player.stats.classes[roleSelect[firstRole]].priority = 0;
+        roleSelect.splice(firstRole, 1);
+
+        // Second role if needed
+        if (flipCoin()) {
+          const secondRole = getRandomInt(0, 2);
+          // eslint-disable-next-line
+          player.stats.classes[roleSelect[secondRole]].isActive = true;
+          // eslint-disable-next-line
+          player.stats.classes[roleSelect[secondRole]].priority = 1;
+
+          roleSelect.splice(secondRole, 1);
+          if (flipCoin()) {
+            // eslint-disable-next-line
+            player.stats.classes[roleSelect[0]].isActive = true;
+            // eslint-disable-next-line
+            player.stats.classes[roleSelect[0]].priority = 2;
+
+            roleSelect.splice(0, 1);
+          }
+        }
+
+        let j = 1;
+        roleSelect.forEach((v) => {
+          // eslint-disable-next-line
+          player.stats.classes[v].priority = j;
+          j += 1;
+        });
+
+        store.commit(MutationTypes.ADD_PLAYER, player);
+      }
+    };
+
     return {
       addPlayer,
       playerTag,
+      generateRandom,
     };
   },
 });
