@@ -12,10 +12,12 @@
   "dependencies": {
     "@types/lodash": "^4.14.161",
     "@types/sortablejs": "^1.10.6",
+    "@types/uuid": "^8.3.0",
     "bootstrap": "^5.0.0-alpha1",
     "lodash": "^4.17.20",
     "popper.js": "^1.16.1",
     "sortablejs": "^1.10.2",
+    "uuid": "^8.3.0",
     "vue": "^3.0.0-beta.1",
     "vue-drag-sortable": "^0.2.2",
     "vuex": "^4.0.0-alpha.1"

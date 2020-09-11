@@ -1,7 +1,5 @@
 <template>
-  <div draggable="true" @contextmenu="editPlayer" @dragstart="drag">
-    {{ player.identity.displayName }}
-  </div>
+  <div draggable="true" @contextmenu="editPlayer" @dragstart="drag">{{ player.identity.name }}</div>
 </template>
 
 <script lang="ts">
@@ -20,7 +18,10 @@ export default defineComponent({
     const store = useStore();
 
     const drag = (ev: DragEvent) => {
-      const _ = ev?.dataTransfer?.setData('playerTag', props.player?.identity.battleTag || '');
+      const _ = ev?.dataTransfer?.setData(
+        'playerTag',
+        props.player?.identity.uuid || ''
+      );
 
       return _;
     };
@@ -32,7 +33,7 @@ export default defineComponent({
         return;
       }
 
-      store.commit(MutationTypes.EDIT_PLAYER, props.player.identity.battleTag);
+      store.commit(MutationTypes.EDIT_PLAYER, props.player.identity.uuid);
     };
 
     return {

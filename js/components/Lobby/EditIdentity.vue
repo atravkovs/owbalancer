@@ -2,32 +2,10 @@
   <div>
     <div class="row">
       <div class="col-sm-3">
-        <label for="battleTag" class="col-form-label">BattleTag</label>
-      </div>
-      <div class="col-auto text-center">
-        <input
-          type="text"
-          readonly
-          id="battleTag"
-          class="form-control-plaintext"
-          v-model="mIdentity.battleTag"
-        />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-3">
-        <label for="displayName" class="col-form-label">Display Name</label>
+        <label for="name" class="col-form-label">Name</label>
       </div>
       <div class="col-auto">
-        <input type="text" id="displayName" class="form-control" v-model="mIdentity.displayName" />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-3">
-        <label for="twitchName" class="col-form-label">Twitch Name</label>
-      </div>
-      <div class="col-auto">
-        <input type="text" id="twitchName" class="form-control" v-model="mIdentity.twitchName" />
+        <input type="text" id="name" class="form-control" v-model="mIdentity.name" />
       </div>
     </div>
     <div class="row">

@@ -1,14 +1,14 @@
 <template>
   <div class="row g-3">
     <div class="col-auto">
-      <label for="playerTag" class="sr-only">BattleTag</label>
+      <label for="playerTag" class="sr-only">Name</label>
       <input
         v-model.trim="playerTag"
         @keyup.enter="addPlayer"
         type="text"
         class="form-control"
         id="playerTag"
-        placeholder="BattleTag#1337"
+        placeholder="Name#1337"
       />
     </div>
     <div class="col-auto">
@@ -31,15 +31,10 @@ export default defineComponent({
     const playerTag = ref('');
 
     function addPlayer() {
-      if (!/^([A-z0-9])+#\d{3,6}$/.test(playerTag.value)) {
-        console.log('Error: Please enter actual battle tag');
-        return;
-      }
-
       const player = PlayerEditor.createDefaultPlayer(playerTag.value);
 
       store.commit(MutationTypes.ADD_PLAYER, player);
-      store.commit(MutationTypes.EDIT_PLAYER, player.identity.battleTag);
+      store.commit(MutationTypes.EDIT_PLAYER, player.identity.uuid);
       playerTag.value = '';
     }
 

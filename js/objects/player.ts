@@ -1,15 +1,14 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export type Identity = {
-  battleTag: string;
-  displayName: string;
-  twitchName: string;
+  uuid: string;
+  name: string;
   isSquire: boolean;
   isCaptain: boolean;
 };
 
 export type ClassType = {
-  rating: number;
   priority: number;
-  playHours: number;
   isActive: boolean;
   primary: boolean;
   secondary: boolean;
@@ -24,7 +23,7 @@ export type Classes = {
 };
 
 export type Stats = {
-  level: number;
+  rank: number;
   classes: Classes;
 };
 
@@ -38,42 +37,36 @@ export type Players = {
   [tag: string]: Player;
 };
 
-const createDefaultPlayer: (battleTag: string) => Player = battleTag => {
-  const displayName = battleTag.split('#')[0];
-
+const createDefaultPlayer: (name: string) => Player = name => {
   return {
     identity: {
-      battleTag,
-      displayName,
-      twitchName: '',
+      name,
+      uuid: uuidv4(),
       isCaptain: false,
       isSquire: false,
     },
     stats: {
-      level: 0,
+      rank: 0,
       classes: {
         dps: {
-          rating: 0,
           playHours: 0,
-          isActive: false,
           priority: 0,
           primary: false,
+          isActive: false,
           secondary: false,
         },
         tank: {
-          rating: 0,
           playHours: 0,
-          isActive: false,
           priority: 1,
           primary: false,
+          isActive: false,
           secondary: false,
         },
         support: {
-          rating: 0,
           playHours: 0,
-          isActive: false,
           priority: 2,
           primary: false,
+          isActive: false,
           secondary: false,
         },
       },

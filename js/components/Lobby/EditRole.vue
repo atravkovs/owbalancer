@@ -6,15 +6,6 @@
       <SupportIcon v-if="rtype === 'support'" />
     </span>
     <span class="input-group-text">
-      <img v-if="mRole.rating < 1500" class="s-2em" src="@/assets/rank_icons/Bronze.png" />
-      <img v-else-if="mRole.rating < 2000" class="s-2em" src="@/assets/rank_icons/Silver.png" />
-      <img v-else-if="mRole.rating < 2500" class="s-2em" src="@/assets/rank_icons/Gold.png" />
-      <img v-else-if="mRole.rating < 3000" class="s-2em" src="@/assets/rank_icons/Platinum.png" />
-      <img v-else-if="mRole.rating < 3500" class="s-2em" src="@/assets/rank_icons/Diamond.png" />
-      <img v-else-if="mRole.rating < 4000" class="s-2em" src="@/assets/rank_icons/Master.png" />
-      <img v-else-if="mRole.rating < 5000" class="s-2em" src="@/assets/rank_icons/Grandmaster.png" />
-    </span>
-    <span class="input-group-text">
       <input
         v-model="mRole.isActive"
         type="checkbox"
@@ -89,13 +80,6 @@
       />
       <label class="btn btn-sm btn-secondary" for="option_projectile">Projectile</label>
     </span>
-    <input
-      v-model="mRole.rating"
-      type="number"
-      :id="rtype"
-      class="form-control"
-      placeholder="Rating"
-    />
   </div>
 </template>
 

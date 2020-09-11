@@ -1,10 +1,41 @@
 <template>
   <div class="row mb-3">
     <div class="col-sm-3">
-      <label for="label" class="col-form-label">Level</label>
+      <label for="label" class="col-form-label">Rank</label>
     </div>
     <div class="col-auto">
-      <input type="number" id="level" class="form-control" v-model="playerStats.level" />
+      <div class="input-group">
+        <span class="input-group-text">
+          <img v-if="playerStats.rank < 1500" class="s-2em" src="@/assets/rank_icons/Bronze.png" />
+          <img
+            v-else-if="playerStats.rank < 2000"
+            class="s-2em"
+            src="@/assets/rank_icons/Silver.png"
+          />
+          <img v-else-if="playerStats.rank < 2500" class="s-2em" src="@/assets/rank_icons/Gold.png" />
+          <img
+            v-else-if="playerStats.rank < 3000"
+            class="s-2em"
+            src="@/assets/rank_icons/Platinum.png"
+          />
+          <img
+            v-else-if="playerStats.rank < 3500"
+            class="s-2em"
+            src="@/assets/rank_icons/Diamond.png"
+          />
+          <img
+            v-else-if="playerStats.rank < 4000"
+            class="s-2em"
+            src="@/assets/rank_icons/Master.png"
+          />
+          <img
+            v-else-if="playerStats.rank < 5000"
+            class="s-2em"
+            src="@/assets/rank_icons/Grandmaster.png"
+          />
+        </span>
+        <input type="number" id="level" class="form-control" v-model="playerStats.rank" />
+      </div>
     </div>
   </div>
   <Sortable v-on:update-position="updatePosition" handle=".sortable-handler">
@@ -36,14 +67,14 @@ import MutationTypes from '@/store/mutation-types';
 export default defineComponent({
   name: 'EditStats',
   props: {
-    battleTag: String,
+    uuid: String,
     stats: Object as PropType<Stats>,
   },
   components: { Sortable, EditRole },
   setup(props) {
     const store = useStore();
     const stats = computed(() => props.stats);
-    const battleTag = computed(() => props.battleTag);
+    const uuid = computed(() => props.uuid);
     const result: DescribedClassType[] = [];
     const playerStats = ref(stats);
 
@@ -67,7 +98,7 @@ export default defineComponent({
         oldIndex === undefined ||
         newIndex === undefined ||
         oldIndex === newIndex ||
-        battleTag.value === undefined ||
+        uuid.value === undefined ||
         !stats.value
       )
         return;
@@ -103,8 +134,8 @@ export default defineComponent({
       });
 
       store.commit(MutationTypes.UPDATE_STATS, {
-        battleTag: battleTag.value,
-        stats: { level: stats.value.level, classes },
+        uuid: uuid.value,
+        stats: { rank: stats.value.rank, classes },
       });
     };
 

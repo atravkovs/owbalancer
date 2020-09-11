@@ -1,7 +1,7 @@
 <template>
   <Modal
-    :isActive="player.identity.battleTag.length > 0"
-    :title="player.identity.battleTag"
+    :isActive="player.identity.name.length > 0"
+    :title="player.identity.name"
     @close-modal="closeModal"
     @save-changes="saveChanges"
   >
@@ -11,7 +11,7 @@
     </fieldset>
     <fieldset class="EditPlayer-Block">
       <h3>Stats</h3>
-      <EditStats :stats="player.stats" :battleTag="player.identity.battleTag" />
+      <EditStats :stats="player.stats" :uuid="player.identity.uuid" />
     </fieldset>
   </Modal>
 </template>
@@ -46,7 +46,7 @@ export default defineComponent({
 
     const saveChanges = () => {
       // By executing mutation changes are being synchronized from object to local storage
-      store.commit(MutationTypes.EDIT_PLAYER, player.value.identity.battleTag);
+      store.commit(MutationTypes.EDIT_PLAYER, player.value.identity.uuid);
     };
 
     return { player, closeModal, saveChanges };

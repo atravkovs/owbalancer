@@ -17,16 +17,16 @@
     <div class="overflow-auto h40r bg-secondary border p-1">
       <PlayerCard
         class="bg-light mb-1"
-        v-for="[battleTag, player] in state.players"
+        v-for="[uuid, player] in state.players"
         :player="player"
-        :key="battleTag"
+        :key="uuid"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from 'vue';
+import { computed, defineComponent, reactive, watch } from 'vue';
 import orderBy from 'lodash/orderBy';
 
 import { useStore } from '@/store';
@@ -42,24 +42,26 @@ export default defineComponent({
   components: { Sort, PlayerCard, Export, ImportFile, DeletePlayers },
   setup() {
     const store = useStore();
-
-    const players = Object.entries(store.state.players);
+    const storePlayers = computed(() => Object.entries(store.state.players));
     const state = reactive({
-      players,
+      storePlayers,
+      players: storePlayers.value,
     });
+
+    watch(
+      () => state.storePlayers,
+      () => {
+        state.players = storePlayers.value;
+      }
+    );
 
     const sort = (rule: string, order: 'asc' | 'desc') => {
       const sortedPlayers = orderBy(
-        state.players,
+        storePlayers.value,
         [
           ([, p]) => {
-            if (rule === 'name') return p.identity.displayName;
-            if (rule === 'sr') {
-              return Object.values(p.stats.classes).reduce((acc, value) => {
-                return !value.isActive ? acc : acc + value.rating;
-              }, 0);
-            }
-
+            if (rule === 'name') return p.identity.name;
+            if (rule === 'sr') return p.stats.rank;
             return p.createdAt;
           },
         ],
