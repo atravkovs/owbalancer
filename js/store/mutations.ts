@@ -46,7 +46,7 @@ export const mutations: MutationTree<State> & Mutations = {
     const players = Object.entries(state.players);
     const captainsCount = Math.floor(players.length / PLAYERS_IN_TEAM);
     const eligible = players.filter(([, player]) => player.stats.rank >= minSR)
-      .sort(([, player], [, player2]) => player.stats.rank - player2.stats.rank);
+      .sort(([, player], [, player2]) => player2.stats.rank - player.stats.rank);
 
     let i = 0;
     while (i < captainsCount && i < eligible.length) {
@@ -59,7 +59,7 @@ export const mutations: MutationTree<State> & Mutations = {
     const players = Object.entries(state.players);
     const squiresCount = Math.floor(players.length / PLAYERS_IN_TEAM);
     const eligible = players.filter(([, player]) => player.stats.rank <= maxSR)
-      .sort(([, player], [, player2]) => player2.stats.rank - player.stats.rank);
+      .sort(([, player], [, player2]) => player.stats.rank - player2.stats.rank);
 
     let i = 0;
     while (i < squiresCount && i < eligible.length) {
