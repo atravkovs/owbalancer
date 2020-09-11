@@ -1,23 +1,11 @@
 <template>
   <Dropdown id="sort" title="⇅ Sort">
-    <li>
-      <a href="#" class="dropdown-item" @click="$emit('sort', 'date', 'asc')">▲ Order of addition</a>
-    </li>
-    <li>
-      <a href="#" class="dropdown-item" @click="$emit('sort', 'date', 'desc')">▼ Order of addition</a>
-    </li>
-    <li>
-      <a href="#" class="dropdown-item" @click="$emit('sort', 'name', 'asc')">▲ Name</a>
-    </li>
-    <li>
-      <a href="#" class="dropdown-item" @click="$emit('sort', 'name', 'desc')">▼ Name</a>
-    </li>
-    <li>
-      <a href="#" class="dropdown-item" @click="$emit('sort', 'sr', 'asc')">▲ Rating</a>
-    </li>
-    <li>
-      <a href="#" class="dropdown-item" @click="$emit('sort', 'sr', 'desc')">▼ Rating</a>
-    </li>
+    <drop-item @drop-click="$emit('sort', 'date', 'asc')">▲ Order of addition</drop-item>
+    <drop-item @drop-click="$emit('sort', 'date', 'desc')">▼ Order of addition</drop-item>
+    <drop-item @drop-click="$emit('sort', 'name', 'asc')">▲ Name</drop-item>
+    <drop-item @drop-click="$emit('sort', 'name', 'desc')">▼ Name</drop-item>
+    <drop-item @drop-click="$emit('sort', 'sr', 'asc')">▲ Rating</drop-item>
+    <drop-item @drop-click="$emit('sort', 'sr', 'desc')">▼ Rating</drop-item>
   </Dropdown>
 </template>
 
@@ -25,9 +13,10 @@
 import { defineComponent } from 'vue';
 
 import Dropdown from '@/components/Helpers/Dropdown.vue';
+import DropItem from '@/components/Helpers/DropItem.vue';
 
 export default defineComponent({
   name: 'Sort',
-  components: { Dropdown },
+  components: { Dropdown, DropItem },
 });
 </script>

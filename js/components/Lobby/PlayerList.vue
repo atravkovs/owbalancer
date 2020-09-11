@@ -5,6 +5,9 @@
         <Sort v-on:sort="sort" />
       </div>
       <div>
+        <Assign />
+      </div>
+      <div>
         <ImportFile />
       </div>
       <div>
@@ -42,6 +45,7 @@ import orderBy from 'lodash/orderBy';
 import { useStore } from '@/store';
 
 import Sort from '@/components/Lobby/Sort.vue';
+import Assign from '@/components/Lobby/Assign.vue';
 import PlayerCard from '@/components/PlayerCard.vue';
 import Export from '@/components/Lobby/Export.vue';
 import ImportFile from '@/components/Lobby/Import.vue';
@@ -50,7 +54,7 @@ import { Player } from '@/objects/player';
 
 export default defineComponent({
   name: 'App',
-  components: { Sort, PlayerCard, Export, ImportFile, DeletePlayers },
+  components: { Assign, Sort, PlayerCard, Export, ImportFile, DeletePlayers },
   setup() {
     const store = useStore();
     const storePlayers = computed(() => Object.entries(store.state.players));
