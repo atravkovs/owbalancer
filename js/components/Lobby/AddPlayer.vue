@@ -6,13 +6,13 @@
         v-model.trim="playerTag"
         @keyup.enter="addPlayer"
         type="text"
-        class="form-control"
+        class="form-control form-control-sm"
         id="playerTag"
         placeholder="Name#1337"
       />
     </div>
     <div class="col-auto">
-      <button @click="addPlayer" class="btn btn-danger">Add Player</button>
+      <button @click="addPlayer" class="btn btn-sm btn-danger">Add Player</button>
     </div>
   </div>
 </template>
