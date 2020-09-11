@@ -12,7 +12,14 @@
         </div>
         <div>{{ player.stats.rank }}</div>
       </div>
-      <span class="lh-100">{{ player.identity.name }}</span>
+      <div class="lh-100">
+        {{ player.identity.name }}
+        &nbsp;
+        <span class="extra-icon">
+          <CrownIcon v-if="player.identity.isCaptain" />
+          <SwordIcon v-if="player.identity.isSquire" />
+        </span>
+      </div>
     </div>
     <div class="role-icons">
       <RoleIcon v-for="role in state.icons" :rtype="role" :key="role" />
@@ -29,13 +36,15 @@ import MutationTypes from '@/store/mutation-types';
 
 import RoleIcon from '@/components/svg/RoleIcon.vue';
 import RankIcon from '@/components/svg/RankIcon.vue';
+import CrownIcon from '@/components/svg/CrownIcon.vue';
+import SwordIcon from '@/components/svg/SwordIcon.vue';
 
 export default defineComponent({
   name: 'PlayerCard',
   props: {
     player: Object as PropType<Player>,
   },
-  components: { RoleIcon, RankIcon },
+  components: { RoleIcon, RankIcon, CrownIcon, SwordIcon },
   setup(props) {
     const store = useStore();
 
@@ -98,5 +107,8 @@ export default defineComponent({
 .role-icons > *:last-child {
   font-size: 1rem;
   color: var(--bs-gray-dark);
+}
+.extra-icon {
+  color: var(--bs-info);
 }
 </style>
