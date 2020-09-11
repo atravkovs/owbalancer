@@ -4,6 +4,9 @@
       <RoleIcon :rtype="rtype" />
     </span>
     <span class="input-group-text">
+      <rank-icon :rank="mRole.rank" />
+    </span>
+    <span class="input-group-text">
       <input
         v-model="mRole.isActive"
         type="checkbox"
@@ -78,6 +81,7 @@
       />
       <label class="btn btn-sm btn-secondary" for="option_projectile">Projectile</label>
     </span>
+    <input type="number" id="level" class="form-control" v-model="mRole.rank" />
   </div>
 </template>
 
@@ -85,6 +89,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import RoleIcon from '@/components/svg/RoleIcon.vue';
+import RankIcon from '@/components/svg/RankIcon.vue';
 import { ClassType } from '@/objects/player';
 
 export default defineComponent({
@@ -93,7 +98,7 @@ export default defineComponent({
     rtype: String,
     role: Object as PropType<ClassType>,
   },
-  components: { RoleIcon },
+  components: { RoleIcon, RankIcon },
   setup(props) {
     const role = computed(() => props.role);
     const mRole = ref(role);

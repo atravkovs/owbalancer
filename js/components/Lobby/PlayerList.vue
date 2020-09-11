@@ -88,7 +88,10 @@ export default defineComponent({
         [
           ([, p]) => {
             if (rule === 'name') return p.identity.name.toLowerCase();
-            if (rule === 'sr') return p.stats.rank;
+            if (rule === 'sr')
+              return Object.values(p.stats.classes)
+                .filter((role) => role.isActive)
+                .sort((a, b) => a.priority - b.priority)[0].rank;
             return p.createdAt;
           },
         ],
@@ -108,7 +111,9 @@ export default defineComponent({
       sort(state.activeSort.rule, state.activeSort.order, filtered);
     };
 
-    onMounted(() => sort(state.activeSort.rule, state.activeSort.order));
+    onMounted(() => {
+      sort(state.activeSort.rule, state.activeSort.order);
+    });
 
     return { state, sort, filter };
   },

@@ -5,6 +5,12 @@ import MutationTypes from './mutation-types';
 import { State } from './state';
 import { Player, Stats, Players } from '../objects/player';
 
+function getPriorityRank(player: Player): number {
+  return Object.values(player.stats.classes)
+    .filter((role) => role.isActive)
+    .sort((a, b) => a.priority - b.priority)[0].rank;
+}
+
 export type Mutations<S = State> = {
   [MutationTypes.DELETE_PLAYERS](state: S): void;
   [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
@@ -45,8 +51,8 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.ASSIGN_CAPTAINS](state, minSR) {
     const players = Object.entries(state.players);
     const captainsCount = Math.floor(players.length / PLAYERS_IN_TEAM);
-    const eligible = players.filter(([, player]) => player.stats.rank >= minSR)
-      .sort(([, player], [, player2]) => player2.stats.rank - player.stats.rank);
+    const eligible = players.filter(([, player]) => getPriorityRank(player) >= minSR)
+      .sort(([, player], [, player2]) => getPriorityRank(player2) - getPriorityRank(player));
 
     let i = 0;
     while (i < captainsCount && i < eligible.length) {
@@ -58,8 +64,8 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.ASSIGN_SQUIRES](state, maxSR) {
     const players = Object.entries(state.players);
     const squiresCount = Math.floor(players.length / PLAYERS_IN_TEAM);
-    const eligible = players.filter(([, player]) => player.stats.rank <= maxSR)
-      .sort(([, player], [, player2]) => player.stats.rank - player2.stats.rank);
+    const eligible = players.filter(([, player]) => getPriorityRank(player) <= maxSR)
+      .sort(([, player], [, player2]) => getPriorityRank(player) - getPriorityRank(player2));
 
     let i = 0;
     while (i < squiresCount && i < eligible.length) {

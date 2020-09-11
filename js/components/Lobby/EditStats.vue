@@ -1,17 +1,4 @@
 <template>
-  <div class="row mb-3">
-    <div class="col-sm-3">
-      <label for="label" class="col-form-label">Rank</label>
-    </div>
-    <div class="col-auto">
-      <div class="input-group">
-        <span class="input-group-text">
-          <rank-icon :rank="playerStats.rank" />
-        </span>
-        <input type="number" id="level" class="form-control" v-model="playerStats.rank" />
-      </div>
-    </div>
-  </div>
   <Sortable v-on:update-position="updatePosition" handle=".sortable-handler">
     <EditRole
       v-for="role in roles"
@@ -38,7 +25,6 @@ import {
 
 import Sortable from '@/components/Helpers/Sortable.vue';
 import EditRole from '@/components/Lobby/EditRole.vue';
-import RankIcon from '@/components/svg/RankIcon.vue';
 
 export default defineComponent({
   name: 'EditStats',
@@ -46,7 +32,7 @@ export default defineComponent({
     uuid: String,
     stats: Object as PropType<Stats>,
   },
-  components: { Sortable, EditRole, RankIcon },
+  components: { Sortable, EditRole },
   setup(props) {
     const store = useStore();
     const stats = computed(() => props.stats);

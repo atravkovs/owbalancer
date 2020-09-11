@@ -57,13 +57,17 @@ export default defineComponent({
       for (let i = 0; i < playerCount; i += 1) {
         const roleSelect = ['dps', 'support', 'tank'];
         const player = PlayerEditor.createDefaultPlayer(`Player ${i + 1}`);
-        player.stats.rank = getRandomInt(MIN_SR, MAX_SR);
 
         const firstRole = getRandomInt(0, 3);
         // eslint-disable-next-line
         player.stats.classes[roleSelect[firstRole]].isActive = true;
         // eslint-disable-next-line
         player.stats.classes[roleSelect[firstRole]].priority = 0;
+        // eslint-disable-next-line
+        player.stats.classes[roleSelect[firstRole]].rank = getRandomInt(
+          MIN_SR,
+          MAX_SR
+        );
         roleSelect.splice(firstRole, 1);
 
         // Second role if needed
@@ -73,6 +77,11 @@ export default defineComponent({
           player.stats.classes[roleSelect[secondRole]].isActive = true;
           // eslint-disable-next-line
           player.stats.classes[roleSelect[secondRole]].priority = 1;
+          // eslint-disable-next-line
+          player.stats.classes[roleSelect[secondRole]].rank = getRandomInt(
+            MIN_SR,
+            MAX_SR
+          );
 
           roleSelect.splice(secondRole, 1);
           if (flipCoin()) {
@@ -80,6 +89,11 @@ export default defineComponent({
             player.stats.classes[roleSelect[0]].isActive = true;
             // eslint-disable-next-line
             player.stats.classes[roleSelect[0]].priority = 2;
+            // eslint-disable-next-line
+            player.stats.classes[roleSelect[0]].rank = getRandomInt(
+              MIN_SR,
+              MAX_SR
+            );
 
             roleSelect.splice(0, 1);
           }

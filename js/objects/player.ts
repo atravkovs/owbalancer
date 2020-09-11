@@ -8,6 +8,7 @@ export type Identity = {
 };
 
 export type ClassType = {
+  rank: number;
   priority: number;
   isActive: boolean;
   primary: boolean;
@@ -23,7 +24,6 @@ export type Classes = {
 };
 
 export type Stats = {
-  rank: number;
   classes: Classes;
 };
 
@@ -48,9 +48,9 @@ const createDefaultPlayer: (name: string) => Player = name => {
       isSquire: false,
     },
     stats: {
-      rank: 0,
       classes: {
         dps: {
+          rank: 0,
           playHours: 0,
           priority: 0,
           primary: false,
@@ -58,6 +58,7 @@ const createDefaultPlayer: (name: string) => Player = name => {
           secondary: false,
         },
         tank: {
+          rank: 0,
           playHours: 0,
           priority: 1,
           primary: false,
@@ -65,6 +66,7 @@ const createDefaultPlayer: (name: string) => Player = name => {
           secondary: false,
         },
         support: {
+          rank: 0,
           playHours: 0,
           priority: 2,
           primary: false,

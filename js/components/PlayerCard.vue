@@ -8,9 +8,9 @@
     <div class="d-flex">
       <div class="w-40p text-center font-smaller">
         <div>
-          <rank-icon :rank="player.stats.rank" />
+          <rank-icon :rank="sr" />
         </div>
-        <div>{{ player.stats.rank }}</div>
+        <div>{{ sr }}</div>
       </div>
       <div class="lh-100">
         {{ player.identity.name }}
@@ -78,7 +78,15 @@ export default defineComponent({
       icons,
     });
 
+    const sr = computed(
+      () =>
+        Object.values(props.player?.stats.classes || {})
+          .filter((role) => role.isActive)
+          .sort((a, b) => a.priority - b.priority)[0].rank
+    );
+
     return {
+      sr,
       drag,
       state,
       editPlayer,
