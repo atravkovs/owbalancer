@@ -60,7 +60,7 @@ export default defineComponent({
         storePlayers.value,
         [
           ([, p]) => {
-            if (rule === 'name') return p.identity.name;
+            if (rule === 'name') return p.identity.name.toLowerCase();
             if (rule === 'sr') return p.stats.rank;
             return p.createdAt;
           },

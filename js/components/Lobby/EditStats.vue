@@ -6,33 +6,7 @@
     <div class="col-auto">
       <div class="input-group">
         <span class="input-group-text">
-          <img v-if="playerStats.rank < 1500" class="s-2em" src="@/assets/rank_icons/Bronze.png" />
-          <img
-            v-else-if="playerStats.rank < 2000"
-            class="s-2em"
-            src="@/assets/rank_icons/Silver.png"
-          />
-          <img v-else-if="playerStats.rank < 2500" class="s-2em" src="@/assets/rank_icons/Gold.png" />
-          <img
-            v-else-if="playerStats.rank < 3000"
-            class="s-2em"
-            src="@/assets/rank_icons/Platinum.png"
-          />
-          <img
-            v-else-if="playerStats.rank < 3500"
-            class="s-2em"
-            src="@/assets/rank_icons/Diamond.png"
-          />
-          <img
-            v-else-if="playerStats.rank < 4000"
-            class="s-2em"
-            src="@/assets/rank_icons/Master.png"
-          />
-          <img
-            v-else-if="playerStats.rank < 5000"
-            class="s-2em"
-            src="@/assets/rank_icons/Grandmaster.png"
-          />
+          <rank-icon :rank="playerStats.rank" />
         </span>
         <input type="number" id="level" class="form-control" v-model="playerStats.rank" />
       </div>
@@ -52,6 +26,9 @@
 import { defineComponent, ref, PropType, computed } from 'vue';
 import { SortableEvent } from 'sortablejs';
 
+import { useStore } from '@/store';
+import MutationTypes from '@/store/mutation-types';
+
 import {
   Classes,
   ClassType,
@@ -61,8 +38,7 @@ import {
 
 import Sortable from '@/components/Helpers/Sortable.vue';
 import EditRole from '@/components/Lobby/EditRole.vue';
-import { useStore } from '@/store';
-import MutationTypes from '@/store/mutation-types';
+import RankIcon from '@/components/svg/RankIcon.vue';
 
 export default defineComponent({
   name: 'EditStats',
@@ -70,7 +46,7 @@ export default defineComponent({
     uuid: String,
     stats: Object as PropType<Stats>,
   },
-  components: { Sortable, EditRole },
+  components: { Sortable, EditRole, RankIcon },
   setup(props) {
     const store = useStore();
     const stats = computed(() => props.stats);

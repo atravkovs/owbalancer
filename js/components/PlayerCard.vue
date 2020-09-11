@@ -1,19 +1,41 @@
 <template>
-  <div draggable="true" @contextmenu="editPlayer" @dragstart="drag">{{ player.identity.name }}</div>
+  <div
+    class="d-flex justify-content-between"
+    draggable="true"
+    @contextmenu="editPlayer"
+    @dragstart="drag"
+  >
+    <div class="d-flex">
+      <div class="w-40p text-center font-smaller">
+        <div>
+          <rank-icon :rank="player.stats.rank" />
+        </div>
+        <div>{{ player.stats.rank }}</div>
+      </div>
+      <span class="lh-100">{{ player.identity.name }}</span>
+    </div>
+    <div class="role-icons">
+      <RoleIcon v-for="role in state.icons" :rtype="role" :key="role" />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, reactive, computed } from 'vue';
 
 import { useStore } from '@/store';
 import { Player } from '@/objects/player';
 import MutationTypes from '@/store/mutation-types';
+
+import RoleIcon from '@/components/svg/RoleIcon.vue';
+import RankIcon from '@/components/svg/RankIcon.vue';
 
 export default defineComponent({
   name: 'PlayerCard',
   props: {
     player: Object as PropType<Player>,
   },
+  components: { RoleIcon, RankIcon },
   setup(props) {
     const store = useStore();
 
@@ -36,10 +58,45 @@ export default defineComponent({
       store.commit(MutationTypes.EDIT_PLAYER, props.player.identity.uuid);
     };
 
+    const icons = computed(() =>
+      Object.entries(props.player?.stats.classes || {})
+        .filter(([, role]) => role.isActive)
+        .sort(([, role], [, role2]) => role2.priority - role.priority)
+        .reduce((acc: string[], [name]) => [...acc, name], [])
+    );
+
+    const state = reactive({
+      icons,
+    });
+
     return {
       drag,
+      state,
       editPlayer,
     };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.lh-100 {
+  line-height: 50px;
+}
+.w-40p {
+  width: 40px;
+}
+.font-smaller {
+  font-size: 0.9rem;
+}
+.role-icons {
+  line-height: 1;
+}
+.role-icons > * {
+  font-size: 0.8rem;
+  color: var(--bs-gray);
+}
+.role-icons > *:last-child {
+  font-size: 1rem;
+  color: var(--bs-gray-dark);
+}
+</style>

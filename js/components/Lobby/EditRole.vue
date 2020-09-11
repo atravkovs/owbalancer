@@ -1,9 +1,7 @@
 <template>
   <div class="input-group">
     <span class="input-group-text cursor-pointer sortable-handler">
-      <TankIcon v-if="rtype === 'tank'" />
-      <DamageIcon v-if="rtype === 'dps'" />
-      <SupportIcon v-if="rtype === 'support'" />
+      <RoleIcon :rtype="rtype" />
     </span>
     <span class="input-group-text">
       <input
@@ -86,9 +84,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import TankIcon from '@/components/svg/TankIcon.vue';
-import SupportIcon from '@/components/svg/SupportIcon.vue';
-import DamageIcon from '@/components/svg/DamageIcon.vue';
+import RoleIcon from '@/components/svg/RoleIcon.vue';
 import { ClassType } from '@/objects/player';
 
 export default defineComponent({
@@ -97,7 +93,7 @@ export default defineComponent({
     rtype: String,
     role: Object as PropType<ClassType>,
   },
-  components: { TankIcon, SupportIcon, DamageIcon },
+  components: { RoleIcon },
   setup(props) {
     const role = computed(() => props.role);
     const mRole = ref(role);
