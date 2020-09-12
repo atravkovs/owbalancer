@@ -20,7 +20,7 @@ export default defineComponent({
     const balance = () => {
       wasm
         .then((lib) => {
-          const text = lib.greet(store.state.players);
+          const text = lib.balance(store.state.players);
           console.log('Received: ', text);
         })
         .catch(console.error);
