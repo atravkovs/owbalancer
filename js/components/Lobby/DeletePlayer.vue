@@ -1,5 +1,9 @@
 <template>
-  <div @dragover="allowDrop" @drop="drop" class="border border-danger w-100">Delete Player</div>
+  <div
+    @dragover="allowDrop"
+    @drop="drop"
+    class="border border-danger w-100 delete-player"
+  >==== Delete Player ====</div>
 </template>
 
 <script lang="ts">
@@ -35,5 +39,13 @@ export default defineComponent({
 div {
   height: 5rem;
   max-width: 25rem;
+}
+
+.delete-player {
+  font-weight: bold;
+  line-height: 5rem;
+  text-align: center;
+  text-transform: uppercase;
+  border-style: dashed !important;
 }
 </style>
