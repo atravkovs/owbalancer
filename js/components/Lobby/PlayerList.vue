@@ -59,7 +59,13 @@ export default defineComponent({
   components: { Assign, Sort, PlayerCard, Export, ImportFile, DeletePlayers },
   setup() {
     const store = useStore();
-    const storePlayers = computed(() => Object.entries(store.state.players));
+    const storePlayers = computed(() =>
+      Object.entries(store.state.players).filter(([, p]) =>
+        store.state.reservedPlayers.length > 0
+          ? store.state.reservedPlayers.includes(p.identity.uuid)
+          : true
+      )
+    );
     const activeSort: { rule: string; order: 'asc' | 'desc' } = {
       rule: 'name',
       order: 'asc',

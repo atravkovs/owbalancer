@@ -9,6 +9,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useStore } from '@/store';
+import MutationTypes from '@/store/mutation-types';
 
 const wasm = import('@/../pkg/index.js');
 
@@ -20,8 +21,15 @@ export default defineComponent({
     const balance = () => {
       wasm
         .then((lib) => {
-          const text = lib.balance(store.state.players, 1000);
-          console.log('Received: ', text);
+          const { leftovers, teams } = lib.balance(store.state.players, 1000);
+          const ignoredUuids = leftovers.reduce((acc, leftover) => {
+            acc.push(leftover.uuid);
+            return acc;
+          }, []);
+
+          store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
+
+          console.log('Received: ', leftovers, teams);
         })
         .catch(console.error);
     };

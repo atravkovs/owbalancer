@@ -18,6 +18,7 @@ export type Mutations<S = State> = {
   [MutationTypes.CLEAR_CAPTAINS](state: S): void;
   [MutationTypes.CLEAR_SQUIRES](state: S): void;
   [MutationTypes.CLEAR_ALL_EXTRA](state: S): void;
+  [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
@@ -83,5 +84,8 @@ export const mutations: MutationTree<State> & Mutations = {
       state.players[uuid].identity.isCaptain = false;
       state.players[uuid].identity.isSquire = false;
     });
+  },
+  [MutationTypes.RESERVE_PLAYERS](state, players) {
+    state.reservedPlayers = players;
   }
 };

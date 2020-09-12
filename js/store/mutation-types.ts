@@ -11,6 +11,7 @@ enum MutationTypes {
   CLEAR_CAPTAINS = 'CLEAR_CAPTAINS',
   CLEAR_SQUIRES = 'CLEAR_SQUIRES',
   CLEAR_ALL_EXTRA = 'CLEAR_ALL_EXTRA',
+  RESERVE_PLAYERS = 'RESERVE_PLAYERS',
 }
 
 export default MutationTypes;
