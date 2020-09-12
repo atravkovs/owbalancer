@@ -1,7 +1,8 @@
+use rand::rngs::OsRng;
+use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -83,6 +84,21 @@ pub struct Team {
     pub players: Vec<Member>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct BalancerResult {
+    pub teams: Vec<Team>,
+    pub leftovers: Vec<PlayerPool>,
+}
+
+impl BalancerResult {
+    fn new(from: (Vec<Team>, Vec<PlayerPool>)) -> BalancerResult {
+        BalancerResult {
+            teams: from.0,
+            leftovers: from.1,
+        }
+    }
+}
+
 impl Team {
     fn new(name: String, player: Member) -> Team {
         let mut players = Vec::default();
@@ -93,6 +109,30 @@ impl Team {
             players,
             avg_sr: 0.0,
             total_sr: 0,
+        }
+    }
+
+    fn fits_role(&self, role: &Role) -> bool {
+        let dps_count = self
+            .players
+            .iter()
+            .filter(|&member| member.role == SimpleRole::Dps)
+            .count();
+        let support_count = self
+            .players
+            .iter()
+            .filter(|&member| member.role == SimpleRole::Support)
+            .count();
+        let tank_count = self
+            .players
+            .iter()
+            .filter(|&member| member.role == SimpleRole::Tank)
+            .count();
+
+        match role {
+            Role::Dps(_) => (dps_count + 1) <= 2,
+            Role::Support(_) => (support_count + 1) <= 2,
+            Role::Tank(_) => (tank_count + 1) <= 2,
         }
     }
 }
@@ -111,7 +151,7 @@ impl Member {
 
     fn from_primary_player(player: &PlayerPool) -> Member {
         let uuid = player.uuid.clone();
-        let name = player.uuid.clone();
+        let name = player.name.clone();
         let role = player.roles.get(0).unwrap().clone();
 
         return Member::new(uuid, name, role);
@@ -341,7 +381,7 @@ pub fn distribute_squires(teams: &mut Vec<Team>, squires: Vec<PlayerPool>) {
     squires.drain(0..i);
 }
 
-pub fn distribue_leutenant(player: &PlayerPool, teams: &mut Vec<Team>) {
+pub fn distribute_leutenant(player: &PlayerPool, teams: &mut Vec<Team>) -> bool {
     let perfect_match = teams.iter().position(|team| {
         team.players.len() <= 2 && !team.players.get(0).unwrap().has_same_role(player)
     });
@@ -352,7 +392,7 @@ pub fn distribue_leutenant(player: &PlayerPool, teams: &mut Vec<Team>) {
             .unwrap()
             .players
             .push(Member::from_primary_player(player));
-        return;
+        return true;
     }
 
     for team in teams {
@@ -360,12 +400,18 @@ pub fn distribue_leutenant(player: &PlayerPool, teams: &mut Vec<Team>) {
             continue;
         }
 
-        team.players.push(Member::from_primary_player(player));
-        return;
+        if team.fits_role(player.roles.get(0).unwrap()) {
+            team.players.push(Member::from_primary_player(player));
+            return true;
+        }
     }
+
+    false
 }
 
-pub fn distribute_ensign(player: &PlayerPool, teams: &mut Vec<Team>) {
+pub fn distribute_ensign(player: &PlayerPool, teams: &mut Vec<Team>) -> bool {
+    let target_role = player.roles.get(0).unwrap();
+
     let perfect_match = teams.iter().position(|team| {
         let cap = team.players.get(0).unwrap();
         let leut = team.players.get(2).unwrap();
@@ -379,13 +425,13 @@ pub fn distribute_ensign(player: &PlayerPool, teams: &mut Vec<Team>) {
             .unwrap()
             .players
             .push(Member::from_primary_player(player));
-        return;
+        return true;
     }
 
     let perfect_match = teams.iter().position(|team| {
         let cap = team.players.get(0).unwrap();
 
-        !cap.has_same_role(player) && team.players.len() <= 3
+        !cap.has_same_role(player) && team.fits_role(target_role) && team.players.len() <= 3
     });
 
     if let Some(index) = perfect_match {
@@ -394,47 +440,61 @@ pub fn distribute_ensign(player: &PlayerPool, teams: &mut Vec<Team>) {
             .unwrap()
             .players
             .push(Member::from_primary_player(player));
-        return;
+        return true;
     }
 
-    let perfect_match = teams.iter().position(|team| team.players.len() <= 3);
+    let perfect_match = teams
+        .iter()
+        .position(|team| team.players.len() <= 3 && team.fits_role(target_role));
     if let Some(index) = perfect_match {
         teams
             .get_mut(index)
             .unwrap()
             .players
             .push(Member::from_primary_player(player));
-        return;
+        return true;
     }
+
+    false
 }
 
 pub fn distribute_leutenatns(teams: &mut Vec<Team>, pool: &mut Vec<PlayerPool>) {
-    for i in 0..teams.len() {
-        if i >= pool.len() {
+    let mut i = 0;
+    let mut count = 0;
+    while count < teams.len() {
+        if pool.len() <= 0 {
             return;
         }
 
         let player = pool.get(i).unwrap();
-        distribue_leutenant(player, teams);
+        if distribute_leutenant(player, teams) {
+            pool.remove(i);
+            count += 1;
+        } else {
+            i += 1;
+        }
     }
-
-    pool.drain(0..teams.len());
 }
 
 pub fn distribute_ensigns(teams: &mut Vec<Team>, pool: &mut Vec<PlayerPool>) {
-    for i in 0..teams.len() {
-        if i >= pool.len() {
+    let mut i = 0;
+    let mut count = 0;
+    while count < teams.len() {
+        if pool.len() <= 0 {
             return;
         }
 
         let player = pool.get(i).unwrap();
-        distribute_ensign(player, teams);
+        if distribute_ensign(player, teams) {
+            pool.remove(i);
+            count += 1;
+        } else {
+            i += 1;
+        }
     }
-
-    pool.drain(0..teams.len());
 }
 
-pub fn calculate_average(teams: &mut Vec<Team>) {
+pub fn calculate_every_team_average(teams: &mut Vec<Team>) {
     for team in teams {
         let mut total_sr: i32 = 0;
         for player in &team.players {
@@ -452,7 +512,127 @@ pub fn sort_by_average(teams: &mut Vec<Team>) {
     teams.sort_by(|a, b| a.avg_sr.partial_cmp(&b.avg_sr).unwrap());
 }
 
-pub fn balance_players(players: &HashMap<String, Player>) -> Vec<Team> {
+// (average, total_sr, total_count)
+pub fn get_total_average(teams: &mut Vec<Team>) -> (f32, i32, usize) {
+    calculate_every_team_average(teams);
+    let mut total_sr = 0;
+    let mut total_count = 0;
+
+    for team in teams {
+        total_sr += team.total_sr;
+        total_count += team.players.len();
+    }
+
+    let average = total_sr as f32 / total_count as f32;
+
+    return (average, total_sr, total_count);
+}
+
+// (role_index, total_sr, total_players, tolerance)
+// Option<playerSr>
+pub fn fit_player(
+    teams: &mut Vec<Team>,
+    player: &PlayerPool,
+    data: (bool, i32, usize, u32),
+) -> Option<i32> {
+    let (sec_roles, total_sr, total_players, tolerance) = data;
+    let parse_roles_count = if !sec_roles { 1 } else { player.roles.len() };
+
+    for role_index in 0..parse_roles_count {
+        let target_role = player.roles.get(role_index);
+
+        if target_role.is_none() {
+            return None;
+        }
+
+        let target_role = target_role.unwrap();
+        let player_sr = target_role.decompose().1;
+        let new_average = (total_sr + player_sr) as f32 / (total_players + 1) as f32;
+
+        let perfect_match = teams.iter().position(|team| {
+            let team_size = team.players.len();
+            let new_sr = (team.total_sr + player_sr) as f32 / (team_size + 1) as f32;
+
+            (team_size + 1) <= 6
+                && team.fits_role(target_role)
+                && ((new_sr - new_average).abs().floor() as u32) <= tolerance
+        });
+
+        if let Some(index) = perfect_match {
+            let team = teams.get_mut(index).unwrap();
+
+            team.total_sr += player_sr;
+            team.avg_sr = team.total_sr as f32 / (team.players.len() + 1) as f32;
+            team.players.push(Member::new(
+                player.uuid.clone(),
+                player.name.clone(),
+                target_role.clone(),
+            ));
+
+            return Some(player_sr);
+        }
+    }
+
+    None
+}
+
+pub fn sort_remaining(
+    teams: &mut Vec<Team>,
+    pool: &mut Vec<PlayerPool>,
+    tolerance: u32,
+    total_sr: i32,
+    total_count: usize,
+    delta: u32,
+    sec_roles: bool,
+) -> Vec<PlayerPool> {
+    let mut leftovers: Vec<PlayerPool> = Vec::default();
+    let mut total_sr = total_sr;
+    let mut total_count = total_count;
+    let mut sec_roles = sec_roles;
+    let mut added_players = 0;
+
+    pool.shuffle(&mut OsRng::default());
+
+    for player in pool {
+        if let Some(sr) = fit_player(teams, player, (sec_roles, total_sr, total_count, tolerance)) {
+            total_sr += sr;
+            total_count += 1;
+            added_players += 1;
+        } else {
+            leftovers.push(player.clone());
+        }
+    }
+
+    if added_players == 0 && delta == 0 && !sec_roles && leftovers.len() > 0 {
+        sec_roles = true;
+        return sort_remaining(
+            teams,
+            &mut leftovers,
+            tolerance,
+            total_sr,
+            total_count,
+            delta,
+            sec_roles,
+        );
+    } else if leftovers.len() > 0 && (added_players > 0 || !sec_roles) {
+        return sort_remaining(
+            teams,
+            &mut leftovers,
+            tolerance,
+            total_sr,
+            total_count,
+            added_players,
+            sec_roles,
+        );
+    }
+
+    return leftovers;
+}
+
+pub fn balance_players(
+    players: &HashMap<String, Player>,
+    tolerance: u32,
+) -> (Vec<Team>, Vec<PlayerPool>) {
     let captains = get_captains(players);
     let mut preserve = preserve_uuids(&captains);
     let mut teams: Vec<Team> = init_teams(captains);
@@ -466,11 +646,24 @@ pub fn balance_players(players: &HashMap<String, Player>) -> Vec<Team> {
     teams.reverse();
     distribute_leutenatns(&mut teams, &mut pool);
 
-    calculate_average(&mut teams);
+    calculate_every_team_average(&mut teams);
     sort_by_average(&mut teams);
     distribute_ensigns(&mut teams, &mut pool);
 
-    teams
+    let (_, total_sr, total_count) = get_total_average(&mut teams);
+    let delta = 1;
+    let sec_roles = false;
+    let leftovers = sort_remaining(
+        &mut teams,
+        &mut pool,
+        tolerance,
+        total_sr,
+        total_count,
+        delta,
+        sec_roles,
+    );
+
+    (teams, leftovers)
 }
 
 #[wasm_bindgen(start)]
@@ -482,9 +675,11 @@ pub fn main_js() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn balance(player_data: &JsValue) -> JsValue {
+pub fn balance(player_data: &JsValue, tolerance: u32) -> JsValue {
     let players: HashMap<String, Player> = player_data.into_serde().unwrap();
-    let teams = balance_players(&players);
+    let output = balance_players(&players, tolerance);
 
-    JsValue::from_serde(&teams).unwrap()
+    let result = BalancerResult::new(output);
+
+    JsValue::from_serde(&result).unwrap()
 }

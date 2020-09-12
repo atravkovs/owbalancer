@@ -16,6 +16,7 @@ lto = true
 [features]
 
 [dependencies]
+rand = { version = "0.7", features = ["wasm-bindgen"] }
 serde = { version = "1.0", features = ["derive"] }
 wasm-bindgen = { version = "0.2.45", features = ["serde-serialize"] }
 wee_alloc = { version = "0.4.2", optional = true }
