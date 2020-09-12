@@ -77,7 +77,9 @@ pub struct Member {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Team {
+    pub avg_sr: f32,
     pub name: String,
+    pub total_sr: i32,
     pub players: Vec<Member>,
 }
 
@@ -86,7 +88,12 @@ impl Team {
         let mut players = Vec::default();
         players.push(player);
 
-        Team { name, players }
+        Team {
+            name,
+            players,
+            avg_sr: 0.0,
+            total_sr: 0,
+        }
     }
 }
 
@@ -322,13 +329,16 @@ pub fn distribute_squires(teams: &mut Vec<Team>, squires: Vec<PlayerPool>) {
     distribute_squires_to_dps(teams, &mut squires);
 
     // Distribute other players
+    let mut i = 0;
     for team in teams {
         if team.players.len() < 2 {
             team.players
-                .push(Member::from_primary_player(squires.get(0).unwrap()));
-            squires.remove(0);
+                .push(Member::from_primary_player(squires.get(i).unwrap()));
+            i += 1;
         }
     }
+
+    squires.drain(0..i);
 }
 
 pub fn distribue_leutenant(player: &PlayerPool, teams: &mut Vec<Team>) {
@@ -355,6 +365,49 @@ pub fn distribue_leutenant(player: &PlayerPool, teams: &mut Vec<Team>) {
     }
 }
 
+pub fn distribute_ensign(player: &PlayerPool, teams: &mut Vec<Team>) {
+    let perfect_match = teams.iter().position(|team| {
+        let cap = team.players.get(0).unwrap();
+        let leut = team.players.get(2).unwrap();
+
+        !cap.has_same_role(player) && !leut.has_same_role(player) && team.players.len() <= 3
+    });
+
+    if let Some(index) = perfect_match {
+        teams
+            .get_mut(index)
+            .unwrap()
+            .players
+            .push(Member::from_primary_player(player));
+        return;
+    }
+
+    let perfect_match = teams.iter().position(|team| {
+        let cap = team.players.get(0).unwrap();
+
+        !cap.has_same_role(player) && team.players.len() <= 3
+    });
+
+    if let Some(index) = perfect_match {
+        teams
+            .get_mut(index)
+            .unwrap()
+            .players
+            .push(Member::from_primary_player(player));
+        return;
+    }
+
+    let perfect_match = teams.iter().position(|team| team.players.len() <= 3);
+    if let Some(index) = perfect_match {
+        teams
+            .get_mut(index)
+            .unwrap()
+            .players
+            .push(Member::from_primary_player(player));
+        return;
+    }
+}
+
 pub fn distribute_leutenatns(teams: &mut Vec<Team>, pool: &mut Vec<PlayerPool>) {
     for i in 0..teams.len() {
         if i >= pool.len() {
@@ -364,6 +417,39 @@ pub fn distribute_leutenatns(teams: &mut Vec<Team>, pool: &mut Vec<PlayerPool>) 
         let player = pool.get(i).unwrap();
         distribue_leutenant(player, teams);
     }
+
+    pool.drain(0..teams.len());
+}
+
+pub fn distribute_ensigns(teams: &mut Vec<Team>, pool: &mut Vec<PlayerPool>) {
+    for i in 0..teams.len() {
+        if i >= pool.len() {
+            return;
+        }
+
+        let player = pool.get(i).unwrap();
+        distribute_ensign(player, teams);
+    }
+
+    pool.drain(0..teams.len());
+}
+
+pub fn calculate_average(teams: &mut Vec<Team>) {
+    for team in teams {
+        let mut total_sr: i32 = 0;
+        for player in &team.players {
+            total_sr += player.rank;
+        }
+
+        let avg_sr = total_sr as f32 / team.players.len() as f32;
+
+        team.avg_sr = avg_sr;
+        team.total_sr = total_sr;
+    }
+}
+
+pub fn sort_by_average(teams: &mut Vec<Team>) {
+    teams.sort_by(|a, b| a.avg_sr.partial_cmp(&b.avg_sr).unwrap());
 }
 
 pub fn balance_players(players: &HashMap<String, Player>) -> Vec<Team> {
@@ -379,6 +465,10 @@ pub fn balance_players(players: &HashMap<String, Player>) -> Vec<Team> {
     // From low to high sr captain
     teams.reverse();
     distribute_leutenatns(&mut teams, &mut pool);
+
+    calculate_average(&mut teams);
+    sort_by_average(&mut teams);
+    distribute_ensigns(&mut teams, &mut pool);
 
     teams
 }
