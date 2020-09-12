@@ -3,6 +3,7 @@ use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -55,6 +56,7 @@ pub enum Role {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "lowercase")]
 pub enum SimpleRole {
     Tank,
     Dps,
@@ -77,6 +79,7 @@ pub struct Member {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Team {
     pub avg_sr: f32,
     pub name: String,
@@ -236,7 +239,7 @@ pub fn get_roles(player: &Player) -> Vec<Role> {
     if classes.tank.is_active {
         temp_roles.push(RolePriority::new(
             Role::Tank(classes.tank.rank),
-            classes.support.priority,
+            classes.tank.priority,
         ));
     }
 
@@ -327,6 +330,8 @@ pub fn init_teams(captains: Vec<PlayerPool>) -> Vec<Team> {
             Member::from_primary_player(&cap),
         ));
     }
+
+    console::log_1(&JsValue::from_serde(&teams).unwrap());
 
     teams
 }
@@ -635,6 +640,10 @@ pub fn balance_players(
 ) -> (Vec<Team>, Vec<PlayerPool>) {
     let captains = get_captains(players);
     let mut preserve = preserve_uuids(&captains);
+    console::log_2(
+        &JsValue::from_str("Initial captains: "),
+        &JsValue::from_serde(&captains).unwrap(),
+    );
     let mut teams: Vec<Team> = init_teams(captains);
 
     let squires = get_squires(players, teams.len());

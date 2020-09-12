@@ -1,12 +1,15 @@
-export type TeamPlayer = {
-    id: string;
+export type TeamMembers = {
+    rank: number;
+    uuid: string;
+    name: string;
     role: 'dps' | 'support' | 'tank';
 };
 
 export type Team = {
     name: string;
-    averageSR: number;
-    players: TeamPlayer[];
+    avgSr: number;
+    totalSr: number;
+    players: TeamMembers[];
 };
 
 export type Teams = Team[];
@@ -14,7 +17,8 @@ export type Teams = Team[];
 const createEmptyTeam: (name: string) => Team = () => {
     return {
         name,
-        averageSR: 0,
+        avgSr: 0,
+        totalSr: 0,
         players: [],
     };
 };

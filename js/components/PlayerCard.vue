@@ -1,6 +1,6 @@
 <template>
   <div
-    class="d-flex justify-content-between"
+    class="d-flex justify-content-between w-100"
     draggable="true"
     @contextmenu="editPlayer"
     @dragstart="drag"
@@ -43,6 +43,8 @@ export default defineComponent({
   name: 'PlayerCard',
   props: {
     player: Object as PropType<Player>,
+    prefferedRole: String,
+    prefferedRank: Number,
   },
   components: { RoleIcon, RankIcon, CrownIcon, SwordIcon },
   setup(props) {
@@ -67,19 +69,29 @@ export default defineComponent({
       store.commit(MutationTypes.EDIT_PLAYER, props.player.identity.uuid);
     };
 
-    const icons = computed(() =>
-      Object.entries(props.player?.stats.classes || {})
-        .filter(([, role]) => role.isActive)
+    const icons = computed(() => {
+      const classes = Object.entries(props.player?.stats.classes || {});
+
+      const def = props.prefferedRole ? [props.prefferedRole] : [];
+
+      return classes
+        .filter(
+          ([rname, role]) =>
+            role.isActive &&
+            (props.prefferedRole ? rname !== props.prefferedRole : true)
+        )
         .sort(([, role], [, role2]) => role2.priority - role.priority)
-        .reduce((acc: string[], [name]) => [...acc, name], [])
-    );
+        .reduce((acc: string[], [name]) => {
+          return props.prefferedRole ? [name, ...acc] : [...acc, name];
+        }, def);
+    });
 
     const state = reactive({
       icons,
     });
 
     const sr = computed(() =>
-      !props.player ? 0 : PObj.getTopRank(props.player)
+      !props.player ? 0 : props.prefferedRank || PObj.getTopRank(props.player)
     );
 
     return {
