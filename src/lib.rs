@@ -8,20 +8,22 @@ use web_sys::console;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Identity {
     pub uuid: String,
     pub name: String,
-    pub isSquire: bool,
-    pub isCaptain: bool,
+    pub is_squire: bool,
+    pub is_captain: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ClassType {
     pub rank: i32,
     pub priority: i16,
-    pub isActive: bool,
     pub primary: bool,
     pub secondary: bool,
+    pub is_active: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,10 +39,11 @@ pub struct Stats {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Player {
     pub identity: Identity,
     pub stats: Stats,
-    pub createdAt: String,
+    pub created_at: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -93,21 +96,21 @@ pub fn get_roles(player: &Player) -> Vec<Role> {
     let classes = &player.stats.classes;
     let mut temp_roles: Vec<RolePriority> = Vec::new();
 
-    if classes.dps.isActive {
+    if classes.dps.is_active {
         temp_roles.push(RolePriority::new(
             Role::Dps(classes.dps.rank),
             classes.dps.priority,
         ));
     }
 
-    if classes.support.isActive {
+    if classes.support.is_active {
         temp_roles.push(RolePriority::new(
             Role::Support(classes.support.rank),
             classes.support.priority,
         ));
     }
 
-    if classes.tank.isActive {
+    if classes.tank.is_active {
         temp_roles.push(RolePriority::new(
             Role::Tank(classes.tank.rank),
             classes.support.priority,
@@ -138,7 +141,7 @@ pub fn get_priority_rank(roles: &Vec<Role>) -> i32 {
 pub fn get_captains(players: &HashMap<String, Player>) -> Vec<PlayerPool> {
     let mut captains = Vec::default();
     for (uuid, player) in players {
-        if player.identity.isCaptain {
+        if player.identity.is_captain {
             captains.push(PlayerPool::new(
                 uuid.clone(),
                 player.identity.name.clone(),
@@ -155,7 +158,7 @@ pub fn get_captains(players: &HashMap<String, Player>) -> Vec<PlayerPool> {
 pub fn get_squires(players: &HashMap<String, Player>) -> Vec<PlayerPool> {
     let mut squires = Vec::default();
     for (uuid, player) in players {
-        if player.identity.isSquire {
+        if player.identity.is_squire {
             squires.push(PlayerPool::new(
                 uuid.clone(),
                 player.identity.name.clone(),

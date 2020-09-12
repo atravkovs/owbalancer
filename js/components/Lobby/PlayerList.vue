@@ -19,7 +19,9 @@
     </div>
     <div class="row">
       <div class="col-3">Total: {{ state.storePlayers.length }}</div>
-      <div class="col-auto">Showing: {{ state.players.length }}</div>
+      <div class="col-3">Seen: {{ state.players.length }}</div>
+      <div class="col-3">Cap's: {{ captainCount }}</div>
+      <div class="col-3">Squires: {{ squireCount }}</div>
     </div>
     <div class="row">
       <label for="playerFilter" class="col-2 col-form-label">Filter:</label>
@@ -50,7 +52,7 @@ import PlayerCard from '@/components/PlayerCard.vue';
 import Export from '@/components/Lobby/Export.vue';
 import ImportFile from '@/components/Lobby/Import.vue';
 import DeletePlayers from '@/components/Lobby/DeletePlayers.vue';
-import { Player } from '@/objects/player';
+import PObj, { Player } from '@/objects/player';
 
 export default defineComponent({
   name: 'App',
@@ -88,10 +90,7 @@ export default defineComponent({
         [
           ([, p]) => {
             if (rule === 'name') return p.identity.name.toLowerCase();
-            if (rule === 'sr')
-              return Object.values(p.stats.classes)
-                .filter((role) => role.isActive)
-                .sort((a, b) => a.priority - b.priority)[0].rank;
+            if (rule === 'sr') return PObj.getTopRank(p);
             return p.createdAt;
           },
         ],
@@ -115,7 +114,20 @@ export default defineComponent({
       sort(state.activeSort.rule, state.activeSort.order);
     });
 
-    return { state, sort, filter };
+    const squireCount = computed(
+      () =>
+        state.storePlayers.filter(
+          ([, player]) => player.identity.isSquire === true
+        ).length
+    );
+    const captainCount = computed(
+      () =>
+        state.storePlayers.filter(
+          ([, player]) => player.identity.isCaptain === true
+        ).length
+    );
+
+    return { state, sort, filter, squireCount, captainCount };
   },
 });
 </script>

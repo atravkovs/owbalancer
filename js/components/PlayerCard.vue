@@ -31,7 +31,7 @@
 import { defineComponent, PropType, reactive, computed } from 'vue';
 
 import { useStore } from '@/store';
-import { Player } from '@/objects/player';
+import PObj, { Player } from '@/objects/player';
 import MutationTypes from '@/store/mutation-types';
 
 import RoleIcon from '@/components/svg/RoleIcon.vue';
@@ -78,11 +78,8 @@ export default defineComponent({
       icons,
     });
 
-    const sr = computed(
-      () =>
-        Object.values(props.player?.stats.classes || {})
-          .filter((role) => role.isActive)
-          .sort((a, b) => a.priority - b.priority)[0].rank
+    const sr = computed(() =>
+      !props.player ? 0 : PObj.getTopRank(props.player)
     );
 
     return {
