@@ -167,15 +167,24 @@ impl PlayerPool {
             .collect()
     }
 
-    pub fn filter_by_roles(&self, roles_filter: RolesFilter) -> Vec<&Candidate> {
+    pub fn filter_by_roles(&self, roles_filter: RolesFilter) -> Vec<usize> {
         self.0
             .iter()
-            .filter(|&candidate| roles_filter.has_same(candidate.roles.get_primary()))
+            .enumerate()
+            .filter_map(|(index, candidate)| {
+                if roles_filter.has_same(candidate.roles.get_primary()) {
+                    Some(index)
+                } else {
+                    None
+                }
+            })
             .collect()
     }
 
-    pub fn dispose_of(&mut self, candidates: Vec<&Candidate>) {
-        self.0.retain(|candidate| !candidates.contains(&candidate));
+    pub fn dispose_of(&mut self, candidates: Vec<usize>) {
+        for candidate in candidates {
+            self.0.remove(candidate);
+        }
     }
 
     pub fn shuffle(&mut self) {
@@ -241,10 +250,7 @@ impl PlayerPool {
             for candidate in pool {
                 for i in 1..candidate.roles_count() {
                     let role = candidate.roles.get(i);
-                    if role.fits_team(team)
-                        && (role.is_same(&team.get_captain().role)
-                            || role.is_same(&team.get_leutenant().role))
-                    {
+                    if role.fits_team(team) {
                         team.add_player(candidate, role);
                         self.remove_candidate(candidate);
                     }

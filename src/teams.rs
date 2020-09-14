@@ -167,18 +167,17 @@ impl Teams {
         let roles_filter = RolesFilter(vec![SimpleRole::Tank, SimpleRole::Dps]);
 
         let dps_teams = self.filter_dps_captains();
-        let clonned = squires.clone();
-        let mut worthy_squires = clonned.filter_by_roles(roles_filter);
+        let mut worthy_squires = squires.filter_by_roles(roles_filter);
         let mut cache_squires = Vec::default();
 
         for team in dps_teams {
             if worthy_squires.is_empty() {
-                return;
+                break;
             }
 
             let candidate = worthy_squires.pop().unwrap();
             cache_squires.push(candidate);
-            team.add_primary_player(candidate);
+            team.add_primary_player(squires.0.get(candidate).unwrap());
         }
 
         squires.dispose_of(cache_squires);
