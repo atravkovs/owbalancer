@@ -38,8 +38,8 @@ impl<'a> Mathmaking<'a> {
         self.distribute_squires();
         self.init_pool();
         self.distribute_leutenants();
-        self.distribute_fillers();
         self.distribute_ensigns();
+        self.distribute_fillers();
 
         self.update();
         self.pool.shuffle();

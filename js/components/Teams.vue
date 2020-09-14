@@ -57,8 +57,6 @@ export default defineComponent({
 
             store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
             store.commit(MutationTypes.ADD_TEAMS, teams);
-
-            console.log('Received: ', leftovers, teams);
           } catch (e) {
             console.error(e.message);
           }
@@ -87,8 +85,6 @@ export default defineComponent({
         reader.onload = onReaderLoad;
         reader.readAsText(files[0]);
       }
-
-      console.log('Hi! 2');
     };
 
     return { balance, range, clear, teams: storeTeams, imp };

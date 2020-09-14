@@ -308,7 +308,7 @@ impl PlayerPool {
     ) -> (i32, i32) {
         let players_count = 6;
         let tolerance_range = tolerance * players_count;
-        let target_sr = (players_average * (team_count as i32 + 1)) - team_sr;
+        let target_sr = ((players_average * (team_count as i32 + 2)) - team_sr) / 2;
         let min_sr = target_sr - tolerance_range as i32;
         let max_sr = target_sr + tolerance_range as i32;
 

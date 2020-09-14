@@ -32,8 +32,6 @@ export default defineComponent({
         reader.onload = onReaderLoad;
         reader.readAsText(files[0]);
       }
-
-      console.log('Hi!');
     };
 
     return { onChange };

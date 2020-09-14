@@ -252,12 +252,13 @@ impl Teams {
         target_role: &Role,
     ) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
+            let players_count = 6;
             let team_size = team.members_count();
             let new_sr = (team.total_sr + player_sr) as f32 / (team_size + 1) as f32;
 
             (team_size + 1) <= 6
                 && target_role.fits_team(team)
-                && ((new_sr - new_average).abs().floor() as u32) <= tolerance
+                && ((new_sr - new_average).abs().floor() as u32) <= (tolerance * players_count)
         })
     }
 
