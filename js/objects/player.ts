@@ -79,6 +79,18 @@ const createDefaultPlayer: (name: string) => Player = name => {
   };
 };
 
+const getRole = (roles: Classes, role: string): ClassType => {
+  if (role === 'dps') {
+    return roles.dps;
+  }
+
+  if (role === 'tank') {
+    return roles.tank;
+  }
+
+  return roles.support;
+}
+
 const getTopRole = (player: Player): ClassType => {
   return Object.values(player.stats.classes)
     .filter((role) => role.isActive)
@@ -90,6 +102,7 @@ const getTopRank = (player: Player): number => {
 };
 
 export default {
+  getRole,
   getTopRank,
   getTopRole,
   createDefaultPlayer,

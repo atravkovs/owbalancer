@@ -12,6 +12,7 @@ export type Mutations<S = State> = {
   [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
+  [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.EDIT_PLAYER](state: S, playerId: string): void;
   [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
@@ -97,5 +98,37 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.RESERVE_PLAYERS](state, players) {
     state.reservedPlayers = players;
-  }
+  },
+  [MutationTypes.IMPORT_PLAYERS_OLD](state, data) {
+    const parsedData = JSON.parse(data);
+    const { players } = parsedData;
+    const newPlayers: Players = {};
+
+    // eslint-disable-next-line
+    players.forEach((player: any) => {
+      const basePlayer = PObj.createDefaultPlayer(player.id);
+
+      if (player.sr_by_class.dps) {
+        basePlayer.stats.classes.dps.rank = player.sr_by_class.dps;
+      }
+      if (player.sr_by_class.tank) {
+        basePlayer.stats.classes.tank.rank = player.sr_by_class.tank;
+      }
+      if (player.sr_by_class.support) {
+        basePlayer.stats.classes.support.rank = player.sr_by_class.support;
+      }
+
+      let i = 0;
+      player.classes.forEach((rank: string) => {
+        const ct = PObj.getRole(basePlayer.stats.classes, rank);
+        ct.priority = i;
+        ct.isActive = true;
+        i += 1;
+      });
+
+      newPlayers[basePlayer.identity.uuid] = basePlayer;
+    });
+
+    state.players = { ...state.players, ...newPlayers };
+  },
 };
