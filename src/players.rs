@@ -4,6 +4,8 @@ use rand::rngs::OsRng;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -209,15 +211,88 @@ impl PlayerPool {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_mate(&candidate, 3) {
+        if let Some(team) = teams.find_mate(&candidate, 4) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_team(3, candidate.get_primary_role()) {
+        if let Some(team) = teams.find_team(4, candidate.get_primary_role()) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
         self.distribute_ensign(teams, offset + 1)
+    }
+
+    pub fn distribute_filler(&mut self, team: &mut Team, tolerance: u32, players_average: i32) {
+        let range = Self::get_range(
+            team.total_sr,
+            team.members_count(),
+            tolerance,
+            players_average,
+        );
+        let clonned = self.clone();
+        let pool = clonned.filter_range(range);
+
+        let find_candidate = pool
+            .iter()
+            .find(|&candidate| candidate.get_primary_role().fits_team(team));
+
+        if let Some(candidate) = find_candidate {
+            team.add_primary_player(candidate);
+            self.remove_candidate(candidate);
+        } else {
+            for candidate in pool {
+                for i in 1..candidate.roles_count() {
+                    let role = candidate.roles.get(i);
+                    if role.fits_team(team)
+                        && (role.is_same(&team.get_captain().role)
+                            || role.is_same(&team.get_leutenant().role))
+                    {
+                        team.add_player(candidate, role);
+                        self.remove_candidate(candidate);
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn get_primary_average(&self, teams_sr: i32, teams_count: usize) -> i32 {
+        let sum: i32 = self
+            .0
+            .iter()
+            .map(|candidate| candidate.get_primary_role().decompose().1)
+            .sum();
+        let count = self.0.len();
+
+        let mutual_sum = sum + teams_sr;
+        let mutual_count = count + teams_count;
+
+        (mutual_sum as f32 / mutual_count as f32).floor() as i32
+    }
+
+    fn remove_candidate(&mut self, candidate: &Candidate) {
+        let find = self
+            .0
+            .iter()
+            .position(|stored_candidate| stored_candidate == candidate);
+
+        if let Some(index) = find {
+            self.0.remove(index);
+        }
+    }
+
+    fn filter_range(&self, range: (i32, i32)) -> Vec<&Candidate> {
+        self.0
+            .iter()
+            .filter(|&candidate| {
+                let rank = candidate.roles.get_primary_rank();
+                console::log_3(
+                    &JsValue::from_str("Range: "),
+                    &JsValue::from(range.0),
+                    &JsValue::from(range.1),
+                );
+                rank >= range.0 && rank <= range.1
+            })
+            .collect()
     }
 
     fn add_player_to_team(
@@ -230,5 +305,29 @@ impl PlayerPool {
         self.0.remove(offset);
 
         offset
+    }
+
+    fn get_range(
+        team_sr: i32,
+        team_count: usize,
+        tolerance: u32,
+        players_average: i32,
+    ) -> (i32, i32) {
+        let players_count = 6;
+        let tolerance_range = tolerance * players_count;
+        console::log_2(
+            &JsValue::from_str("Players Average: "),
+            &JsValue::from(players_average),
+        );
+        console::log_2(&JsValue::from_str("Team SR: "), &JsValue::from(team_sr));
+        console::log_2(
+            &JsValue::from_str("Team COUNT: "),
+            &JsValue::from(team_count as i32),
+        );
+        let target_sr = (players_average * (team_count as i32 + 1)) - team_sr;
+        let min_sr = target_sr - tolerance_range as i32;
+        let max_sr = target_sr + tolerance_range as i32;
+
+        (min_sr, max_sr)
     }
 }

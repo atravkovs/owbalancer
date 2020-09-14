@@ -9,7 +9,7 @@
       style="width:250px;"
       class="form-range"
       min="0"
-      max="50"
+      max="250"
       step="1"
       v-model="range"
     />

@@ -35,11 +35,7 @@
             <role-icon rtype="support" />
           </div>
           <div class="w-100">
-            <player-card
-              :player="players[member.uuid]"
-              :prefferedRank="member.rank"
-              :prefferedRole="member.role"
-            />
+            <player-card :player="players[member.uuid]" :prefferedRank="member.rank" />
           </div>
         </li>
       </ul>

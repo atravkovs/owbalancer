@@ -199,6 +199,17 @@ impl Teams {
         }
     }
 
+    pub fn distribute_fillers(
+        &mut self,
+        pool: &mut PlayerPool,
+        tolerance: u32,
+        players_average: i32,
+    ) {
+        for team in &mut self.0 {
+            pool.distribute_filler(team, tolerance, players_average);
+        }
+    }
+
     pub fn distribute_ensigns(&mut self, pool: &mut PlayerPool) {
         let mut offset = 0;
         for _ in 0..self.teams_count() {
@@ -220,7 +231,8 @@ impl Teams {
 
     pub fn find_perfect_ensign(&mut self, candidate: &Candidate) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
-            team.members_count() <= 3
+            team.members_count() <= 4
+                && candidate.get_primary_role().fits_team(team)
                 && !team.get_captain().has_same_role(candidate)
                 && !team.get_leutenant().has_same_role(candidate)
         })

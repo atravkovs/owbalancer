@@ -40,6 +40,7 @@ impl<'a> Mathmaking<'a> {
         self.distribute_squires();
         self.init_pool();
         self.distribute_leutenants();
+        self.distribute_fillers();
         self.distribute_ensigns();
 
         self.update();
@@ -86,7 +87,17 @@ impl<'a> Mathmaking<'a> {
     fn distribute_ensigns(&mut self) {
         self.teams.update();
         self.teams.sort();
+        self.pool.sort_by_rank(Direction::ASC);
         self.teams.distribute_ensigns(&mut self.pool);
+    }
+
+    fn distribute_fillers(&mut self) {
+        self.teams.update();
+        self.teams.sort();
+        let avg = self.get_players_average();
+        self.pool.sort_by_rank(Direction::ASC);
+        self.teams
+            .distribute_fillers(&mut self.pool, self.tolerance, avg);
     }
 
     fn update(&mut self) {
@@ -153,6 +164,11 @@ impl<'a> Mathmaking<'a> {
         }
 
         None
+    }
+
+    fn get_players_average(&self) -> i32 {
+        let (total_sr, total_count) = self.teams.get_stats();
+        self.pool.get_primary_average(total_sr, total_count)
     }
 }
 
