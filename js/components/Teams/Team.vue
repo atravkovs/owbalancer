@@ -65,11 +65,11 @@ export default defineComponent({
     const store = useStore();
     const players = computed(() => store.state.players);
 
-    const tanks = props.team?.players.filter(
+    const tanks = props.team?.members.filter(
       (member) => member.role === 'tank'
     );
-    const dps = props.team?.players.filter((member) => member.role === 'dps');
-    const supports = props.team?.players.filter(
+    const dps = props.team?.members.filter((member) => member.role === 'dps');
+    const supports = props.team?.members.filter(
       (member) => member.role === 'support'
     );
 

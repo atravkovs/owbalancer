@@ -9,7 +9,7 @@ export type Team = {
     name: string;
     avgSr: number;
     totalSr: number;
-    players: TeamMembers[];
+    members: TeamMembers[];
 };
 
 export type Teams = Team[];
@@ -19,7 +19,7 @@ const createEmptyTeam: (name: string) => Team = () => {
         name,
         avgSr: 0,
         totalSr: 0,
-        players: [],
+        members: [],
     };
 };
 
