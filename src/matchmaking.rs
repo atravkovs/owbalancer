@@ -1,8 +1,6 @@
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::teams::Teams;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 pub struct Mathmaking<'a> {
     players: &'a Players,

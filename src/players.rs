@@ -4,8 +4,6 @@ use rand::rngs::OsRng;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -285,11 +283,6 @@ impl PlayerPool {
             .iter()
             .filter(|&candidate| {
                 let rank = candidate.roles.get_primary_rank();
-                console::log_3(
-                    &JsValue::from_str("Range: "),
-                    &JsValue::from(range.0),
-                    &JsValue::from(range.1),
-                );
                 rank >= range.0 && rank <= range.1
             })
             .collect()
@@ -315,15 +308,6 @@ impl PlayerPool {
     ) -> (i32, i32) {
         let players_count = 6;
         let tolerance_range = tolerance * players_count;
-        console::log_2(
-            &JsValue::from_str("Players Average: "),
-            &JsValue::from(players_average),
-        );
-        console::log_2(&JsValue::from_str("Team SR: "), &JsValue::from(team_sr));
-        console::log_2(
-            &JsValue::from_str("Team COUNT: "),
-            &JsValue::from(team_count as i32),
-        );
         let target_sr = (players_average * (team_count as i32 + 1)) - team_sr;
         let min_sr = target_sr - tolerance_range as i32;
         let max_sr = target_sr + tolerance_range as i32;
