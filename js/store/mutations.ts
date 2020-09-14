@@ -10,6 +10,7 @@ export type Mutations<S = State> = {
   [MutationTypes.DELETE_PLAYERS](state: S): void;
   [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
   [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
+  [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
   [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
@@ -31,6 +32,9 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.ADD_PLAYER](state, player) {
     state.players[player.identity.uuid] = player;
+  },
+  [MutationTypes.ADD_PLAYERS](state, players) {
+    state.players = { ...state.players, ...players };
   },
   [MutationTypes.ADD_TEAMS](state, teams) {
     state.teams = teams;

@@ -53,6 +53,7 @@ export default defineComponent({
     const generateRandom = () => {
       // eslint-disable-next-line
       const playerCount = +(prompt('Enter players amoun', '20') || 0);
+      const players = {};
 
       for (let i = 0; i < playerCount; i += 1) {
         const roleSelect = ['dps', 'support', 'tank'];
@@ -106,8 +107,11 @@ export default defineComponent({
           j += 1;
         });
 
-        store.commit(MutationTypes.ADD_PLAYER, player);
+        // eslint-disable-next-line
+        players[player.identity.uuid] = player;
       }
+
+      store.commit(MutationTypes.ADD_PLAYERS, players);
     };
 
     return {

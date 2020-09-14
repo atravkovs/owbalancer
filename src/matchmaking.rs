@@ -140,7 +140,11 @@ impl<'a> Mathmaking<'a> {
 
     fn fit_player(&mut self, candidate: &Candidate) -> Option<i32> {
         let roles_count = if !self.sec_roles {
-            1
+            if candidate.roles_count() > 0 {
+                1
+            } else {
+                0
+            }
         } else {
             candidate.roles_count()
         };

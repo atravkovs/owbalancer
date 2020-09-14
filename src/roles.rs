@@ -62,7 +62,11 @@ impl Role {
 
 impl Roles {
     pub fn get_primary(&self) -> &Role {
-        self.0.first().unwrap()
+        if let Some(role) = self.0.first() {
+            role
+        } else {
+            &Role::Dps(0)
+        }
     }
 
     pub fn count(&self) -> usize {

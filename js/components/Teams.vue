@@ -45,21 +45,27 @@ export default defineComponent({
     const balance = () => {
       wasm
         .then((lib) => {
-          const { leftovers, teams } = lib.balance(
-            store.state.players,
-            +range.value
-          );
-          const ignoredUuids = leftovers.reduce((acc, leftover) => {
-            acc.push(leftover.uuid);
-            return acc;
-          }, []);
+          try {
+            const { leftovers, teams } = lib.balance(
+              store.state.players,
+              +range.value
+            );
+            const ignoredUuids = leftovers.reduce((acc, leftover) => {
+              acc.push(leftover.uuid);
+              return acc;
+            }, []);
 
-          store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-          store.commit(MutationTypes.ADD_TEAMS, teams);
+            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
+            store.commit(MutationTypes.ADD_TEAMS, teams);
 
-          console.log('Received: ', leftovers, teams);
+            console.log('Received: ', leftovers, teams);
+          } catch (e) {
+            console.error(e.message);
+          }
         })
-        .catch(console.error);
+        .catch((e) => {
+          console.error(e.message);
+        });
     };
 
     const clear = () => {

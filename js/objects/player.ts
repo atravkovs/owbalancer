@@ -98,7 +98,8 @@ const getTopRole = (player: Player): ClassType => {
 }
 
 const getTopRank = (player: Player): number => {
-  return getTopRole(player).rank;
+  const topRole = getTopRole(player);
+  return topRole ? topRole.rank : 0;
 };
 
 export default {
