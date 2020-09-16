@@ -1,4 +1,4 @@
-use crate::players::{Candidate, PlayerPool};
+use crate::players::{Candidate, Direction, PlayerPool};
 use crate::roles::{Role, RolesFilter, SimpleRole};
 use serde::{Deserialize, Serialize};
 
@@ -151,9 +151,16 @@ impl Teams {
         (total_sr, total_count)
     }
 
-    pub fn sort(&mut self) {
-        self.0
-            .sort_by(|a, b| a.avg_sr.partial_cmp(&b.avg_sr).unwrap())
+    pub fn sort(&mut self, direction: Direction) {
+        self.0.sort_by(|a, b| {
+            let ordering = a.avg_sr.partial_cmp(&b.avg_sr).unwrap();
+
+            if direction == Direction::DESC {
+                return ordering.reverse();
+            }
+
+            ordering
+        })
     }
 
     pub fn filter_dps_captains(&mut self) -> Vec<&mut Team> {
@@ -230,7 +237,7 @@ impl Teams {
 
     pub fn find_perfect_ensign(&mut self, candidate: &Candidate) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
-            team.members_count() <= 4
+            team.members_count() <= 3
                 && candidate.get_primary_role().fits_team(team)
                 && !team.get_captain().has_same_role(candidate)
                 && !team.get_leutenant().has_same_role(candidate)
@@ -251,14 +258,23 @@ impl Teams {
         target_role: &Role,
     ) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
-            let players_count = 6;
             let team_size = team.members_count();
-            let new_sr = (team.total_sr + player_sr) as f32 / (team_size + 1) as f32;
 
             (team_size + 1) <= 6
                 && target_role.fits_team(team)
-                && ((new_sr - new_average).abs().floor() as u32) <= (tolerance * players_count)
+                && Self::player_fits_sr(new_average, tolerance, team_size, player_sr, team.total_sr)
         })
+    }
+
+    fn player_fits_sr(
+        new_average: f32,
+        tolerance: u32,
+        team_size: usize,
+        player_sr: i32,
+        total_sr: i32,
+    ) -> bool {
+        let new_sr = (total_sr + player_sr) as f32 / (team_size + 1) as f32;
+        ((new_sr - new_average).abs().floor() as u32) <= tolerance * (6 - team_size as u32)
     }
 
     fn teams_count(&self) -> usize {

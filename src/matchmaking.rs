@@ -1,6 +1,8 @@
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::teams::Teams;
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 pub struct Mathmaking<'a> {
     players: &'a Players,
@@ -40,10 +42,7 @@ impl<'a> Mathmaking<'a> {
         self.distribute_leutenants();
         self.distribute_ensigns();
         self.distribute_fillers();
-
-        self.update();
-        self.pool.shuffle();
-        self.sort_remaining(1);
+        self.distribute_remaining();
     }
 
     pub fn result(self) -> BalancerResult {
@@ -67,6 +66,14 @@ impl<'a> Mathmaking<'a> {
         self.teams = Teams::from(captains);
     }
 
+    fn distribute_remaining(&mut self) {
+        self.update();
+        self.pool.shuffle();
+        self.teams.sort(Direction::ASC);
+
+        self.sort_remaining(1);
+    }
+
     fn distribute_squires(&mut self) {
         let mut squires = self.players.get_squires();
         squires.sort_by_rank(Direction::DESC);
@@ -77,23 +84,24 @@ impl<'a> Mathmaking<'a> {
     }
 
     fn distribute_leutenants(&mut self) {
-        // From low to high SR captain
-        self.teams.reverse();
         self.teams.distribute_leutenants(&mut self.pool);
     }
 
     fn distribute_ensigns(&mut self) {
         self.teams.update();
-        self.teams.sort();
+        self.teams.sort(Direction::ASC);
         self.pool.sort_by_rank(Direction::ASC);
         self.teams.distribute_ensigns(&mut self.pool);
     }
 
     fn distribute_fillers(&mut self) {
         self.teams.update();
-        self.teams.sort();
+        self.teams.sort(Direction::DESC);
         let avg = self.get_players_average();
-        self.pool.sort_by_rank(Direction::ASC);
+
+        console::log_2(&JsValue::from_str("Players Average: "), &JsValue::from(avg));
+
+        self.pool.sort_by_rank(Direction::DESC);
         self.teams
             .distribute_fillers(&mut self.pool, self.tolerance, avg);
     }

@@ -182,9 +182,18 @@ impl PlayerPool {
     }
 
     pub fn dispose_of(&mut self, candidates: Vec<usize>) {
-        for candidate in candidates {
-            self.0.remove(candidate);
-        }
+        self.0 = self
+            .0
+            .iter_mut()
+            .enumerate()
+            .filter_map(|(id, v)| {
+                if candidates.contains(&id) {
+                    None
+                } else {
+                    Some(v.clone())
+                }
+            })
+            .collect()
     }
 
     pub fn shuffle(&mut self) {
@@ -218,11 +227,11 @@ impl PlayerPool {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_mate(&candidate, 4) {
+        if let Some(team) = teams.find_mate(&candidate, 3) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_team(4, candidate.get_primary_role()) {
+        if let Some(team) = teams.find_team(3, candidate.get_primary_role()) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
@@ -237,22 +246,22 @@ impl PlayerPool {
             players_average,
         );
         let clonned = self.clone();
-        let pool = clonned.filter_range(range);
-
-        let find_candidate = pool
-            .iter()
-            .find(|&candidate| candidate.get_primary_role().fits_team(team));
+        // clonned.shuffle();
+        let find_candidate = clonned.filter_range(range, team);
 
         if let Some(candidate) = find_candidate {
             team.add_primary_player(candidate);
             self.remove_candidate(candidate);
         } else {
-            for candidate in pool {
+            for candidate in &clonned.0 {
                 for i in 1..candidate.roles_count() {
                     let role = candidate.roles.get(i);
-                    if role.fits_team(team) {
+                    let rank = role.decompose().1;
+
+                    if rank >= range.0 && rank <= range.1 && role.fits_team(team) {
                         team.add_player(candidate, role);
                         self.remove_candidate(candidate);
+                        return;
                     }
                 }
             }
@@ -284,14 +293,11 @@ impl PlayerPool {
         }
     }
 
-    fn filter_range(&self, range: (i32, i32)) -> Vec<&Candidate> {
-        self.0
-            .iter()
-            .filter(|&candidate| {
-                let rank = candidate.roles.get_primary_rank();
-                rank >= range.0 && rank <= range.1
-            })
-            .collect()
+    fn filter_range(&self, range: (i32, i32), team: &Team) -> Option<&Candidate> {
+        self.0.iter().find(|&candidate| {
+            let rank = candidate.roles.get_primary_rank();
+            rank >= range.0 && rank <= range.1 && candidate.get_primary_role().fits_team(team)
+        })
     }
 
     fn add_player_to_team(
@@ -315,7 +321,7 @@ impl PlayerPool {
         let players_count = 6;
         let tolerance_range = tolerance * players_count;
         let target_sr = ((players_average * (team_count as i32 + 2)) - team_sr) / 2;
-        let min_sr = target_sr - tolerance_range as i32;
+        let min_sr = target_sr - (tolerance_range as i32 * 2);
         let max_sr = target_sr + tolerance_range as i32;
 
         (min_sr, max_sr)

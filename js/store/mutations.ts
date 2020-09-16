@@ -37,7 +37,7 @@ export const mutations: MutationTree<State> & Mutations = {
     state.players = { ...state.players, ...players };
   },
   [MutationTypes.ADD_TEAMS](state, teams) {
-    state.teams = teams;
+    state.teams = [...teams];
   },
   [MutationTypes.IMPORT_PLAYERS](state, players) {
     state.players = { ...players, ...state.players };

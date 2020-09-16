@@ -15,10 +15,15 @@
       style="width:250px;"
       class="form-range"
       min="0"
-      max="250"
-      step="1"
+      max="150"
+      step="5"
       v-model="range"
     />
+  </div>
+  <div>
+    <span>Min SR: {{ minSr }};&nbsp;</span>
+    <span>Max SR: {{ maxSr }};&nbsp;</span>
+    <span>Average: {{ avgSr }}</span>
   </div>
   <div class="teams pb-5 mb-5">
     <team v-for="team in teams" :key="team.name" :team="team" />
@@ -40,9 +45,28 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const storeTeams = computed(() => store.state.teams);
+    const maxSr = computed(() =>
+      store.state.teams.reduce(
+        (acc, team) => (acc < team.avgSr ? team.avgSr : acc),
+        0
+      )
+    );
+    const minSr = computed(() =>
+      store.state.teams.reduce(
+        (acc, team) => (acc > team.avgSr ? team.avgSr : acc),
+        10000
+      )
+    );
+    const avgSr = computed(
+      () =>
+        store.state.teams.reduce((acc, team) => acc + team.avgSr, 0) /
+        store.state.teams.length
+    );
     const range = ref(0);
 
     const balance = () => {
+      store.commit(MutationTypes.CLEAR_TEAMS);
+
       wasm
         .then((lib) => {
           try {
@@ -55,6 +79,7 @@ export default defineComponent({
               return acc;
             }, []);
 
+            console.log('Teams', teams);
             store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
             store.commit(MutationTypes.ADD_TEAMS, teams);
           } catch (e) {
@@ -87,7 +112,16 @@ export default defineComponent({
       }
     };
 
-    return { balance, range, clear, teams: storeTeams, imp };
+    return {
+      balance,
+      range,
+      clear,
+      teams: storeTeams,
+      imp,
+      maxSr,
+      minSr,
+      avgSr,
+    };
   },
 });
 </script>
