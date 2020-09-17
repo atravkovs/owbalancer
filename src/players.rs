@@ -241,7 +241,6 @@ impl PlayerPool {
     pub fn distribute_filler(&mut self, team: &mut Team, tolerance: u32, players_average: i32) {
         let range = team.get_range(tolerance, players_average);
         let clonned = self.clone();
-        // clonned.shuffle();
         let find_candidate = clonned.filter_range(range, team);
 
         if let Some(candidate) = find_candidate {
