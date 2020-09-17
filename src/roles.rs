@@ -58,6 +58,11 @@ impl Role {
             Role::Tank(_) => (team.tank_count() + 1) <= 2,
         }
     }
+
+    pub fn is_in_range(&self, range: (i32, i32)) -> bool {
+        let rank = self.decompose().1;
+        rank >= range.0 && rank <= range.1
+    }
 }
 
 impl Roles {
@@ -79,6 +84,12 @@ impl Roles {
 
     pub fn get(&self, index: usize) -> &Role {
         self.0.get(index).unwrap()
+    }
+
+    pub fn get_by_simple(&self, simple: &SimpleRole) -> Option<&Role> {
+        self.0
+            .iter()
+            .find(|&role| role.decompose().0 == simple.clone())
     }
 }
 

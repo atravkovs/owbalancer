@@ -10,7 +10,7 @@ pub struct Member {
     pub role: SimpleRole,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Team {
     pub avg_sr: f32,
@@ -19,7 +19,7 @@ pub struct Team {
     pub members: Vec<Member>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Teams(Vec<Team>);
 
 impl Member {
@@ -116,6 +116,98 @@ impl Team {
         self.members.len()
     }
 
+    pub fn get_missing_role(&self) -> Option<SimpleRole> {
+        if self.support_count() < 2 {
+            return Some(SimpleRole::Support);
+        }
+
+        if self.dps_count() < 2 {
+            return Some(SimpleRole::Dps);
+        }
+
+        if self.tank_count() < 2 {
+            return Some(SimpleRole::Tank);
+        }
+
+        None
+    }
+
+    pub fn get_range(&self, tolerance: u32, players_average: i32) -> (i32, i32) {
+        let players_count = 6;
+        let tolerance_range = tolerance * players_count;
+
+        let target_sr = ((players_average * players_count as i32) - self.total_sr)
+            / (players_count as i32 - self.members_count() as i32);
+        let min_sr = target_sr - tolerance_range as i32;
+        let max_sr = target_sr + tolerance_range as i32;
+
+        (min_sr, max_sr)
+    }
+
+    pub fn try_replace(
+        &self,
+        candidate: &Candidate,
+        target_role: &SimpleRole,
+        range: (i32, i32),
+        db: &PlayerPool,
+        tolerance: u32,
+        total_sr: i32,
+        total_count: usize,
+    ) -> Option<usize> {
+        for role in &candidate.roles.0 {
+            let (simple, _) = role.decompose();
+            let position = self.members.iter().position(|member| {
+                if member.role != simple.clone() {
+                    return false;
+                }
+
+                if !self.pfsr(candidate, member, tolerance, total_sr, total_count) {
+                    return false;
+                }
+
+                if let Some(player) = db.get_by_id(member.uuid.clone()) {
+                    if let Some(player_role) = player.roles.get_by_simple(&target_role) {
+                        return player_role.is_in_range(range);
+                    }
+                }
+
+                false
+            });
+
+            if let Some(member_index) = position {
+                return Some(member_index);
+            }
+        }
+
+        None
+    }
+
+    pub fn pfsr(
+        &self,
+        candidate: &Candidate,
+        member: &Member,
+        tolerance: u32,
+        total_sr: i32,
+        total_count: usize,
+    ) -> bool {
+        if let Some(role) = candidate.roles.get_by_simple(&member.role) {
+            let rank = role.decompose().1;
+            let new_average = (total_sr + rank) as f32 / (total_count + 1) as f32;
+            let team_size = 6;
+            let new_sr = (self.total_sr + rank - member.rank) as f32 / team_size as f32;
+
+            ((new_sr - new_average).abs().floor() as u32) <= tolerance
+        } else {
+            false
+        }
+    }
+
+    pub fn fits_sr(&self, player_sr: i32, new_average: f32, tolerance: u32) -> bool {
+        let team_size = self.members_count();
+        let new_sr = (self.total_sr + player_sr) as f32 / (team_size + 1) as f32;
+        ((new_sr - new_average).abs().floor() as u32) <= tolerance * (6 - team_size as u32)
+    }
+
     fn total_sr(&self) -> i32 {
         self.members.iter().map(|member| member.rank).sum()
     }
@@ -139,6 +231,14 @@ impl Teams {
         }
     }
 
+    pub fn get_mut(&mut self, index: usize) -> &mut Team {
+        self.0.get_mut(index).unwrap()
+    }
+
+    pub fn get(&self, index: usize) -> &Team {
+        self.0.get(index).unwrap()
+    }
+
     pub fn get_stats(&self) -> (i32, usize) {
         let mut total_sr = 0;
         let mut total_count = 0;
@@ -149,6 +249,41 @@ impl Teams {
         }
 
         (total_sr, total_count)
+    }
+
+    pub fn get_not_complete(&self) -> Vec<usize> {
+        self.0
+            .iter()
+            .enumerate()
+            .filter_map(|(id, team)| {
+                if team.members_count() < 6 {
+                    Some(id)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
+    pub fn replace_leftover(
+        &self,
+        leftover: &Candidate,
+        role: &SimpleRole,
+        range: (i32, i32),
+        db: &PlayerPool,
+        tolerance: u32,
+        total_sr: i32,
+        total_count: usize,
+    ) -> Option<(usize, usize)> {
+        for (team_index, team) in self.0.iter().enumerate() {
+            if let Some(replacement) =
+                team.try_replace(leftover, role, range, db, tolerance, total_sr, total_count)
+            {
+                return Some((team_index, replacement));
+            }
+        }
+
+        None
     }
 
     pub fn sort(&mut self, direction: Direction) {
@@ -262,19 +397,8 @@ impl Teams {
 
             (team_size + 1) <= 6
                 && target_role.fits_team(team)
-                && Self::player_fits_sr(new_average, tolerance, team_size, player_sr, team.total_sr)
+                && team.fits_sr(player_sr, new_average, tolerance)
         })
-    }
-
-    fn player_fits_sr(
-        new_average: f32,
-        tolerance: u32,
-        team_size: usize,
-        player_sr: i32,
-        total_sr: i32,
-    ) -> bool {
-        let new_sr = (total_sr + player_sr) as f32 / (team_size + 1) as f32;
-        ((new_sr - new_average).abs().floor() as u32) <= tolerance * (6 - team_size as u32)
     }
 
     fn teams_count(&self) -> usize {

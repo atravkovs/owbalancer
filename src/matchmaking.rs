@@ -1,17 +1,17 @@
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::teams::Teams;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 pub struct Mathmaking<'a> {
     players: &'a Players,
+    players_average: i32,
     tolerance: u32,
     total_sr: i32,
     total_count: usize,
     sec_roles: bool,
     teams: Teams,
     pool: PlayerPool,
+    reserve_pool: PlayerPool,
     balanced: Vec<String>,
 }
 
@@ -28,10 +28,12 @@ impl<'a> Mathmaking<'a> {
             tolerance,
             total_sr: 0,
             total_count: 0,
+            players_average: 0,
             sec_roles: false,
             teams: Teams::default(),
             balanced: Vec::default(),
             pool: PlayerPool::default(),
+            reserve_pool: PlayerPool::default(),
         }
     }
 
@@ -43,6 +45,8 @@ impl<'a> Mathmaking<'a> {
         self.distribute_ensigns();
         self.distribute_fillers();
         self.distribute_remaining();
+        self.teams.update();
+        self.swap_steal();
     }
 
     pub fn result(self) -> BalancerResult {
@@ -56,6 +60,7 @@ impl<'a> Mathmaking<'a> {
     fn init_pool(&mut self) {
         self.players.feed(&mut self.pool, &self.balanced);
         self.pool.sort_by_rank(Direction::ASC);
+        self.reserve_pool = self.pool.clone();
     }
 
     fn init_teams(&mut self) {
@@ -64,6 +69,74 @@ impl<'a> Mathmaking<'a> {
         self.preserve_players(&captains);
 
         self.teams = Teams::from(captains);
+    }
+
+    fn swap_steal(&mut self) {
+        self.teams.update();
+        let not_complete_teams = self.teams.get_not_complete();
+
+        for id in not_complete_teams {
+            let teams_clone = self.teams.clone();
+
+            let team = self.teams.get_mut(id);
+            let role = team.get_missing_role();
+            if role.is_none() {
+                continue;
+            }
+
+            let role = role.unwrap();
+            let role_clone = role.clone();
+            let range = team.get_range(self.tolerance, self.players_average);
+            let find_replacement = self.pool.distribute_replacement(
+                role,
+                range,
+                &teams_clone,
+                &self.reserve_pool,
+                self.tolerance,
+                self.total_sr,
+                self.total_count,
+            );
+
+            if let Some((team_id, replacement_id, leftover)) = find_replacement {
+                let replacement_team = teams_clone.get(team_id);
+                let replacement_member = replacement_team.members.get(replacement_id).unwrap();
+                let replacement = self
+                    .reserve_pool
+                    .0
+                    .iter()
+                    .find(|candidate| candidate.uuid.as_str() == replacement_member.uuid.as_str())
+                    .unwrap();
+
+                team.add_player(
+                    &replacement,
+                    replacement.roles.get_by_simple(&role_clone).unwrap(),
+                );
+
+                let team = self.teams.get_mut(team_id);
+                let replacement_member = team.members.remove(replacement_id);
+
+                let pos = self
+                    .pool
+                    .0
+                    .iter()
+                    .position(|c| c.uuid.as_str() == leftover.uuid.as_str());
+                if let Some(index) = pos {
+                    let candidate = self.pool.0.get(index).unwrap();
+                    let add_role = candidate
+                        .roles
+                        .get_by_simple(&replacement_member.role)
+                        .unwrap();
+
+                    team.add_player(candidate, &add_role);
+                    team.update();
+                    self.total_count += 1;
+                    self.total_sr += add_role.decompose().1;
+                    self.pool.0.remove(index);
+                }
+            }
+        }
+
+        self.teams.sort(Direction::ASC);
     }
 
     fn distribute_remaining(&mut self) {
@@ -97,13 +170,11 @@ impl<'a> Mathmaking<'a> {
     fn distribute_fillers(&mut self) {
         self.teams.update();
         self.teams.sort(Direction::DESC);
-        let avg = self.get_players_average();
-
-        console::log_2(&JsValue::from_str("Players Average: "), &JsValue::from(avg));
+        self.calculate_players_average();
 
         self.pool.sort_by_rank(Direction::DESC);
         self.teams
-            .distribute_fillers(&mut self.pool, self.tolerance, avg);
+            .distribute_fillers(&mut self.pool, self.tolerance, self.players_average);
     }
 
     fn update(&mut self) {
@@ -176,9 +247,9 @@ impl<'a> Mathmaking<'a> {
         None
     }
 
-    fn get_players_average(&self) -> i32 {
+    fn calculate_players_average(&mut self) {
         let (total_sr, total_count) = self.teams.get_stats();
-        self.pool.get_primary_average(total_sr, total_count)
+        self.players_average = self.pool.get_primary_average(total_sr, total_count);
     }
 }
 

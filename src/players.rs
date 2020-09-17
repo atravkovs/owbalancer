@@ -1,4 +1,4 @@
-use crate::roles::{Role, Roles, RolesFilter};
+use crate::roles::{Role, Roles, RolesFilter, SimpleRole};
 use crate::teams::{Team, Teams};
 use rand::rngs::OsRng;
 use rand::seq::SliceRandom;
@@ -239,12 +239,7 @@ impl PlayerPool {
     }
 
     pub fn distribute_filler(&mut self, team: &mut Team, tolerance: u32, players_average: i32) {
-        let range = Self::get_range(
-            team.total_sr,
-            team.members_count(),
-            tolerance,
-            players_average,
-        );
+        let range = team.get_range(tolerance, players_average);
         let clonned = self.clone();
         // clonned.shuffle();
         let find_candidate = clonned.filter_range(range, team);
@@ -256,9 +251,8 @@ impl PlayerPool {
             for candidate in &clonned.0 {
                 for i in 1..candidate.roles_count() {
                     let role = candidate.roles.get(i);
-                    let rank = role.decompose().1;
 
-                    if rank >= range.0 && rank <= range.1 && role.fits_team(team) {
+                    if role.is_in_range(range) && role.fits_team(team) {
                         team.add_player(candidate, role);
                         self.remove_candidate(candidate);
                         return;
@@ -266,6 +260,34 @@ impl PlayerPool {
                 }
             }
         }
+    }
+
+    pub fn distribute_replacement(
+        &self,
+        role: SimpleRole,
+        range: (i32, i32),
+        teams: &Teams,
+        db: &PlayerPool,
+        tolerance: u32,
+        total_sr: i32,
+        total_count: usize,
+    ) -> Option<(usize, usize, &Candidate)> {
+        for leftover in &self.0 {
+            let lost = teams.replace_leftover(
+                leftover,
+                &role,
+                range,
+                db,
+                tolerance,
+                total_sr,
+                total_count,
+            );
+            if let Some(replacement) = lost {
+                return Some((replacement.0, replacement.1, leftover));
+            }
+        }
+
+        None
     }
 
     pub fn get_primary_average(&self, teams_sr: i32, teams_count: usize) -> i32 {
@@ -282,6 +304,10 @@ impl PlayerPool {
         (mutual_sum as f32 / mutual_count as f32).floor() as i32
     }
 
+    pub fn get_by_id(&self, uuid: String) -> Option<&Candidate> {
+        self.0.iter().find(|&candidate| candidate.uuid == uuid)
+    }
+
     fn remove_candidate(&mut self, candidate: &Candidate) {
         let find = self
             .0
@@ -295,8 +321,8 @@ impl PlayerPool {
 
     fn filter_range(&self, range: (i32, i32), team: &Team) -> Option<&Candidate> {
         self.0.iter().find(|&candidate| {
-            let rank = candidate.roles.get_primary_rank();
-            rank >= range.0 && rank <= range.1 && candidate.get_primary_role().fits_team(team)
+            let role = candidate.get_primary_role();
+            role.is_in_range(range) && role.fits_team(team)
         })
     }
 
@@ -310,20 +336,5 @@ impl PlayerPool {
         self.0.remove(offset);
 
         offset
-    }
-
-    fn get_range(
-        team_sr: i32,
-        team_count: usize,
-        tolerance: u32,
-        players_average: i32,
-    ) -> (i32, i32) {
-        let players_count = 6;
-        let tolerance_range = tolerance * players_count;
-        let target_sr = ((players_average * (team_count as i32 + 2)) - team_sr) / 2;
-        let min_sr = target_sr - (tolerance_range as i32 * 2);
-        let max_sr = target_sr + tolerance_range as i32;
-
-        (min_sr, max_sr)
     }
 }
