@@ -1,9 +1,9 @@
 <template>
   <div class="card mw-nb">
-    <div class="card-header">Team {{ team.name }}</div>
+    <div class="card-header">Team {{ mTeam.name }}</div>
     <div class="card-body">
       <div>
-        <span>Average SR: {{ team.avgSr }}</span>
+        <span>Average SR: {{ mTeam.avgSr }}</span>
       </div>
       <ul class="list-group list-group-flush">
         <li v-for="member in tanks" :key="member.uuid" class="list-group-item d-flex pl-0">
@@ -14,7 +14,7 @@
             <player-card
               :player="players[member.uuid]"
               :prefferedRank="member.rank"
-              :prefferedRole="member.role"
+              :teamName="teamName"
             />
           </div>
         </li>
@@ -26,7 +26,7 @@
             <player-card
               :player="players[member.uuid]"
               :prefferedRank="member.rank"
-              :prefferedRole="member.role"
+              :teamName="teamName"
             />
           </div>
         </li>
@@ -35,7 +35,11 @@
             <role-icon rtype="support" />
           </div>
           <div class="w-100">
-            <player-card :player="players[member.uuid]" :prefferedRank="member.rank" />
+            <player-card
+              :player="players[member.uuid]"
+              :teamName="teamName"
+              :prefferedRank="member.rank"
+            />
           </div>
         </li>
       </ul>
@@ -60,23 +64,29 @@ export default defineComponent({
   setup(props) {
     const store = useStore();
     const players = computed(() => store.state.players);
-
-    const tanks = props.team?.members.filter(
-      (member) => member.role === 'tank'
-    );
-    const dps = props.team?.members.filter((member) => member.role === 'dps');
-    const supports = props.team?.members.filter(
-      (member) => member.role === 'support'
+    const teamName = computed(() => props.team?.name);
+    const mTeam = computed(() =>
+      store.state.teams.find((team) => team.name === teamName.value)
     );
 
-    return { tanks, dps, supports, players };
+    const tanks = computed(() =>
+      mTeam.value?.members.filter((member) => member.role === 'tank')
+    );
+    const dps = computed(() =>
+      mTeam.value?.members.filter((member) => member.role === 'dps')
+    );
+    const supports = computed(() =>
+      mTeam.value?.members.filter((member) => member.role === 'support')
+    );
+
+    return { tanks, dps, supports, players, teamName, mTeam };
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .fs-b {
-  font-size: 1.2rem;
-  line-height: 50px;
+  font-size: 1.2em;
+  line-height: 3em;
 }
 </style>

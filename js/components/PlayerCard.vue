@@ -2,6 +2,7 @@
   <div
     class="d-flex justify-content-between w-100"
     draggable="true"
+    v-if="player"
     @contextmenu="editPlayer"
     @dragstart="drag"
   >
@@ -42,6 +43,7 @@ import SwordIcon from '@/components/svg/SwordIcon.vue';
 export default defineComponent({
   name: 'PlayerCard',
   props: {
+    teamName: String,
     player: Object as PropType<Player>,
     prefferedRole: String,
     prefferedRank: Number,
@@ -51,12 +53,17 @@ export default defineComponent({
     const store = useStore();
 
     const drag = (ev: DragEvent) => {
-      const _ = ev?.dataTransfer?.setData(
-        'playerTag',
-        props.player?.identity.uuid || ''
-      );
+      let a = null;
+      if (ev?.dataTransfer) {
+        a = ev.dataTransfer.setData(
+          'playerTag',
+          props.player?.identity.uuid || ''
+        );
+        console.log(props.teamName);
+        a = ev.dataTransfer?.setData('team', props.teamName || '');
+      }
 
-      return _;
+      return a;
     };
 
     const editPlayer = (e: MouseEvent) => {
@@ -112,17 +119,17 @@ export default defineComponent({
   width: 40px;
 }
 .font-smaller {
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 .role-icons {
   line-height: 1;
 }
 .role-icons > * {
-  font-size: 0.8rem;
+  font-size: 0.8em;
   color: var(--bs-gray);
 }
 .role-icons > *:last-child {
-  font-size: 1rem;
+  font-size: 1em;
   color: var(--bs-gray-dark);
 }
 .extra-icon {

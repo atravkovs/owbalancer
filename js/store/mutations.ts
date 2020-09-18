@@ -10,12 +10,14 @@ export type Mutations<S = State> = {
   [MutationTypes.DELETE_PLAYERS](state: S): void;
   [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
   [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
+  [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
   [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
   [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.EDIT_PLAYER](state: S, playerId: string): void;
+  [MutationTypes.REMOVE_RESERVED_PLAYER](state: S, data: { teamName: string; playerId: string }): void;
   [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
   [MutationTypes.ASSIGN_CAPTAINS](state: S, minSR: number): void;
   [MutationTypes.ASSIGN_SQUIRES](state: S, maxSR: number): void;
@@ -32,6 +34,9 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.ADD_PLAYER](state, player) {
     state.players[player.identity.uuid] = player;
+  },
+  [MutationTypes.ADD_RESERVE](state, uuid) {
+    state.reservedPlayers.push(uuid);
   },
   [MutationTypes.ADD_PLAYERS](state, players) {
     state.players = { ...state.players, ...players };
@@ -53,6 +58,14 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.DELETE_PLAYERS](state) {
     state.players = {};
+  },
+  [MutationTypes.REMOVE_RESERVED_PLAYER](state, { teamName, playerId }) {
+    const teamF = state.teams.findIndex(team => team.name === teamName);
+
+    if (teamF !== -1) {
+      const index = state.teams[teamF].members.findIndex(member => member.uuid === playerId);
+      state.teams[teamF].members.splice(index, 1);
+    }
   },
   [MutationTypes.ASSIGN_CAPTAINS](state, minSR) {
     const players = Object.entries(state.players);

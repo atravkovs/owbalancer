@@ -7,21 +7,19 @@
       <div>
         <Assign />
       </div>
-      <div>
-        <ImportFile />
-      </div>
-      <div>
+      <div class="d-flex">
         <Export />
+        <ImportFile />
       </div>
       <div>
         <DeletePlayers />
       </div>
     </div>
-    <div class="row">
-      <div class="col-3">Total: {{ state.storePlayers.length }}</div>
-      <div class="col-3">Seen: {{ state.players.length }}</div>
-      <div class="col-3">Cap's: {{ captainCount }}</div>
-      <div class="col-3">Squires: {{ squireCount }}</div>
+    <div class="d-flex justify-content-between">
+      <div>Total: {{ state.storePlayers.length }}</div>
+      <div>Seen: {{ state.players.length }}</div>
+      <div>Cap's: {{ captainCount }}</div>
+      <div>Squires: {{ squireCount }}</div>
     </div>
     <div class="row">
       <label for="playerFilter" class="col-2 col-form-label">Filter:</label>
@@ -29,7 +27,7 @@
         <input id="playerFilter" type="text" class="form-control form-control-sm" @input="filter" />
       </div>
     </div>
-    <div class="overflow-auto h40r bg-secondary border p-1">
+    <div class="overflow-auto h40r bg-secondary border p-1" @dragover="allowDrop" @drop="drop">
       <PlayerCard
         class="bg-light mb-1"
         v-for="[uuid, player] in state.players"
@@ -45,6 +43,7 @@ import { computed, defineComponent, onMounted, reactive, watch } from 'vue';
 import orderBy from 'lodash/orderBy';
 
 import { useStore } from '@/store';
+import MutationTypes from '@/store/mutation-types';
 
 import Sort from '@/components/Lobby/Sort.vue';
 import Assign from '@/components/Lobby/Assign.vue';
@@ -59,11 +58,12 @@ export default defineComponent({
   components: { Assign, Sort, PlayerCard, Export, ImportFile, DeletePlayers },
   setup() {
     const store = useStore();
+    const teamsLen = computed(() => store.state.teams.length);
     const storePlayers = computed(() =>
       Object.entries(store.state.players).filter(([, p]) =>
         store.state.reservedPlayers.length > 0
           ? store.state.reservedPlayers.includes(p.identity.uuid)
-          : store.state.teams.length <= 0
+          : teamsLen.value <= 0
       )
     );
     const activeSort: { rule: string; order: 'asc' | 'desc' } = {
@@ -133,7 +133,22 @@ export default defineComponent({
         ).length
     );
 
-    return { state, sort, filter, squireCount, captainCount };
+    const allowDrop = (ev: DragEvent) => {
+      ev.preventDefault();
+    };
+    const drop = (ev: DragEvent) => {
+      ev.preventDefault();
+      const playerId = ev?.dataTransfer?.getData('playerTag');
+      const teamName = ev?.dataTransfer?.getData('team');
+      store.commit(MutationTypes.ADD_RESERVE, playerId);
+      store.commit(MutationTypes.REMOVE_RESERVED_PLAYER, {
+        teamName,
+        playerId,
+      });
+      console.log(`Hello, ${playerId} from ${teamName}!`);
+    };
+
+    return { state, sort, filter, squireCount, captainCount, allowDrop, drop };
   },
 });
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100">
+  <div class="w-100 h-100">
     <h3>Lobby</h3>
 
     <AddPlayer />

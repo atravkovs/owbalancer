@@ -23,8 +23,16 @@ export default defineComponent({
 
     const drop = (ev: DragEvent) => {
       ev.preventDefault();
-      const playerTag = ev?.dataTransfer?.getData('playerTag');
-      store.commit(MutationTypes.DELETE_PLAYER, playerTag);
+      const playerId = ev?.dataTransfer?.getData('playerTag');
+      const teamName = ev?.dataTransfer?.getData('team');
+      store.commit(MutationTypes.DELETE_PLAYER, playerId);
+
+      if (teamName) {
+        store.commit(MutationTypes.REMOVE_RESERVED_PLAYER, {
+          teamName,
+          playerId,
+        });
+      }
     };
 
     return {
