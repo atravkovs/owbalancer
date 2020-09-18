@@ -63,7 +63,7 @@ export default defineComponent({
       Object.entries(store.state.players).filter(([, p]) =>
         store.state.reservedPlayers.length > 0
           ? store.state.reservedPlayers.includes(p.identity.uuid)
-          : true
+          : store.state.teams.length <= 0
       )
     );
     const activeSort: { rule: string; order: 'asc' | 'desc' } = {
