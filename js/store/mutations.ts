@@ -1,31 +1,33 @@
 import { MutationTree } from 'vuex';
 import { PLAYERS_IN_TEAM } from '@/constants';
-import PObj, { Player, Stats, Players } from '@/objects/player';
-import { Teams } from '@/objects/team';
+import PObj, { Player, Stats, Players, ClassType } from '@/objects/player';
+import TObj, { Teams } from '@/objects/team';
 
 import MutationTypes from './mutation-types';
 import { State } from './state';
 
 export type Mutations<S = State> = {
-  [MutationTypes.DELETE_PLAYERS](state: S): void;
-  [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
-  [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
-  [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
-  [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
-  [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
-  [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
-  [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
-  [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
-  [MutationTypes.EDIT_PLAYER](state: S, playerId: string): void;
-  [MutationTypes.REMOVE_RESERVED_PLAYER](state: S, data: { teamName: string; playerId: string }): void;
-  [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
-  [MutationTypes.ASSIGN_CAPTAINS](state: S, minSR: number): void;
-  [MutationTypes.ASSIGN_SQUIRES](state: S, maxSR: number): void;
-  [MutationTypes.CLEAR_CAPTAINS](state: S): void;
   [MutationTypes.CLEAR_TEAMS](state: S): void;
   [MutationTypes.CLEAR_SQUIRES](state: S): void;
+  [MutationTypes.CLEAR_CAPTAINS](state: S): void;
+  [MutationTypes.DELETE_PLAYERS](state: S): void;
   [MutationTypes.CLEAR_ALL_EXTRA](state: S): void;
+  [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
+  [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
+  [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
+  [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
+  [MutationTypes.EDIT_PLAYER](state: S, playerId: string): void;
+  [MutationTypes.ASSIGN_SQUIRES](state: S, maxSR: number): void;
+  [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
+  [MutationTypes.ASSIGN_CAPTAINS](state: S, minSR: number): void;
+  [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
+  [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
+  [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
+  [MutationTypes.REMOVE_FROM_RESERVE](state: S, playerId: string): void;
+  [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
+  [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamName: string; playerId: string }): void;
+  [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamName: string; playerName: string; playerId: string; role: ClassType; roleName: 'dps' | 'support' | 'tank' }): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
@@ -59,12 +61,36 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.DELETE_PLAYERS](state) {
     state.players = {};
   },
-  [MutationTypes.REMOVE_RESERVED_PLAYER](state, { teamName, playerId }) {
+  [MutationTypes.REMOVE_FROM_RESERVE](state, playerId) {
+    const index = state.reservedPlayers.indexOf(playerId);
+    if (index >= 0) {
+      state.reservedPlayers.splice(index, 1);
+    }
+  },
+  [MutationTypes.REMOVE_FROM_TEAM](state, { teamName, playerId }) {
     const teamF = state.teams.findIndex(team => team.name === teamName);
 
     if (teamF !== -1) {
       const index = state.teams[teamF].members.findIndex(member => member.uuid === playerId);
       state.teams[teamF].members.splice(index, 1);
+      const { avgSr, totalSr } = TObj.calcStats(state.teams[teamF]);
+      state.teams[teamF].avgSr = avgSr;
+      state.teams[teamF].totalSr = totalSr;
+    }
+  },
+  [MutationTypes.ADD_TEAMPLAYER](state, { playerName, teamName, playerId, role, roleName }) {
+    const teamF = state.teams.findIndex(team => team.name === teamName);
+
+    if (teamF !== -1) {
+      state.teams[teamF].members.push({
+        uuid: playerId,
+        name: playerName,
+        rank: role.rank,
+        role: roleName,
+      });
+      const { avgSr, totalSr } = TObj.calcStats(state.teams[teamF]);
+      state.teams[teamF].avgSr = avgSr;
+      state.teams[teamF].totalSr = totalSr;
     }
   },
   [MutationTypes.ASSIGN_CAPTAINS](state, minSR) {

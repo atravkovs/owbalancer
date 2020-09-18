@@ -14,7 +14,7 @@ export type Team = {
 
 export type Teams = Team[];
 
-const createEmptyTeam: (name: string) => Team = () => {
+const createEmptyTeam: (tname: string) => Team = (name) => {
     return {
         name,
         avgSr: 0,
@@ -23,6 +23,14 @@ const createEmptyTeam: (name: string) => Team = () => {
     };
 };
 
+const calcStats: (team: Team) => { avgSr: number; totalSr: number } = (team) => {
+    const totalSr = team.members.reduce((acc, member) => acc + member.rank, 0);
+    const avgSr = totalSr / team.members.length;
+
+    return { avgSr, totalSr };
+};
+
 export default {
-    createEmptyTeam
+    calcStats,
+    createEmptyTeam,
 };

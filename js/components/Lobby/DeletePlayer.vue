@@ -28,7 +28,7 @@ export default defineComponent({
       store.commit(MutationTypes.DELETE_PLAYER, playerId);
 
       if (teamName) {
-        store.commit(MutationTypes.REMOVE_RESERVED_PLAYER, {
+        store.commit(MutationTypes.REMOVE_FROM_TEAM, {
           teamName,
           playerId,
         });

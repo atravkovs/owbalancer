@@ -6,42 +6,9 @@
         <span>Average SR: {{ mTeam.avgSr }}</span>
       </div>
       <ul class="list-group list-group-flush">
-        <li v-for="member in tanks" :key="member.uuid" class="list-group-item d-flex pl-0">
-          <div class="fs-b pr-2">
-            <role-icon rtype="tank" />
-          </div>
-          <div class="w-100">
-            <player-card
-              :player="players[member.uuid]"
-              :prefferedRank="member.rank"
-              :teamName="teamName"
-            />
-          </div>
-        </li>
-        <li v-for="member in dps" :key="member.uuid" class="list-group-item d-flex pl-0">
-          <div class="fs-b pr-2">
-            <role-icon rtype="dps" />
-          </div>
-          <div class="w-100">
-            <player-card
-              :player="players[member.uuid]"
-              :prefferedRank="member.rank"
-              :teamName="teamName"
-            />
-          </div>
-        </li>
-        <li v-for="member in supports" :key="member.uuid" class="list-group-item d-flex pl-0">
-          <div class="fs-b pr-2">
-            <role-icon rtype="support" />
-          </div>
-          <div class="w-100">
-            <player-card
-              :player="players[member.uuid]"
-              :teamName="teamName"
-              :prefferedRank="member.rank"
-            />
-          </div>
-        </li>
+        <team-roles :members="tanks" rtype="tank" :teamName="teamName" />
+        <team-roles :members="dps" rtype="dps" :teamName="teamName" />
+        <team-roles :members="supports" rtype="support" :teamName="teamName" />
       </ul>
     </div>
   </div>
@@ -52,15 +19,14 @@ import { computed, defineComponent, PropType } from 'vue';
 import { Team } from '@/objects/team';
 import { useStore } from '@/store';
 
-import RoleIcon from '@/components/svg/RoleIcon.vue';
-import PlayerCard from '@/components/PlayerCard.vue';
+import TeamRoles from '@/components/Teams/TeamRoles.vue';
 
 export default defineComponent({
   name: 'Team',
   props: {
     team: Object as PropType<Team>,
   },
-  components: { RoleIcon, PlayerCard },
+  components: { TeamRoles },
   setup(props) {
     const store = useStore();
     const players = computed(() => store.state.players);
@@ -83,10 +49,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.fs-b {
-  font-size: 1.2em;
-  line-height: 3em;
-}
-</style>

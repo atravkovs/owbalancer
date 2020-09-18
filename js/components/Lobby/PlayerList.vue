@@ -141,7 +141,7 @@ export default defineComponent({
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamName = ev?.dataTransfer?.getData('team');
       store.commit(MutationTypes.ADD_RESERVE, playerId);
-      store.commit(MutationTypes.REMOVE_RESERVED_PLAYER, {
+      store.commit(MutationTypes.REMOVE_FROM_TEAM, {
         teamName,
         playerId,
       });
