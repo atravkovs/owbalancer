@@ -7,13 +7,13 @@
     @dragstart="drag"
   >
     <div class="d-flex">
-      <div class="w-40p text-center font-smaller">
+      <div class="text-center font-smaller" :class="{ 'd-flex': !!teamUuid, 'w-40p': !teamUuid }">
         <div>
           <rank-icon :rank="sr" />
         </div>
         <div>{{ sr }}</div>
       </div>
-      <div class="lh-100">
+      <div :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid }">
         {{ player.identity.name }}
         &nbsp;
         <span class="extra-icon">

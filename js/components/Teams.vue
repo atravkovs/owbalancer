@@ -25,7 +25,7 @@
     <span>Max SR: {{ maxSr }};&nbsp;</span>
     <span>Average: {{ avgSr }}</span>
   </div>
-  <div class="teams pb-5 mb-5">
+  <div class="teams pb-5 mb-5 overflow-auto h-80vh">
     <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
 </template>
@@ -130,13 +130,16 @@ export default defineComponent({
 .teams {
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: auto auto auto;
-  column-gap: 2rem;
-  row-gap: 2rem;
+  grid-template-columns: repeat(auto-fit, 250px);
+  column-gap: 1rem;
+  row-gap: 1rem;
   margin-top: 2rem;
-  max-width: 1024px;
+  min-width: 700px;
 }
 .wf {
   width: 6rem;
+}
+.h-80vh {
+  height: 80vh;
 }
 </style>

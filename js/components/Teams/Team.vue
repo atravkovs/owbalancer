@@ -1,10 +1,10 @@
 <template>
   <div class="card mw-nb">
-    <div class="card-header">Team {{ mTeam.name }}</div>
-    <div class="card-body">
-      <div>
-        <span>Average SR: {{ mTeam.avgSr }}</span>
-      </div>
+    <div class="card-header d-flex justify-content-between pr-0 py-0">
+      <span class="py-1">Team {{ mTeam.name }}</span>
+      <span class="bg-primary btr px-2 py-1 text-light">{{ teamAverage }}</span>
+    </div>
+    <div class="card-body p-0 fs-small">
       <ul class="list-group list-group-flush">
         <team-roles :members="tanks" rtype="tank" :teamUuid="teamUuid" />
         <team-roles :members="dps" rtype="dps" :teamUuid="teamUuid" />
@@ -31,6 +31,7 @@ export default defineComponent({
     const store = useStore();
     const players = computed(() => store.state.players);
     const teamUuid = computed(() => props.team?.uuid);
+    const teamAverage = computed(() => Math.round(props.team?.avgSr || 0));
     const mTeam = computed(() =>
       store.state.teams.find((team) => team.uuid === teamUuid.value)
     );
@@ -45,7 +46,16 @@ export default defineComponent({
       mTeam.value?.members.filter((member) => member.role === 'support')
     );
 
-    return { tanks, dps, supports, players, teamUuid, mTeam };
+    return { tanks, dps, supports, players, teamUuid, mTeam, teamAverage };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.btr {
+  border-top-right-radius: calc(0.25rem - 1px);
+}
+.fs-small {
+  font-size: 0.9rem;
+}
+</style>

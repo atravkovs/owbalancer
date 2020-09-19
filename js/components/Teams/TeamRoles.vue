@@ -4,7 +4,7 @@
     :key="i"
     @dragover="allowDrop"
     @drop="(e) => drop(e, i)"
-    class="list-group-item d-flex pl-0"
+    class="list-group-item d-flex p-0 pl-3 pr-1 py-1"
   >
     <div class="fs-b pr-2">
       <role-icon :rtype="rtype" />
