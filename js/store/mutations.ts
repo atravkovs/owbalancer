@@ -182,7 +182,7 @@ export const mutations: MutationTree<State> & Mutations = {
 
     // eslint-disable-next-line
     players.forEach((player: any) => {
-      const basePlayer = PObj.createDefaultPlayer(player.id);
+      const basePlayer = PObj.createDefaultPlayer(player.display_name);
 
       if (player.sr_by_class.dps) {
         basePlayer.stats.classes.dps.rank = player.sr_by_class.dps;
