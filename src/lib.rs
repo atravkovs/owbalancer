@@ -27,3 +27,12 @@ pub fn balance(player_data: &JsValue, tolerance: u32) -> JsValue {
 
     JsValue::from_serde(&matchmaking.result()).unwrap()
 }
+
+#[wasm_bindgen]
+pub fn balance_half(player_data: &JsValue, tolerance: u32) -> JsValue {
+    let players: Players = player_data.into_serde().unwrap();
+    let mut matchmaking = Mathmaking::new(&players, tolerance);
+    matchmaking.balance_half();
+
+    JsValue::from_serde(&matchmaking.result()).unwrap()
+}

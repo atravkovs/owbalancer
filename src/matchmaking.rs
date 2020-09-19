@@ -49,6 +49,16 @@ impl<'a> Mathmaking<'a> {
         self.swap_steal();
     }
 
+    pub fn balance_half(&mut self) {
+        self.init_teams();
+        self.distribute_squires();
+        self.init_pool();
+        self.distribute_leutenants();
+        self.distribute_ensigns();
+        self.teams.update();
+        self.teams.sort(Direction::ASC);
+    }
+
     pub fn result(self) -> BalancerResult {
         BalancerResult::new(self.teams, self.pool)
     }
