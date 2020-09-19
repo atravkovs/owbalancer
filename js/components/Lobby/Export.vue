@@ -5,6 +5,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { useStore } from '@/store';
+import { Players } from '@/objects/player';
 
 function download(filename: string, text: string) {
   const element = document.createElement('a');
@@ -22,6 +23,11 @@ function download(filename: string, text: string) {
   document.body.removeChild(element);
 }
 
+type ExportData = {
+  format: string;
+  players: Players;
+};
+
 export default defineComponent({
   name: 'Export',
   setup() {
@@ -30,9 +36,14 @@ export default defineComponent({
 
     const onClick = () => {
       const data = players.value;
+      const exportData: ExportData = {
+        format: 'xv-1',
+        players: data,
+      };
+
       download(
         `balancer-${new Date().toLocaleString('ru-RU')}.json`,
-        JSON.stringify(data)
+        JSON.stringify(exportData)
       );
     };
 

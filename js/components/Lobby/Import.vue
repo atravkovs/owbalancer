@@ -20,8 +20,17 @@ export default defineComponent({
     const onReaderLoad = (event: ProgressEvent<FileReader>) => {
       if (!event.target) return;
 
-      const players = JSON.parse(event.target.result as string);
-      store.commit(MutationTypes.IMPORT_PLAYERS, players);
+      const source = event.target.result as string;
+      const data = JSON.parse(source);
+
+      if (data.format === 'xv-1') {
+        store.commit(MutationTypes.IMPORT_PLAYERS, data.players);
+        return;
+      }
+
+      if (data.format_version === 9 && data.format_type === 'tournament') {
+        store.commit(MutationTypes.IMPORT_PLAYERS_OLD, source);
+      }
     };
 
     const onChange = (event: Event) => {

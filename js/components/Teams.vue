@@ -2,12 +2,6 @@
   <h3>Teams</h3>
   <div class="d-flex">
     <button class="btn btn-sm btn-primary" @click="balance">Balance</button>
-    <div class="form-file form-file-sm wf">
-      <input type="file" id="importOldFile" class="form-file-input d-none" @change="imp" />
-      <label for="importOldFile" class="form-file-label w-100">
-        <span class="form-file-button">Import Old</span>
-      </label>
-    </div>
     <button class="btn btn-sm btn-danger ml-2" @click="clear">Clear</button>
     <span>Dispersion value: {{ range }}</span>
     <input
@@ -95,29 +89,11 @@ export default defineComponent({
       store.commit(MutationTypes.CLEAR_TEAMS);
     };
 
-    const onReaderLoad = (event: ProgressEvent<FileReader>) => {
-      if (!event.target) return;
-
-      const data = event.target.result as string;
-      store.commit(MutationTypes.IMPORT_PLAYERS_OLD, data);
-    };
-
-    const imp = (event: Event) => {
-      const reader = new FileReader();
-      const { files } = event.target as HTMLInputElement;
-
-      if (files !== null && files.length) {
-        reader.onload = onReaderLoad;
-        reader.readAsText(files[0]);
-      }
-    };
-
     return {
       balance,
       range,
       clear,
       teams: storeTeams,
-      imp,
       maxSr,
       minSr,
       avgSr,
