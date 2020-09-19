@@ -11,7 +11,7 @@
     <span class="ml-2">Difference: {{ maxSr - minSr }}</span>
     <span class="ml-2">Average: {{ avgSr }}</span>
   </div>
-  <div class="teams pb-5 mb-5 overflow-auto h-80vh">
+  <div class="teams overflow-auto h-80vh">
     <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
   <balance />

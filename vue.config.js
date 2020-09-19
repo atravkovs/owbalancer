@@ -3,6 +3,7 @@ const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 
 module.exports = {
   configureWebpack: {
+    title: 'Tournament Balancer',
     entry: './js/main.ts',
     resolve: {
       alias: {
