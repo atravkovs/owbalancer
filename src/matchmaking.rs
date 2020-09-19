@@ -91,7 +91,7 @@ impl<'a> Mathmaking<'a> {
 
     fn init_teams(&mut self) {
         let mut captains = self.players.get_captains();
-        captains.sort_by_rank(Direction::DESC);
+        captains.sort_by_rank(Direction::ASC);
         self.preserve_players(&captains);
 
         self.teams = Teams::from(captains);
@@ -175,10 +175,12 @@ impl<'a> Mathmaking<'a> {
 
     fn distribute_squires(&mut self) {
         let mut squires = self.players.get_squires();
-        squires.sort_by_rank(Direction::DESC);
+        squires.sort_by_rank(Direction::ASC);
         self.preserve_players(&squires);
 
         self.teams.distribute_squires_to_dps(&mut squires);
+        self.teams.update();
+        self.teams.sort(Direction::DESC);
         self.teams.distribute_squires(&mut squires);
     }
 
