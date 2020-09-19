@@ -5,8 +5,8 @@ export const STORAGE_KEY = 'owbalancer';
 
 const storage = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
 
-const players: Players = storage.players || {};
 const teams: Teams = storage.teams || [];
+const players: Players = storage.players || {};
 const reservedPlayers: ReservedPlayers = storage.reservedPlayers || [];
 
 export const state = {
@@ -14,6 +14,7 @@ export const state = {
   players,
   editPlayer: '',
   reservedPlayers,
+  isBalance: false,
 };
 
 export type State = typeof state;

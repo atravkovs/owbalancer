@@ -8,6 +8,7 @@ import { State } from './state';
 
 export type Mutations<S = State> = {
   [MutationTypes.CLEAR_TEAMS](state: S): void;
+  [MutationTypes.TOGGLE_BALANCE](state: S): void;
   [MutationTypes.CLEAR_SQUIRES](state: S): void;
   [MutationTypes.CLEAR_CAPTAINS](state: S): void;
   [MutationTypes.DELETE_PLAYERS](state: S): void;
@@ -17,6 +18,7 @@ export type Mutations<S = State> = {
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
   [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
+  [MutationTypes.REMOVE_TEAM](state: S, teamUuid: string): void;
   [MutationTypes.EDIT_PLAYER](state: S, playerId: string): void;
   [MutationTypes.ASSIGN_SQUIRES](state: S, maxSR: number): void;
   [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
@@ -43,6 +45,9 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.CLEAR_EDIT_PLAYER](state) {
     state.editPlayer = '';
   },
+  [MutationTypes.TOGGLE_BALANCE](state) {
+    state.isBalance = !state.isBalance;
+  },
   [MutationTypes.ADD_PLAYER](state, player) {
     state.players[player.identity.uuid] = player;
   },
@@ -57,6 +62,22 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.ADD_TEAMS](state, teams) {
     state.teams = [...teams];
+  },
+  [MutationTypes.REMOVE_TEAM](state, teamUuid: string) {
+    const teamIndex = state.teams.findIndex(tm => tm.uuid === teamUuid);
+
+    if (teamIndex < 0) {
+      return;
+    }
+
+    if (state.teams.length - 1 > 0) {
+      const players = state.teams[teamIndex].members.map(member => member.uuid);
+      state.reservedPlayers.push(...players);
+    } else {
+      state.reservedPlayers = [];
+    }
+
+    state.teams.splice(teamIndex, 1);
   },
   [MutationTypes.IMPORT_PLAYERS](state, players) {
     state.players = { ...players, ...state.players };

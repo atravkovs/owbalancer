@@ -1,5 +1,5 @@
 <template>
-  <button @click="onClick" class="btn btn-secondary btn-sm">Export</button>
+  <button @click="onClick" class="btn btn-secondary btn-sm rounded-0 rounded-left">Export</button>
 </template>
 
 <script lang="ts">

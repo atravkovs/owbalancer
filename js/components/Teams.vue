@@ -4,16 +4,6 @@
     <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
     <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
     <button class="btn btn-sm btn-danger ml-2" @click="clear">Clear</button>
-    <span>Dispersion value: {{ range }}</span>
-    <input
-      type="range"
-      style="width:250px;"
-      class="form-range"
-      min="0"
-      max="150"
-      step="5"
-      v-model="range"
-    />
   </div>
   <div v-if="teams.length > 0">
     <span>Min SR: {{ minSr }}</span>
@@ -24,21 +14,21 @@
   <div class="teams pb-5 mb-5 overflow-auto h-80vh">
     <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
+  <balance />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useStore } from '@/store';
 import TObj from '@/objects/team';
 import MutationTypes from '@/store/mutation-types';
 
 import Team from '@/components/Teams/Team.vue';
-
-const wasm = import('@/../pkg/index.js');
+import Balance from '@/components/Teams/Balance.vue';
 
 export default defineComponent({
   name: 'Teams',
-  components: { Team },
+  components: { Team, Balance },
   setup() {
     const store = useStore();
     const storeTeams = computed(() => store.state.teams);
@@ -64,33 +54,9 @@ export default defineComponent({
           store.state.teams.length
       )
     );
-    const range = ref(0);
 
     const balance = () => {
-      store.commit(MutationTypes.CLEAR_TEAMS);
-
-      wasm
-        .then((lib) => {
-          try {
-            const { leftovers, teams } = lib.balance(
-              store.state.players,
-              +range.value
-            );
-            const ignoredUuids = leftovers.reduce((acc, leftover) => {
-              acc.push(leftover.uuid);
-              return acc;
-            }, []);
-
-            console.log('Teams', teams);
-            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-            store.commit(MutationTypes.ADD_TEAMS, teams);
-          } catch (e) {
-            console.error(e.message);
-          }
-        })
-        .catch((e) => {
-          console.error(e.message);
-        });
+      store.commit(MutationTypes.TOGGLE_BALANCE);
     };
 
     const clear = () => {
@@ -109,7 +75,6 @@ export default defineComponent({
     };
 
     return {
-      range,
       clear,
       maxSr,
       minSr,

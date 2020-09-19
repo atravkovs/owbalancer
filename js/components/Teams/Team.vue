@@ -1,8 +1,9 @@
 <template>
   <div class="card mw-nb mh-300">
-    <div class="card-header d-flex justify-content-between pr-0 py-0">
+    <div class="card-header d-flex justify-content-between p-0">
       <div class="py-1 d-flex">
-        <span>Team</span>
+        <u class="ml-2 c-pointer" @click="removeTeam">x</u>
+        <span class="ml-2">Team</span>
         <input
           type="text"
           class="form-control-plaintext p-0 pl-1"
@@ -68,6 +69,10 @@ export default defineComponent({
       }
     }, 1000);
 
+    const removeTeam = () => {
+      store.commit(MutationTypes.REMOVE_TEAM, cTeam.value.uuid);
+    };
+
     return {
       tanks,
       dps,
@@ -77,6 +82,7 @@ export default defineComponent({
       mTeam,
       teamAverage,
       updateTeam,
+      removeTeam,
     };
   },
 });
@@ -91,5 +97,8 @@ export default defineComponent({
 }
 .mh-300 {
   max-height: 290px;
+}
+.c-pointer {
+  cursor: pointer;
 }
 </style>

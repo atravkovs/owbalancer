@@ -13,7 +13,11 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button class="btn btn-primary" @click="$emit('save-changes')">Save changes</button>
+          <button
+            v-if="!hideSaveChanges"
+            class="btn btn-primary"
+            @click="$emit('save-changes')"
+          >{{ customAction || 'Save changes' }}</button>
         </div>
       </div>
     </div>
@@ -30,6 +34,7 @@ export default defineComponent({
   props: {
     title: String,
     isActive: Boolean,
+    customAction: String,
   },
   setup(props, { emit }) {
     const modalRef = ref(null);
