@@ -2,7 +2,7 @@
   <div class="card mw-nb">
     <div class="card-header d-flex justify-content-between pr-0 py-0">
       <span class="py-1">Team {{ mTeam.name }}</span>
-      <span class="bg-primary btr px-2 py-1 text-light">{{ teamAverage }}</span>
+      <span class="bg-secondary btr px-2 py-1 text-light">{{ teamAverage }}</span>
     </div>
     <div class="card-body p-0 pb-1 fs-small">
       <ul class="list-group list-group-flush">

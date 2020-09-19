@@ -14,10 +14,11 @@
       v-model="range"
     />
   </div>
-  <div>
-    <span>Min SR: {{ minSr }};&nbsp;</span>
-    <span>Max SR: {{ maxSr }};&nbsp;</span>
-    <span>Average: {{ avgSr }}</span>
+  <div v-if="teams.length > 0">
+    <span>Min SR: {{ minSr }}</span>
+    <span class="ml-2">Max SR: {{ maxSr }}</span>
+    <span class="ml-2">Difference: {{ maxSr - minSr }}</span>
+    <span class="ml-2">Average: {{ avgSr }}</span>
   </div>
   <div class="teams pb-5 mb-5 overflow-auto h-80vh">
     <team v-for="team in teams" :key="team.uuid" :team="team" />
@@ -40,21 +41,26 @@ export default defineComponent({
     const store = useStore();
     const storeTeams = computed(() => store.state.teams);
     const maxSr = computed(() =>
-      store.state.teams.reduce(
-        (acc, team) => (acc < team.avgSr ? team.avgSr : acc),
-        0
+      Math.floor(
+        store.state.teams.reduce(
+          (acc, team) => (acc < team.avgSr ? team.avgSr : acc),
+          0
+        )
       )
     );
     const minSr = computed(() =>
-      store.state.teams.reduce(
-        (acc, team) => (acc > team.avgSr ? team.avgSr : acc),
-        10000
+      Math.floor(
+        store.state.teams.reduce(
+          (acc, team) => (acc > team.avgSr ? team.avgSr : acc),
+          10000
+        )
       )
     );
-    const avgSr = computed(
-      () =>
+    const avgSr = computed(() =>
+      Math.floor(
         store.state.teams.reduce((acc, team) => acc + team.avgSr, 0) /
-        store.state.teams.length
+          store.state.teams.length
+      )
     );
     const range = ref(0);
 
