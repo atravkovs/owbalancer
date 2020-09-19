@@ -14,7 +14,6 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button
-            v-if="!hideSaveChanges"
             class="btn btn-primary"
             @click="$emit('save-changes')"
           >{{ customAction || 'Save changes' }}</button>

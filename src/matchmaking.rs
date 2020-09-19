@@ -40,7 +40,7 @@ impl<'a> Mathmaking<'a> {
     pub fn balance_players(&mut self) {
         self.init_teams();
         self.distribute_squires();
-        self.init_pool();
+        self.init_pool(false);
         self.distribute_leutenants();
         self.distribute_ensigns();
         self.distribute_fillers();
@@ -52,23 +52,39 @@ impl<'a> Mathmaking<'a> {
     pub fn balance_half(&mut self) {
         self.init_teams();
         self.distribute_squires();
-        self.init_pool();
+        self.init_pool(false);
         self.distribute_leutenants();
         self.distribute_ensigns();
         self.teams.update();
         self.teams.sort(Direction::ASC);
     }
 
+    pub fn balance_remaining(&mut self) {
+        self.init_pool(true);
+        self.distribute_fillers();
+        self.distribute_remaining();
+        self.teams.update();
+        self.swap_steal();
+    }
+
     pub fn result(self) -> BalancerResult {
         BalancerResult::new(self.teams, self.pool)
+    }
+
+    pub fn add_reserve(&mut self, reserve: Vec<String>) {
+        self.balanced = reserve;
+    }
+
+    pub fn add_teams(&mut self, teams: Teams) {
+        self.teams = teams;
     }
 
     fn preserve_players(&mut self, players: &PlayerPool) {
         self.balanced.extend(players.collect_ids().into_iter())
     }
 
-    fn init_pool(&mut self) {
-        self.players.feed(&mut self.pool, &self.balanced);
+    fn init_pool(&mut self, invert: bool) {
+        self.players.feed(&mut self.pool, &self.balanced, invert);
         self.pool.sort_by_rank(Direction::ASC);
         self.reserve_pool = self.pool.clone();
     }

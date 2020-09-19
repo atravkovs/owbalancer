@@ -96,9 +96,15 @@ impl Players {
         PlayerPool(players)
     }
 
-    pub fn feed(&self, pool: &mut PlayerPool, exclude: &Vec<String>) {
+    pub fn feed(&self, pool: &mut PlayerPool, exclude: &Vec<String>, invert: bool) {
         for (_, player) in &self.0 {
-            if !exclude.contains(&player.identity.uuid) {
+            let mut pass = exclude.contains(&player.identity.uuid);
+
+            if !invert {
+                pass = !pass;
+            }
+
+            if pass {
                 pool.add_player(player);
             }
         }

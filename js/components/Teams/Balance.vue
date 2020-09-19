@@ -37,6 +37,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { computed, defineComponent, ref } from 'vue';
 
 import Modal from '@/components/Helpers/Modal.vue';
@@ -54,74 +55,83 @@ export default defineComponent({
 
     const store = useStore();
     const isActive = computed(() => store.state.isBalance);
+    const reservedPlayers = computed(() => store.state.reservedPlayers);
+    const stateTeams = computed(() => store.state.teams);
 
     const closeModal = () => {
       store.commit(MutationTypes.TOGGLE_BALANCE);
     };
 
-    const fullBalance = () => {
-      store.commit(MutationTypes.CLEAR_TEAMS);
-
-      wasm
-        .then((lib) => {
-          try {
-            const { leftovers, teams } = lib.balance(
-              store.state.players,
-              +range.value
-            );
-            const ignoredUuids = leftovers.reduce((acc, leftover) => {
-              acc.push(leftover.uuid);
-              return acc;
-            }, []);
-
-            console.log('Teams', teams);
-            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-            store.commit(MutationTypes.ADD_TEAMS, teams);
-          } catch (e) {
-            console.error(e.message);
-          }
-        })
-        .catch((e) => {
-          console.error(e.message);
-        });
+    const fullBalance: (lib: any) => any = (lib) => {
+      return lib.balance(store.state.players, +range.value);
     };
 
-    const halfBalance = () => {
-      store.commit(MutationTypes.CLEAR_TEAMS);
+    const halfBalance: (lib: any) => any = (lib) => {
+      return lib.balance_half(store.state.players, +range.value);
+    };
 
-      wasm
-        .then((lib) => {
-          try {
-            const { leftovers, teams } = lib.balance_half(
-              store.state.players,
-              +range.value
-            );
-            const ignoredUuids = leftovers.reduce((acc, leftover) => {
-              acc.push(leftover.uuid);
-              return acc;
-            }, []);
+    const finalBalance: (lib: any, data: any) => any = (
+      lib,
+      { teamsCopy, reserveCopy }
+    ) => {
+      return lib.balance_final(
+        store.state.players,
+        +range.value,
+        reserveCopy,
+        teamsCopy
+      );
+    };
 
-            console.log('Teams', teams);
-            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-            store.commit(MutationTypes.ADD_TEAMS, teams);
-          } catch (e) {
-            console.error(e.message);
-          }
-        })
-        .catch((e) => {
-          console.error(e.message);
-        });
+    const conditionalBalance: (lib: any, data: any) => any = (lib, data) => {
+      if (balanceType.value === 'half') {
+        return halfBalance(lib);
+      }
+
+      if (balanceType.value === 'final') {
+        return finalBalance(lib, data);
+      }
+
+      return fullBalance(lib);
     };
 
     const balance = () => {
-      if (balanceType.value === 'full') {
-        fullBalance();
-      } else if (balanceType.value === 'half') {
-        halfBalance();
-      }
+      const teamsCopy = [...stateTeams.value];
+      const reserveCopy = [...reservedPlayers.value];
+
+      store.commit(MutationTypes.CLEAR_TEAMS);
+
+      wasm
+        .then((lib) => {
+          try {
+            const { leftovers, teams } = conditionalBalance(lib, {
+              teamsCopy,
+              reserveCopy,
+            });
+
+            const ignoredUuids = leftovers.reduce((acc, leftover) => {
+              acc.push(leftover.uuid);
+              return acc;
+            }, []);
+
+            console.log('Teams', teams);
+            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
+            store.commit(MutationTypes.ADD_TEAMS, teams);
+          } catch (e) {
+            console.error(e.message);
+          }
+        })
+        .catch((e) => {
+          console.error(e.message);
+        });
     };
 
-    return { closeModal, isActive, range, balance, balanceType };
+    return {
+      closeModal,
+      isActive,
+      range,
+      balance,
+      balanceType,
+    };
   },
 });
 </script>

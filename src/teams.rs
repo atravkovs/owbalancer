@@ -22,7 +22,7 @@ pub struct Team {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
-pub struct Teams(Vec<Team>);
+pub struct Teams(pub Vec<Team>);
 
 impl Member {
     pub fn new(uuid: String, name: String, role: Role) -> Member {
@@ -140,8 +140,13 @@ impl Team {
         let players_count = 6;
         let tolerance_range = tolerance * players_count;
 
-        let target_sr = ((players_average * players_count as i32) - self.total_sr)
-            / (players_count as i32 - self.members_count() as i32);
+        let target_sr = if self.members_count() as u32 != players_count {
+            ((players_average * players_count as i32) - self.total_sr)
+                / (players_count as i32 - self.members_count() as i32)
+        } else {
+            self.avg_sr as i32
+        };
+
         let min_sr = target_sr - tolerance_range as i32;
         let max_sr = target_sr + tolerance_range as i32;
 
