@@ -1,7 +1,15 @@
 <template>
-  <div class="card mw-nb">
+  <div class="card mw-nb mh-300">
     <div class="card-header d-flex justify-content-between pr-0 py-0">
-      <span class="py-1">Team {{ mTeam.name }}</span>
+      <div class="py-1 d-flex">
+        <span>Team</span>
+        <input
+          type="text"
+          class="form-control-plaintext p-0 pl-1"
+          :value="mTeam.name"
+          @input="updateTeam"
+        />
+      </div>
       <span class="bg-secondary btr px-2 py-1 text-light">{{ teamAverage }}</span>
     </div>
     <div class="card-body p-0 pb-1 fs-small">
@@ -15,11 +23,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { Team } from '@/objects/team';
 import { useStore } from '@/store';
+import debounce from 'lodash/debounce';
 
 import TeamRoles from '@/components/Teams/TeamRoles.vue';
+import MutationTypes from '@/store/mutation-types';
 
 export default defineComponent({
   name: 'Team',
@@ -32,9 +42,10 @@ export default defineComponent({
     const players = computed(() => store.state.players);
     const teamUuid = computed(() => props.team?.uuid);
     const teamAverage = computed(() => Math.round(props.team?.avgSr || 0));
-    const mTeam = computed(() =>
+    const cTeam = computed(() =>
       store.state.teams.find((team) => team.uuid === teamUuid.value)
     );
+    const mTeam = ref(cTeam);
 
     const tanks = computed(() =>
       mTeam.value?.members.filter((member) => member.role === 'tank')
@@ -46,7 +57,27 @@ export default defineComponent({
       mTeam.value?.members.filter((member) => member.role === 'support')
     );
 
-    return { tanks, dps, supports, players, teamUuid, mTeam, teamAverage };
+    const updateTeam = debounce((e: Event) => {
+      const teamName = (e.target as HTMLInputElement).value;
+
+      if (cTeam.value && teamName) {
+        store.commit(MutationTypes.UPDATE_TEAM_NAME, {
+          teamUuid: cTeam.value.uuid,
+          teamName,
+        });
+      }
+    }, 1000);
+
+    return {
+      tanks,
+      dps,
+      supports,
+      players,
+      teamUuid,
+      mTeam,
+      teamAverage,
+      updateTeam,
+    };
   },
 });
 </script>
@@ -57,5 +88,8 @@ export default defineComponent({
 }
 .fs-small {
   font-size: 0.9rem;
+}
+.mh-300 {
+  max-height: 290px;
 }
 </style>

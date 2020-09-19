@@ -1,1 +1,1 @@
-declare module 'vue-drag-sortable';
+declare module 'naampje';

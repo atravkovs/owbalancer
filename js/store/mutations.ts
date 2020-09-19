@@ -1,7 +1,7 @@
 import { MutationTree } from 'vuex';
 import { PLAYERS_IN_TEAM } from '@/constants';
 import PObj, { Player, Stats, Players, ClassType } from '@/objects/player';
-import TObj, { Teams } from '@/objects/team';
+import TObj, { Teams, Team } from '@/objects/team';
 
 import MutationTypes from './mutation-types';
 import { State } from './state';
@@ -13,6 +13,7 @@ export type Mutations<S = State> = {
   [MutationTypes.DELETE_PLAYERS](state: S): void;
   [MutationTypes.CLEAR_ALL_EXTRA](state: S): void;
   [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
+  [MutationTypes.ADD_TEAM](state: S, team: Team): void;
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
   [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
@@ -27,10 +28,18 @@ export type Mutations<S = State> = {
   [MutationTypes.REMOVE_FROM_RESERVE](state: S, playerId: string): void;
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
+  [MutationTypes.UPDATE_TEAM_NAME](state: S, data: { teamUuid: string; teamName: string }): void;
   [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamUuid: string; playerName: string; playerId: string; role: ClassType; roleName: 'dps' | 'support' | 'tank' }): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
+  [MutationTypes.UPDATE_TEAM_NAME](state, { teamUuid, teamName }) {
+    const index = state.teams.findIndex(mTeam => mTeam.uuid === teamUuid);
+
+    if (index >= 0) {
+      state.teams[index].name = teamName;
+    }
+  },
   [MutationTypes.CLEAR_EDIT_PLAYER](state) {
     state.editPlayer = '';
   },
@@ -42,6 +51,9 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.ADD_PLAYERS](state, players) {
     state.players = { ...state.players, ...players };
+  },
+  [MutationTypes.ADD_TEAM](state, team) {
+    state.teams.push(team);
   },
   [MutationTypes.ADD_TEAMS](state, teams) {
     state.teams = [...teams];

@@ -1,7 +1,8 @@
 <template>
   <h3>Teams</h3>
   <div class="d-flex">
-    <button class="btn btn-sm btn-primary" @click="balance">Balance</button>
+    <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
+    <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
     <button class="btn btn-sm btn-danger ml-2" @click="clear">Clear</button>
     <span>Dispersion value: {{ range }}</span>
     <input
@@ -28,6 +29,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
+import TObj from '@/objects/team';
 import MutationTypes from '@/store/mutation-types';
 
 import Team from '@/components/Teams/Team.vue';
@@ -95,14 +97,26 @@ export default defineComponent({
       store.commit(MutationTypes.CLEAR_TEAMS);
     };
 
+    const addNew = () => {
+      const newTeam = TObj.createEmptyTeam();
+
+      if (store.state.teams.length <= 0) {
+        const playerIds = Object.keys(store.state.players);
+        store.commit(MutationTypes.RESERVE_PLAYERS, playerIds);
+      }
+
+      store.commit(MutationTypes.ADD_TEAM, newTeam);
+    };
+
     return {
-      balance,
       range,
       clear,
-      teams: storeTeams,
       maxSr,
       minSr,
       avgSr,
+      addNew,
+      balance,
+      teams: storeTeams,
     };
   },
 });

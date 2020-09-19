@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import NameGenerator from 'naampje';
 
 export type TeamMembers = {
     rank: number;
@@ -17,7 +18,8 @@ export type Team = {
 
 export type Teams = Team[];
 
-const createEmptyTeam: (tname: string) => Team = (name) => {
+const createEmptyTeam: () => Team = () => {
+    const name = NameGenerator.name();
     return {
         name,
         avgSr: 0,
