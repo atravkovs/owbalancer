@@ -4,7 +4,7 @@
       <span class="py-1">Team {{ mTeam.name }}</span>
       <span class="bg-primary btr px-2 py-1 text-light">{{ teamAverage }}</span>
     </div>
-    <div class="card-body p-0 fs-small">
+    <div class="card-body p-0 pb-1 fs-small">
       <ul class="list-group list-group-flush">
         <team-roles :members="tanks" rtype="tank" :teamUuid="teamUuid" />
         <team-roles :members="dps" rtype="dps" :teamUuid="teamUuid" />

@@ -4,12 +4,12 @@
     :key="i"
     @dragover="allowDrop"
     @drop="(e) => drop(e, i)"
-    class="list-group-item d-flex p-0 pl-3 pr-1 py-1"
+    class="list-group-item d-flex p-0 pl-3 pr-1"
   >
     <div class="fs-b pr-2">
       <role-icon :rtype="rtype" />
     </div>
-    <div class="w-100">
+    <div class="w-100 lh-26">
       <player-card
         v-if="members[i - 1]"
         :player="players[members[i - 1].uuid]"
@@ -142,5 +142,8 @@ export default defineComponent({
 .fs-b {
   font-size: 1.2em;
   line-height: 2.4em;
+}
+.lh-26 {
+  line-height: 2.6rem;
 }
 </style>

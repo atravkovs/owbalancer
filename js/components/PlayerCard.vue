@@ -13,7 +13,10 @@
         </div>
         <div>{{ sr }}</div>
       </div>
-      <div :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid }">
+      <div
+        class="text-ellip"
+        :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, 'wt': !!teamUuid }"
+      >
         {{ player.identity.name }}
         &nbsp;
         <span class="extra-icon">
@@ -111,6 +114,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.text-ellip {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.wt {
+  width: 100px;
+}
 .lh-100 {
   line-height: 50px;
 }
