@@ -26,8 +26,8 @@ export type Mutations<S = State> = {
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
   [MutationTypes.REMOVE_FROM_RESERVE](state: S, playerId: string): void;
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
-  [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamName: string; playerId: string }): void;
-  [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamName: string; playerName: string; playerId: string; role: ClassType; roleName: 'dps' | 'support' | 'tank' }): void;
+  [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
+  [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamUuid: string; playerName: string; playerId: string; role: ClassType; roleName: 'dps' | 'support' | 'tank' }): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
@@ -67,8 +67,8 @@ export const mutations: MutationTree<State> & Mutations = {
       state.reservedPlayers.splice(index, 1);
     }
   },
-  [MutationTypes.REMOVE_FROM_TEAM](state, { teamName, playerId }) {
-    const teamF = state.teams.findIndex(team => team.name === teamName);
+  [MutationTypes.REMOVE_FROM_TEAM](state, { teamUuid, playerId }) {
+    const teamF = state.teams.findIndex(team => team.uuid === teamUuid);
 
     if (teamF !== -1) {
       const index = state.teams[teamF].members.findIndex(member => member.uuid === playerId);
@@ -78,8 +78,8 @@ export const mutations: MutationTree<State> & Mutations = {
       state.teams[teamF].totalSr = totalSr;
     }
   },
-  [MutationTypes.ADD_TEAMPLAYER](state, { playerName, teamName, playerId, role, roleName }) {
-    const teamF = state.teams.findIndex(team => team.name === teamName);
+  [MutationTypes.ADD_TEAMPLAYER](state, { playerName, teamUuid, playerId, role, roleName }) {
+    const teamF = state.teams.findIndex(team => team.uuid === teamUuid);
 
     if (teamF !== -1) {
       state.teams[teamF].members.push({

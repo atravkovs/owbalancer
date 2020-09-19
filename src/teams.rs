@@ -1,6 +1,7 @@
 use crate::players::{Candidate, Direction, PlayerPool};
 use crate::roles::{Role, RolesFilter, SimpleRole};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Member {
@@ -13,6 +14,7 @@ pub struct Member {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Team {
+    pub uuid: Uuid,
     pub avg_sr: f32,
     pub name: String,
     pub total_sr: i32,
@@ -57,9 +59,11 @@ impl Team {
     pub fn new(name: String, player: Member) -> Team {
         let mut members = Vec::default();
         members.push(player);
+        let uuid = Uuid::new_v4();
 
         Team {
             name,
+            uuid,
             members,
             avg_sr: 0.0,
             total_sr: 0,

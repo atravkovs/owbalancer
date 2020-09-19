@@ -6,9 +6,9 @@
         <span>Average SR: {{ mTeam.avgSr }}</span>
       </div>
       <ul class="list-group list-group-flush">
-        <team-roles :members="tanks" rtype="tank" :teamName="teamName" />
-        <team-roles :members="dps" rtype="dps" :teamName="teamName" />
-        <team-roles :members="supports" rtype="support" :teamName="teamName" />
+        <team-roles :members="tanks" rtype="tank" :teamUuid="teamUuid" />
+        <team-roles :members="dps" rtype="dps" :teamUuid="teamUuid" />
+        <team-roles :members="supports" rtype="support" :teamUuid="teamUuid" />
       </ul>
     </div>
   </div>
@@ -30,9 +30,9 @@ export default defineComponent({
   setup(props) {
     const store = useStore();
     const players = computed(() => store.state.players);
-    const teamName = computed(() => props.team?.name);
+    const teamUuid = computed(() => props.team?.uuid);
     const mTeam = computed(() =>
-      store.state.teams.find((team) => team.name === teamName.value)
+      store.state.teams.find((team) => team.uuid === teamUuid.value)
     );
 
     const tanks = computed(() =>
@@ -45,7 +45,7 @@ export default defineComponent({
       mTeam.value?.members.filter((member) => member.role === 'support')
     );
 
-    return { tanks, dps, supports, players, teamName, mTeam };
+    return { tanks, dps, supports, players, teamUuid, mTeam };
   },
 });
 </script>

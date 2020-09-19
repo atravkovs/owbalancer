@@ -14,7 +14,7 @@
         v-if="members[i - 1]"
         :player="players[members[i - 1].uuid]"
         :prefferedRank="members[i - 1].rank"
-        :teamName="teamName"
+        :teamUuid="teamUuid"
       />
     </div>
   </li>
@@ -34,7 +34,7 @@ export default defineComponent({
   name: 'TeamRoles',
   props: {
     rtype: String,
-    teamName: String,
+    teamUuid: String,
     members: Array,
   },
   components: { RoleIcon, PlayerCard },
@@ -49,9 +49,9 @@ export default defineComponent({
       ev.preventDefault();
       const i = index - 1;
       const playerId = ev?.dataTransfer?.getData('playerTag');
-      const teamName = ev?.dataTransfer?.getData('team');
+      const teamUuid = ev?.dataTransfer?.getData('team');
 
-      if (!playerId || !props.rtype || !props.teamName) return;
+      if (!playerId || !props.rtype || !props.teamUuid) return;
 
       const player = players.value[playerId];
       const role = PObj.getRole(player.stats.classes, props.rtype);
@@ -66,22 +66,22 @@ export default defineComponent({
           return;
         }
 
-        if (!teamName) {
+        if (!teamUuid) {
           store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-            teamName: props.teamName,
+            teamUuid: props.teamUuid,
             playerId: member.uuid,
           });
           store.commit(MutationTypes.REMOVE_FROM_RESERVE, playerId);
           store.commit(MutationTypes.ADD_RESERVE, member.uuid);
           store.commit(MutationTypes.ADD_TEAMPLAYER, {
-            teamName: props.teamName,
+            teamUuid: props.teamUuid,
             playerId,
             role,
             roleName: props.rtype,
           });
         } else {
           const teamF = store.state.teams.findIndex(
-            (team) => team.name === teamName
+            (team) => team.uuid === teamUuid
           );
           const swapCandidate = store.state.players[member.uuid];
 
@@ -96,21 +96,21 @@ export default defineComponent({
 
             if (sdRole.isActive) {
               store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-                teamName: props.teamName,
+                teamUuid: props.teamUuid,
                 playerId: member.uuid,
               });
               store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-                teamName,
+                teamUuid,
                 playerId,
               });
               store.commit(MutationTypes.ADD_TEAMPLAYER, {
-                teamName: props.teamName,
+                teamUuid: props.teamUuid,
                 playerId,
                 role,
                 roleName: props.rtype,
               });
               store.commit(MutationTypes.ADD_TEAMPLAYER, {
-                teamName,
+                teamUuid,
                 playerId: member.uuid,
                 role: sdRole,
                 roleName: memF.role,
@@ -120,12 +120,12 @@ export default defineComponent({
         }
       } else {
         store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-          teamName,
+          teamUuid,
           playerId,
         });
         store.commit(MutationTypes.REMOVE_FROM_RESERVE, playerId);
         store.commit(MutationTypes.ADD_TEAMPLAYER, {
-          teamName: props.teamName,
+          teamUuid: props.teamUuid,
           playerId,
           role,
           roleName: props.rtype,

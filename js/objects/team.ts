@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export type TeamMembers = {
     rank: number;
     uuid: string;
@@ -6,6 +8,7 @@ export type TeamMembers = {
 };
 
 export type Team = {
+    uuid: string;
     name: string;
     avgSr: number;
     totalSr: number;
@@ -20,6 +23,7 @@ const createEmptyTeam: (tname: string) => Team = (name) => {
         avgSr: 0,
         totalSr: 0,
         members: [],
+        uuid: uuidv4(),
     };
 };
 

@@ -26,7 +26,7 @@
     <span>Average: {{ avgSr }}</span>
   </div>
   <div class="teams pb-5 mb-5">
-    <team v-for="team in teams" :key="team.name" :team="team" />
+    <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
 </template>
 

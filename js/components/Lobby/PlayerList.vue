@@ -139,13 +139,13 @@ export default defineComponent({
     const drop = (ev: DragEvent) => {
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
-      const teamName = ev?.dataTransfer?.getData('team');
+      const teamUuid = ev?.dataTransfer?.getData('team');
       store.commit(MutationTypes.ADD_RESERVE, playerId);
       store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-        teamName,
+        teamUuid,
         playerId,
       });
-      console.log(`Hello, ${playerId} from ${teamName}!`);
+      console.log(`Hello, ${playerId} from ${teamUuid}!`);
     };
 
     return { state, sort, filter, squireCount, captainCount, allowDrop, drop };

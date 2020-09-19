@@ -24,12 +24,12 @@ export default defineComponent({
     const drop = (ev: DragEvent) => {
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
-      const teamName = ev?.dataTransfer?.getData('team');
+      const teamUuid = ev?.dataTransfer?.getData('team');
       store.commit(MutationTypes.DELETE_PLAYER, playerId);
 
-      if (teamName) {
+      if (teamUuid) {
         store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-          teamName,
+          teamUuid,
           playerId,
         });
       }

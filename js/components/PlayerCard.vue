@@ -43,7 +43,7 @@ import SwordIcon from '@/components/svg/SwordIcon.vue';
 export default defineComponent({
   name: 'PlayerCard',
   props: {
-    teamName: String,
+    teamUuid: String,
     player: Object as PropType<Player>,
     prefferedRole: String,
     prefferedRank: Number,
@@ -59,8 +59,7 @@ export default defineComponent({
           'playerTag',
           props.player?.identity.uuid || ''
         );
-        console.log(props.teamName);
-        a = ev.dataTransfer?.setData('team', props.teamName || '');
+        a = ev.dataTransfer?.setData('team', props.teamUuid || '');
       }
 
       return a;
