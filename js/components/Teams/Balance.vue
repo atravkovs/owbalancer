@@ -6,7 +6,7 @@
     @close-modal="closeModal"
     @save-changes="balance"
   >
-    <div class="mb-3">
+    <div class="mb-3 mt-1">
       <label class="form-label">Balance Type</label>
       <br />
       <div class="btn-group">
@@ -16,6 +16,30 @@
         <label class="btn btn-primary" for="balance2">Half</label>
         <input type="radio" value="final" id="balance3" class="btn-check" v-model="balanceType" />
         <label class="btn btn-primary" for="balance3">Final</label>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Options</label>
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="lowRankLimiter"
+          class="form-check-input"
+          v-model="lowRankLimiter"
+        />
+        <label for="lowRankLimiter" class="form-check-label">Low rank limiter</label>
+      </div>
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="disallowSecondaryRoles"
+          class="form-check-input"
+          v-model="disallowSecondaryRoles"
+        />
+        <label
+          for="disallowSecondaryRoles"
+          class="form-check-label"
+        >Disallow duplicate secondary roles</label>
       </div>
     </div>
     <div class="mb-3">
@@ -52,6 +76,8 @@ export default defineComponent({
   setup() {
     const range = ref(30);
     const balanceType = ref('full');
+    const lowRankLimiter = ref(false);
+    const disallowSecondaryRoles = ref(false);
 
     const store = useStore();
     const isActive = computed(() => store.state.isBalance);
@@ -63,11 +89,21 @@ export default defineComponent({
     };
 
     const fullBalance: (lib: any) => any = (lib) => {
-      return lib.balance(store.state.players, +range.value);
+      return lib.balance(
+        store.state.players,
+        +range.value,
+        lowRankLimiter.value,
+        disallowSecondaryRoles.value
+      );
     };
 
     const halfBalance: (lib: any) => any = (lib) => {
-      return lib.balance_half(store.state.players, +range.value);
+      return lib.balance_half(
+        store.state.players,
+        +range.value,
+        lowRankLimiter.value,
+        disallowSecondaryRoles.value
+      );
     };
 
     const finalBalance: (lib: any, data: any) => any = (
@@ -77,6 +113,8 @@ export default defineComponent({
       return lib.balance_final(
         store.state.players,
         +range.value,
+        lowRankLimiter.value,
+        disallowSecondaryRoles.value,
         reserveCopy,
         teamsCopy
       );
@@ -126,11 +164,13 @@ export default defineComponent({
     };
 
     return {
-      closeModal,
-      isActive,
       range,
       balance,
+      isActive,
+      closeModal,
       balanceType,
+      lowRankLimiter,
+      disallowSecondaryRoles,
     };
   },
 });

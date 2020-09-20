@@ -1,6 +1,8 @@
+use crate::matchmaking::Config;
 use crate::players::{Candidate, Direction, PlayerPool};
 use crate::roles::{Role, RolesFilter, SimpleRole};
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -98,12 +100,24 @@ impl Team {
         self.count_role(&SimpleRole::Dps)
     }
 
+    pub fn low_dps_count(&self, threshold: i32) -> usize {
+        self.count_role_lows(&SimpleRole::Dps, threshold)
+    }
+
     pub fn support_count(&self) -> usize {
         self.count_role(&SimpleRole::Support)
     }
 
+    pub fn low_support_count(&self, threshold: i32) -> usize {
+        self.count_role_lows(&SimpleRole::Support, threshold)
+    }
+
     pub fn tank_count(&self) -> usize {
         self.count_role(&SimpleRole::Tank)
+    }
+
+    pub fn low_tank_count(&self, threshold: i32) -> usize {
+        self.count_role_lows(&SimpleRole::Tank, threshold)
     }
 
     pub fn update(&mut self) -> (f32, i32) {
@@ -136,12 +150,12 @@ impl Team {
         None
     }
 
-    pub fn get_range(&self, tolerance: u32, players_average: i32) -> (i32, i32) {
+    pub fn get_range(&self, config: &Config) -> (i32, i32) {
         let players_count = 6;
-        let tolerance_range = tolerance * players_count;
+        let tolerance_range = config.tolerance * players_count;
 
         let target_sr = if self.members_count() as u32 != players_count {
-            ((players_average * players_count as i32) - self.total_sr)
+            ((config.players_average * players_count as i32) - self.total_sr)
                 / (players_count as i32 - self.members_count() as i32)
         } else {
             self.avg_sr as i32
@@ -159,9 +173,7 @@ impl Team {
         target_role: &SimpleRole,
         range: (i32, i32),
         db: &PlayerPool,
-        tolerance: u32,
-        total_sr: i32,
-        total_count: usize,
+        config: &Config,
     ) -> Option<usize> {
         for role in &candidate.roles.0 {
             let (simple, _) = role.decompose();
@@ -170,7 +182,7 @@ impl Team {
                     return false;
                 }
 
-                if !self.pfsr(candidate, member, tolerance, total_sr, total_count) {
+                if !self.pfsr(candidate, member, config) {
                     return false;
                 }
 
@@ -191,21 +203,14 @@ impl Team {
         None
     }
 
-    pub fn pfsr(
-        &self,
-        candidate: &Candidate,
-        member: &Member,
-        tolerance: u32,
-        total_sr: i32,
-        total_count: usize,
-    ) -> bool {
+    pub fn pfsr(&self, candidate: &Candidate, member: &Member, config: &Config) -> bool {
         if let Some(role) = candidate.roles.get_by_simple(&member.role) {
             let rank = role.decompose().1;
-            let new_average = (total_sr + rank) as f32 / (total_count + 1) as f32;
+            let new_average = (config.total_sr + rank) as f32 / (config.total_count + 1) as f32;
             let team_size = 6;
             let new_sr = (self.total_sr + rank - member.rank) as f32 / team_size as f32;
 
-            ((new_sr - new_average).abs().floor() as u32) <= tolerance
+            ((new_sr - new_average).abs().floor() as u32) <= config.tolerance
         } else {
             false
         }
@@ -225,6 +230,13 @@ impl Team {
         self.members
             .iter()
             .filter(|&member| member.role == *role)
+            .count()
+    }
+
+    fn count_role_lows(&self, role: &SimpleRole, threshold: i32) -> usize {
+        self.members
+            .iter()
+            .filter(|&member| member.role == *role && member.rank < threshold)
             .count()
     }
 }
@@ -280,14 +292,10 @@ impl Teams {
         role: &SimpleRole,
         range: (i32, i32),
         db: &PlayerPool,
-        tolerance: u32,
-        total_sr: i32,
-        total_count: usize,
+        config: &Config,
     ) -> Option<(usize, usize)> {
         for (team_index, team) in self.0.iter().enumerate() {
-            if let Some(replacement) =
-                team.try_replace(leftover, role, range, db, tolerance, total_sr, total_count)
-            {
+            if let Some(replacement) = team.try_replace(leftover, role, range, db, config) {
                 return Some((team_index, replacement));
             }
         }
@@ -297,13 +305,15 @@ impl Teams {
 
     pub fn sort(&mut self, direction: Direction) {
         self.0.sort_by(|a, b| {
-            let ordering = a.avg_sr.partial_cmp(&b.avg_sr).unwrap();
+            if let Some(ordering) = a.avg_sr.partial_cmp(&b.avg_sr) {
+                if direction == Direction::DESC {
+                    return ordering.reverse();
+                }
 
-            if direction == Direction::DESC {
-                return ordering.reverse();
+                ordering
+            } else {
+                Ordering::Equal
             }
-
-            ordering
         })
     }
 
@@ -342,28 +352,23 @@ impl Teams {
         }
     }
 
-    pub fn distribute_leutenants(&mut self, pool: &mut PlayerPool) {
+    pub fn distribute_leutenants(&mut self, pool: &mut PlayerPool, config: &Config) {
         let mut offset = 0;
         for _ in 0..self.teams_count() {
-            offset = pool.distribute_leutenant(self, offset);
+            offset = pool.distribute_leutenant(self, offset, config);
         }
     }
 
-    pub fn distribute_fillers(
-        &mut self,
-        pool: &mut PlayerPool,
-        tolerance: u32,
-        players_average: i32,
-    ) {
+    pub fn distribute_fillers(&mut self, pool: &mut PlayerPool, config: &Config) {
         for team in &mut self.0 {
-            pool.distribute_filler(team, tolerance, players_average);
+            pool.distribute_filler(team, config);
         }
     }
 
-    pub fn distribute_ensigns(&mut self, pool: &mut PlayerPool) {
+    pub fn distribute_ensigns(&mut self, pool: &mut PlayerPool, config: &Config) {
         let mut offset = 0;
         for _ in 0..self.teams_count() {
-            offset = pool.distribute_ensign(self, offset);
+            offset = pool.distribute_ensign(self, offset, config);
         }
     }
 
@@ -371,42 +376,52 @@ impl Teams {
         &mut self,
         candidate: &Candidate,
         max_member_count: usize,
+        config: &Config,
     ) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
             team.members_count() <= max_member_count
-                && candidate.get_primary_role().fits_team(team)
+                && candidate.get_primary_role().fits_team(team, config)
                 && !team.get_captain().has_same_role(candidate)
         })
     }
 
-    pub fn find_perfect_ensign(&mut self, candidate: &Candidate) -> Option<&mut Team> {
+    pub fn find_perfect_ensign(
+        &mut self,
+        candidate: &Candidate,
+        config: &Config,
+    ) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
             team.members_count() <= 3
-                && candidate.get_primary_role().fits_team(team)
+                && candidate.get_primary_role().fits_team(team, config)
                 && !team.get_captain().has_same_role(candidate)
                 && !team.get_leutenant().has_same_role(candidate)
         })
     }
 
-    pub fn find_team(&mut self, max_size: usize, target_role: &Role) -> Option<&mut Team> {
+    pub fn find_team(
+        &mut self,
+        max_size: usize,
+        target_role: &Role,
+        config: &Config,
+    ) -> Option<&mut Team> {
         self.0
             .iter_mut()
-            .find(|team| team.members_count() <= max_size && target_role.fits_team(team))
+            .find(|team| team.members_count() <= max_size && target_role.fits_team(team, config))
     }
 
     pub fn fit_player(
         &mut self,
         player_sr: i32,
         new_average: f32,
-        tolerance: u32,
+        config: &Config,
         target_role: &Role,
     ) -> Option<&mut Team> {
         self.0.iter_mut().find(|team| {
             let team_size = team.members_count();
 
             (team_size + 1) <= 6
-                && target_role.fits_team(team)
-                && team.fits_sr(player_sr, new_average, tolerance)
+                && target_role.fits_team(team, config)
+                && team.fits_sr(player_sr, new_average, config.tolerance)
         })
     }
 

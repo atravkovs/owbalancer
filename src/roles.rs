@@ -1,12 +1,13 @@
+use crate::matchmaking::Config;
 use crate::players::Classes;
 use crate::teams::Team;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Role {
-    Tank(i32),
-    Dps(i32),
-    Support(i32),
+    Tank((i32, bool, bool)),
+    Dps((i32, bool, bool)),
+    Support((i32, bool, bool)),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -45,17 +46,56 @@ impl Role {
 
     pub fn decompose(&self) -> (SimpleRole, i32) {
         match self {
-            Role::Dps(rank) => (SimpleRole::Dps, *rank),
-            Role::Support(rank) => (SimpleRole::Support, *rank),
-            Role::Tank(rank) => (SimpleRole::Tank, *rank),
+            Role::Dps(rank) => (SimpleRole::Dps, rank.0),
+            Role::Support(rank) => (SimpleRole::Support, rank.0),
+            Role::Tank(rank) => (SimpleRole::Tank, rank.0),
         }
     }
 
-    pub fn fits_team(&self, team: &Team) -> bool {
+    pub fn fits_team(&self, team: &Team, config: &Config) -> bool {
         match self {
-            Role::Dps(_) => (team.dps_count() + 1) <= 2,
-            Role::Support(_) => (team.support_count() + 1) <= 2,
-            Role::Tank(_) => (team.tank_count() + 1) <= 2,
+            Role::Dps(rank) => {
+                if (team.dps_count() + 1) > 2 {
+                    return false;
+                }
+
+                if config.rank_limiter
+                    && rank.0 < config.limiter_max
+                    && team.low_dps_count(config.limiter_max) > 0
+                {
+                    return false;
+                }
+
+                true
+            }
+            Role::Support(rank) => {
+                if (team.support_count() + 1) > 2 {
+                    return false;
+                }
+
+                if config.rank_limiter
+                    && rank.0 < config.limiter_max
+                    && team.low_support_count(config.limiter_max) > 0
+                {
+                    return false;
+                }
+
+                true
+            }
+            Role::Tank(rank) => {
+                if (team.tank_count() + 1) > 2 {
+                    return false;
+                }
+
+                if config.rank_limiter
+                    && rank.0 < config.limiter_max
+                    && team.low_tank_count(config.limiter_max) > 0
+                {
+                    return false;
+                }
+
+                true
+            }
         }
     }
 
@@ -70,7 +110,7 @@ impl Roles {
         if let Some(role) = self.0.first() {
             role
         } else {
-            &Role::Dps(0)
+            &Role::Dps((0, false, false))
         }
     }
 
@@ -99,21 +139,29 @@ impl From<&Classes> for Roles {
 
         if classes.dps.is_active {
             temp_roles.push(RolePriority::new(
-                Role::Dps(classes.dps.rank),
+                Role::Dps((classes.dps.rank, classes.dps.primary, classes.dps.secondary)),
                 classes.dps.priority,
             ));
         }
 
         if classes.support.is_active {
             temp_roles.push(RolePriority::new(
-                Role::Support(classes.support.rank),
+                Role::Support((
+                    classes.support.rank,
+                    classes.support.primary,
+                    classes.support.secondary,
+                )),
                 classes.support.priority,
             ));
         }
 
         if classes.tank.is_active {
             temp_roles.push(RolePriority::new(
-                Role::Tank(classes.tank.rank),
+                Role::Tank((
+                    classes.tank.rank,
+                    classes.tank.primary,
+                    classes.tank.secondary,
+                )),
                 classes.tank.priority,
             ));
         }

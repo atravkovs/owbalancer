@@ -1,3 +1,4 @@
+use crate::matchmaking::Config;
 use crate::roles::{Role, Roles, RolesFilter, SimpleRole};
 use crate::teams::{Team, Teams};
 use rand::rngs::OsRng;
@@ -192,11 +193,11 @@ impl PlayerPool {
             .0
             .iter_mut()
             .enumerate()
-            .filter_map(|(id, v)| {
+            .filter_map(|(id, candidate)| {
                 if candidates.contains(&id) {
                     None
                 } else {
-                    Some(v.clone())
+                    Some(candidate.clone())
                 }
             })
             .collect()
@@ -206,48 +207,58 @@ impl PlayerPool {
         self.0.shuffle(&mut OsRng::default());
     }
 
-    pub fn distribute_leutenant(&mut self, teams: &mut Teams, offset: usize) -> usize {
+    pub fn distribute_leutenant(
+        &mut self,
+        teams: &mut Teams,
+        offset: usize,
+        config: &Config,
+    ) -> usize {
         if offset >= self.0.len() {
             return offset;
         }
         let candidate = self.0.get(offset).unwrap().clone();
 
-        if let Some(team) = teams.find_mate(&candidate, 2) {
+        if let Some(team) = teams.find_mate(&candidate, 2, config) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_team(2, candidate.get_primary_role()) {
+        if let Some(team) = teams.find_team(2, candidate.get_primary_role(), config) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        self.distribute_leutenant(teams, offset + 1)
+        self.distribute_leutenant(teams, offset + 1, config)
     }
 
-    pub fn distribute_ensign(&mut self, teams: &mut Teams, offset: usize) -> usize {
+    pub fn distribute_ensign(
+        &mut self,
+        teams: &mut Teams,
+        offset: usize,
+        config: &Config,
+    ) -> usize {
         if offset >= self.0.len() {
             return offset;
         }
         let candidate = self.0.get(offset).unwrap().clone();
 
-        if let Some(team) = teams.find_perfect_ensign(&candidate) {
+        if let Some(team) = teams.find_perfect_ensign(&candidate, config) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_mate(&candidate, 3) {
+        if let Some(team) = teams.find_mate(&candidate, 3, config) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        if let Some(team) = teams.find_team(3, candidate.get_primary_role()) {
+        if let Some(team) = teams.find_team(3, candidate.get_primary_role(), config) {
             return self.add_player_to_team(team, &candidate, offset);
         }
 
-        self.distribute_ensign(teams, offset + 1)
+        self.distribute_ensign(teams, offset + 1, config)
     }
 
-    pub fn distribute_filler(&mut self, team: &mut Team, tolerance: u32, players_average: i32) {
-        let range = team.get_range(tolerance, players_average);
+    pub fn distribute_filler(&mut self, team: &mut Team, config: &Config) {
+        let range = team.get_range(config);
         let clonned = self.clone();
-        let find_candidate = clonned.filter_range(range, team);
+        let find_candidate = clonned.filter_range(range, team, config);
 
         if let Some(candidate) = find_candidate {
             team.add_primary_player(candidate);
@@ -257,7 +268,7 @@ impl PlayerPool {
                 for i in 1..candidate.roles_count() {
                     let role = candidate.roles.get(i);
 
-                    if role.is_in_range(range) && role.fits_team(team) {
+                    if role.is_in_range(range) && role.fits_team(team, config) {
                         team.add_player(candidate, role);
                         self.remove_candidate(candidate);
                         return;
@@ -273,20 +284,10 @@ impl PlayerPool {
         range: (i32, i32),
         teams: &Teams,
         db: &PlayerPool,
-        tolerance: u32,
-        total_sr: i32,
-        total_count: usize,
+        config: &Config,
     ) -> Option<(usize, usize, &Candidate)> {
         for leftover in &self.0 {
-            let lost = teams.replace_leftover(
-                leftover,
-                &role,
-                range,
-                db,
-                tolerance,
-                total_sr,
-                total_count,
-            );
+            let lost = teams.replace_leftover(leftover, &role, range, db, config);
             if let Some(replacement) = lost {
                 return Some((replacement.0, replacement.1, leftover));
             }
@@ -324,10 +325,10 @@ impl PlayerPool {
         }
     }
 
-    fn filter_range(&self, range: (i32, i32), team: &Team) -> Option<&Candidate> {
+    fn filter_range(&self, range: (i32, i32), team: &Team, config: &Config) -> Option<&Candidate> {
         self.0.iter().find(|&candidate| {
             let role = candidate.get_primary_role();
-            role.is_in_range(range) && role.fits_team(team)
+            role.is_in_range(range) && role.fits_team(team, config)
         })
     }
 

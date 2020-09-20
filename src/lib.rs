@@ -23,18 +23,36 @@ pub fn main_js() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn balance(player_data: &JsValue, tolerance: u32) -> JsValue {
+pub fn balance(
+    player_data: &JsValue,
+    tolerance: u32,
+    rank_limiter: bool,
+    duplicate_roles: bool,
+) -> JsValue {
     let players: Players = player_data.into_serde().unwrap();
-    let mut matchmaking = Mathmaking::new(&players, tolerance);
+    console::log_2(
+        &JsValue::from_str("Rank limiter"),
+        &JsValue::from_bool(rank_limiter),
+    );
+    console::log_2(
+        &JsValue::from_str("Duplicate roles"),
+        &JsValue::from_bool(duplicate_roles),
+    );
+    let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.balance_players();
 
     JsValue::from_serde(&matchmaking.result()).unwrap()
 }
 
 #[wasm_bindgen]
-pub fn balance_half(player_data: &JsValue, tolerance: u32) -> JsValue {
+pub fn balance_half(
+    player_data: &JsValue,
+    tolerance: u32,
+    rank_limiter: bool,
+    duplicate_roles: bool,
+) -> JsValue {
     let players: Players = player_data.into_serde().unwrap();
-    let mut matchmaking = Mathmaking::new(&players, tolerance);
+    let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.balance_half();
 
     JsValue::from_serde(&matchmaking.result()).unwrap()
@@ -47,6 +65,8 @@ struct ReserveData(pub Vec<String>);
 pub fn balance_final(
     player_data: &JsValue,
     tolerance: u32,
+    rank_limiter: bool,
+    duplicate_roles: bool,
     reserve_data: &JsValue,
     teams_data: &JsValue,
 ) -> JsValue {
@@ -54,16 +74,7 @@ pub fn balance_final(
     let teams: Teams = teams_data.into_serde().unwrap();
     let reserve: ReserveData = reserve_data.into_serde().unwrap();
 
-    console::log_2(
-        &JsValue::from_str("Teams count"),
-        &JsValue::from(teams.0.len() as i32),
-    );
-    console::log_2(
-        &JsValue::from_str("Reserve count"),
-        &JsValue::from(reserve.0.len() as i32),
-    );
-
-    let mut matchmaking = Mathmaking::new(&players, tolerance);
+    let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.add_reserve(reserve.0);
     matchmaking.add_teams(teams);
     matchmaking.balance_remaining();
