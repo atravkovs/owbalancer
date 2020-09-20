@@ -284,10 +284,11 @@ impl PlayerPool {
         range: (i32, i32),
         teams: &Teams,
         db: &PlayerPool,
+        target_team: &Team,
         config: &Config,
     ) -> Option<(usize, usize, &Candidate)> {
         for leftover in &self.0 {
-            let lost = teams.replace_leftover(leftover, &role, range, db, config);
+            let lost = teams.replace_leftover(leftover, &role, range, db, target_team, config);
             if let Some(replacement) = lost {
                 return Some((replacement.0, replacement.1, leftover));
             }

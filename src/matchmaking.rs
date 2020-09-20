@@ -1,6 +1,8 @@
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::teams::Teams;
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
@@ -12,6 +14,7 @@ pub struct Config {
     pub rank_limiter: bool,
     pub players_average: i32,
     pub duplicate_roles: bool,
+    pub increase_players_count: bool,
 }
 
 pub struct Mathmaking<'a> {
@@ -124,6 +127,7 @@ impl<'a> Mathmaking<'a> {
                 range,
                 &self.teams,
                 &self.reserve_pool,
+                &team.clone(),
                 &self.config,
             );
 
@@ -145,7 +149,14 @@ impl<'a> Mathmaking<'a> {
                 );
                 team.update();
 
+                console::log_3(
+                    &JsValue::from_str("Moved"),
+                    &JsValue::from_str(team.name.as_str()),
+                    &JsValue::from_str(replacement.name.as_str()),
+                );
+
                 let team = self.teams.get_mut(team_id);
+
                 let replacement_member = team.members.remove(replacement_id);
 
                 let pos = self
@@ -159,6 +170,12 @@ impl<'a> Mathmaking<'a> {
                         .roles
                         .get_by_simple(&replacement_member.role)
                         .unwrap();
+
+                    console::log_3(
+                        &JsValue::from_str("Add"),
+                        &JsValue::from_str(team.name.as_str()),
+                        &JsValue::from_str(candidate.name.as_str()),
+                    );
 
                     team.add_player(candidate, &add_role);
                     team.update();
@@ -312,6 +329,7 @@ impl Config {
             sec_roles: false,
             limiter_max: 2500,
             players_average: 0,
+            increase_players_count: false,
         }
     }
 }

@@ -4,6 +4,8 @@ use crate::roles::{Role, RolesFilter, SimpleRole};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use uuid::Uuid;
+use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Member {
@@ -189,22 +191,30 @@ impl Team {
         target_role: &SimpleRole,
         range: (i32, i32),
         db: &PlayerPool,
+        target_team: &Team,
         config: &Config,
     ) -> Option<usize> {
         for role in &candidate.roles.0 {
             let (simple, _) = role.decompose();
             let position = self.members.iter().position(|member| {
+                let is_self = target_team.uuid == self.uuid;
+
                 if member.role != simple.clone() {
                     return false;
                 }
 
-                if !self.pfsr(candidate, member, config) {
+                if !is_self && !self.pfsr(candidate, member, config) {
                     return false;
                 }
 
                 if let Some(player) = db.get_by_id(member.uuid.clone()) {
                     if let Some(player_role) = player.roles.get_by_simple(&target_role) {
-                        return player_role.is_in_range(range);
+                        if is_self && !self.pfsr2(candidate, member, config, player_role) {
+                            return false;
+                        }
+
+                        return player_role.is_in_range(range)
+                            && player_role.fits_team_limit(target_team, config);
                     }
                 }
 
@@ -225,6 +235,28 @@ impl Team {
             let new_average = (config.total_sr + rank) as f32 / (config.total_count + 1) as f32;
             let team_size = 6;
             let new_sr = (self.total_sr + rank - member.rank) as f32 / team_size as f32;
+
+            ((new_sr - new_average).abs().floor() as u32) <= config.tolerance
+                && role.fits_team_limit(&self, config)
+        } else {
+            false
+        }
+    }
+
+    pub fn pfsr2(
+        &self,
+        candidate: &Candidate,
+        member: &Member,
+        config: &Config,
+        player_role: &Role,
+    ) -> bool {
+        if let Some(role) = candidate.roles.get_by_simple(&member.role) {
+            let rank = role.decompose().1;
+            let rank2 = player_role.decompose().1;
+            let new_average = (config.total_sr - member.rank + rank2 + rank) as f32
+                / (config.total_count + 1) as f32;
+            let team_size = 6;
+            let new_sr = (self.total_sr + rank + rank2 - member.rank) as f32 / team_size as f32;
 
             ((new_sr - new_average).abs().floor() as u32) <= config.tolerance
                 && role.fits_team_limit(&self, config)
@@ -335,10 +367,13 @@ impl Teams {
         role: &SimpleRole,
         range: (i32, i32),
         db: &PlayerPool,
+        target_team: &Team,
         config: &Config,
     ) -> Option<(usize, usize)> {
         for (team_index, team) in self.0.iter().enumerate() {
-            if let Some(replacement) = team.try_replace(leftover, role, range, db, config) {
+            if let Some(replacement) =
+                team.try_replace(leftover, role, range, db, target_team, config)
+            {
                 return Some((team_index, replacement));
             }
         }
