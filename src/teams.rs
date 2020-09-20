@@ -4,8 +4,6 @@ use crate::roles::{Role, RolesFilter, SimpleRole};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use uuid::Uuid;
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Member {
