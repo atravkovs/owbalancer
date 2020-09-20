@@ -127,6 +127,41 @@ impl Role {
         }
     }
 
+    pub fn fits_team_limit(&self, team: &Team, config: &Config) -> bool {
+        match self {
+            Role::Dps(rank) => {
+                if config.rank_limiter
+                    && rank.0 < config.limiter_max
+                    && team.low_dps_count(config.limiter_max) > 0
+                {
+                    return false;
+                }
+
+                true
+            }
+            Role::Support(rank) => {
+                if config.rank_limiter
+                    && rank.0 < config.limiter_max
+                    && team.low_support_count(config.limiter_max) > 0
+                {
+                    return false;
+                }
+
+                true
+            }
+            Role::Tank(rank) => {
+                if config.rank_limiter
+                    && rank.0 < config.limiter_max
+                    && team.low_tank_count(config.limiter_max) > 0
+                {
+                    return false;
+                }
+
+                true
+            }
+        }
+    }
+
     pub fn is_in_range(&self, range: (i32, i32)) -> bool {
         let rank = self.decompose().1;
         rank >= range.0 && rank <= range.1

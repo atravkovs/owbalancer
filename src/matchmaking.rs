@@ -56,7 +56,6 @@ impl<'a> Mathmaking<'a> {
         self.distribute_ensigns();
         self.distribute_fillers();
         self.distribute_remaining();
-        self.teams.update();
         self.swap_steal();
     }
 
@@ -66,7 +65,6 @@ impl<'a> Mathmaking<'a> {
         self.init_pool(false);
         self.distribute_leutenants();
         self.distribute_ensigns();
-        self.teams.update();
         self.teams.sort(Direction::ASC);
     }
 
@@ -74,7 +72,6 @@ impl<'a> Mathmaking<'a> {
         self.init_pool(true);
         self.distribute_fillers();
         self.distribute_remaining();
-        self.teams.update();
         self.swap_steal();
     }
 
@@ -172,6 +169,11 @@ impl<'a> Mathmaking<'a> {
             }
         }
 
+        if self.config.rank_limiter {
+            self.config.rank_limiter = false;
+            self.swap_steal();
+        }
+
         self.teams.sort(Direction::ASC);
     }
 
@@ -235,13 +237,6 @@ impl<'a> Mathmaking<'a> {
             && self.pool.size() > 0
         {
             self.config.duplicate_roles = false;
-            self.sort_remaining(added_players);
-        } else if added_players == 0
-            && delta == 0
-            && self.config.rank_limiter
-            && self.pool.size() > 0
-        {
-            self.config.rank_limiter = false;
             self.sort_remaining(added_players);
         } else if self.pool.size() > 0 && (added_players > 0 || !self.config.sec_roles) {
             self.sort_remaining(added_players);

@@ -211,8 +211,8 @@ impl Team {
                 false
             });
 
-            if let Some(member_index) = position {
-                return Some(member_index);
+            if position.is_some() {
+                return position;
             }
         }
 
@@ -227,6 +227,7 @@ impl Team {
             let new_sr = (self.total_sr + rank - member.rank) as f32 / team_size as f32;
 
             ((new_sr - new_average).abs().floor() as u32) <= config.tolerance
+                && role.fits_team_limit(&self, config)
         } else {
             false
         }
