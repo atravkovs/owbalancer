@@ -229,6 +229,20 @@ impl<'a> Mathmaking<'a> {
         if added_players == 0 && delta == 0 && !self.config.sec_roles && self.pool.size() > 0 {
             self.config.sec_roles = true;
             self.sort_remaining(added_players);
+        } else if added_players == 0
+            && delta == 0
+            && self.config.duplicate_roles
+            && self.pool.size() > 0
+        {
+            self.config.duplicate_roles = false;
+            self.sort_remaining(added_players);
+        } else if added_players == 0
+            && delta == 0
+            && self.config.rank_limiter
+            && self.pool.size() > 0
+        {
+            self.config.rank_limiter = false;
+            self.sort_remaining(added_players);
         } else if self.pool.size() > 0 && (added_players > 0 || !self.config.sec_roles) {
             self.sort_remaining(added_players);
         }

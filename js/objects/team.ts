@@ -5,6 +5,8 @@ export type TeamMembers = {
     rank: number;
     uuid: string;
     name: string;
+    primary: boolean;
+    secondary: boolean;
     role: 'dps' | 'support' | 'tank';
 };
 

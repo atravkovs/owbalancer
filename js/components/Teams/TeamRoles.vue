@@ -79,6 +79,8 @@ export default defineComponent({
             role,
             roleName: props.rtype,
             playerName: player.identity.name,
+            primary: role.primary,
+            secondary: role.secondary,
           });
         } else {
           const teamF = store.state.teams.findIndex(
@@ -110,6 +112,8 @@ export default defineComponent({
                 role,
                 roleName: props.rtype,
                 playerName: player.identity.name,
+                primary: role.primary,
+                secondary: role.secondary,
               });
               store.commit(MutationTypes.ADD_TEAMPLAYER, {
                 teamUuid,
@@ -117,6 +121,8 @@ export default defineComponent({
                 role: sdRole,
                 roleName: memF.role,
                 playerName: member.name,
+                primary: member.primary,
+                secondary: member.secondary,
               });
             }
           }
@@ -133,6 +139,8 @@ export default defineComponent({
           role,
           roleName: props.rtype,
           playerName: player.identity.name,
+          primary: role.primary,
+          secondary: role.secondary,
         });
       }
     };

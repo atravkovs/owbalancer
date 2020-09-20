@@ -52,6 +52,22 @@ impl Role {
         }
     }
 
+    pub fn is_primary(&self) -> bool {
+        match self {
+            Role::Dps((_, primary, _)) => *primary,
+            Role::Support((_, primary, _)) => *primary,
+            Role::Tank((_, primary, _)) => *primary,
+        }
+    }
+
+    pub fn is_secondary(&self) -> bool {
+        match self {
+            Role::Dps((_, _, secondary)) => *secondary,
+            Role::Support((_, _, secondary)) => *secondary,
+            Role::Tank((_, _, secondary)) => *secondary,
+        }
+    }
+
     pub fn fits_team(&self, team: &Team, config: &Config) -> bool {
         match self {
             Role::Dps(rank) => {
@@ -63,6 +79,10 @@ impl Role {
                     && rank.0 < config.limiter_max
                     && team.low_dps_count(config.limiter_max) > 0
                 {
+                    return false;
+                }
+
+                if config.duplicate_roles && team.has_dps_duplicate(rank.1, rank.2) {
                     return false;
                 }
 
@@ -80,6 +100,10 @@ impl Role {
                     return false;
                 }
 
+                if config.duplicate_roles && team.has_support_duplicate(rank.1, rank.2) {
+                    return false;
+                }
+
                 true
             }
             Role::Tank(rank) => {
@@ -91,6 +115,10 @@ impl Role {
                     && rank.0 < config.limiter_max
                     && team.low_tank_count(config.limiter_max) > 0
                 {
+                    return false;
+                }
+
+                if config.duplicate_roles && team.has_tank_duplicate(rank.1, rank.2) {
                     return false;
                 }
 

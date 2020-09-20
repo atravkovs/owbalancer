@@ -10,6 +10,8 @@ pub struct Member {
     pub rank: i32,
     pub uuid: String,
     pub name: String,
+    pub primary: bool,
+    pub secondary: bool,
     pub role: SimpleRole,
 }
 
@@ -28,13 +30,15 @@ pub struct Teams(pub Vec<Team>);
 
 impl Member {
     pub fn new(uuid: String, name: String, role: Role) -> Member {
-        let (role, rank) = role.decompose();
+        let (simple, rank) = role.decompose();
 
         Member {
             uuid,
             name,
-            role,
             rank,
+            role: simple,
+            primary: role.is_primary(),
+            secondary: role.is_secondary(),
         }
     }
 
@@ -104,8 +108,16 @@ impl Team {
         self.count_role_lows(&SimpleRole::Dps, threshold)
     }
 
+    pub fn has_dps_duplicate(&self, primary: bool, secondary: bool) -> bool {
+        self.find_duplicates(&SimpleRole::Dps, primary, secondary)
+    }
+
     pub fn support_count(&self) -> usize {
         self.count_role(&SimpleRole::Support)
+    }
+
+    pub fn has_support_duplicate(&self, primary: bool, secondary: bool) -> bool {
+        self.find_duplicates(&SimpleRole::Support, primary, secondary)
     }
 
     pub fn low_support_count(&self, threshold: i32) -> usize {
@@ -114,6 +126,10 @@ impl Team {
 
     pub fn tank_count(&self) -> usize {
         self.count_role(&SimpleRole::Tank)
+    }
+
+    pub fn has_tank_duplicate(&self, primary: bool, secondary: bool) -> bool {
+        self.find_duplicates(&SimpleRole::Tank, primary, secondary)
     }
 
     pub fn low_tank_count(&self, threshold: i32) -> usize {
@@ -238,6 +254,32 @@ impl Team {
             .iter()
             .filter(|&member| member.role == *role && member.rank < threshold)
             .count()
+    }
+
+    fn find_duplicates(&self, role: &SimpleRole, primary: bool, secondary: bool) -> bool {
+        if primary {
+            if self
+                .members
+                .iter()
+                .find(|&member| member.role == *role && member.primary)
+                .is_some()
+            {
+                return true;
+            }
+        }
+
+        if secondary {
+            if self
+                .members
+                .iter()
+                .find(|&member| member.role == *role && member.secondary)
+                .is_some()
+            {
+                return true;
+            }
+        }
+
+        false
     }
 }
 

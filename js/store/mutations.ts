@@ -31,7 +31,7 @@ export type Mutations<S = State> = {
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
   [MutationTypes.UPDATE_TEAM_NAME](state: S, data: { teamUuid: string; teamName: string }): void;
-  [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamUuid: string; playerName: string; playerId: string; role: ClassType; roleName: 'dps' | 'support' | 'tank' }): void;
+  [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamUuid: string; playerName: string; playerId: string; role: ClassType; primary: boolean; secondary: boolean; roleName: 'dps' | 'support' | 'tank' }): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
@@ -111,7 +111,7 @@ export const mutations: MutationTree<State> & Mutations = {
       state.teams[teamF].totalSr = totalSr;
     }
   },
-  [MutationTypes.ADD_TEAMPLAYER](state, { playerName, teamUuid, playerId, role, roleName }) {
+  [MutationTypes.ADD_TEAMPLAYER](state, { playerName, teamUuid, playerId, role, roleName, primary, secondary }) {
     const teamF = state.teams.findIndex(team => team.uuid === teamUuid);
 
     if (teamF !== -1) {
@@ -120,6 +120,7 @@ export const mutations: MutationTree<State> & Mutations = {
         name: playerName,
         rank: role.rank,
         role: roleName,
+        primary, secondary,
       });
       const { avgSr, totalSr } = TObj.calcStats(state.teams[teamF]);
       state.teams[teamF].avgSr = avgSr;
