@@ -17,12 +17,11 @@
         class="text-ellip"
         :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, 'wt': !!teamUuid }"
       >
-        {{ player.identity.name }}
-        &nbsp;
         <span class="extra-icon">
           <CrownIcon v-if="player.identity.isCaptain" />
           <SwordIcon v-if="player.identity.isSquire" />
         </span>
+        {{ player.identity.name }}
       </div>
     </div>
     <div class="role-icons">

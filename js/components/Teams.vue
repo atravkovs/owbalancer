@@ -91,7 +91,7 @@ export default defineComponent({
 .teams {
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: repeat(auto-fit, 250px);
+  grid-template-columns: repeat(auto-fit, 275px);
   column-gap: 1rem;
   row-gap: 1rem;
   margin-top: 2rem;
