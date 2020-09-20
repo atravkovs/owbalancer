@@ -28,8 +28,8 @@
         type="range"
         class="form-range"
         min="0"
-        max="150"
-        step="5"
+        max="60"
+        step="1"
         v-model="range"
       />
     </div>
