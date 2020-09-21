@@ -345,6 +345,17 @@ impl Teams {
         (total_sr, total_count)
     }
 
+    pub fn swap(&mut self, team1: usize, member1: usize, team2: usize, member2: usize) {
+        let memb1 = self.get(team1).members.get(member1).unwrap().clone();
+        let memb2 = self.get(team2).members.get(member2).unwrap().clone();
+        self.get_mut(team1).members.remove(member1);
+        self.get_mut(team2).members.remove(member2);
+        self.get_mut(team1).members.push(memb2);
+        self.get_mut(team2).members.push(memb1);
+        self.get_mut(team1).update();
+        self.get_mut(team2).update();
+    }
+
     pub fn get_not_complete(&self) -> Vec<usize> {
         self.0
             .iter()

@@ -2,8 +2,6 @@ use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::roles::SimpleRole;
 use crate::teams::{Member, Team, Teams};
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
@@ -152,14 +150,7 @@ impl<'a> Mathmaking<'a> {
                 );
                 team.update();
 
-                console::log_3(
-                    &JsValue::from_str("Moved"),
-                    &JsValue::from_str(team.name.as_str()),
-                    &JsValue::from_str(replacement.name.as_str()),
-                );
-
                 let team = self.teams.get_mut(team_id);
-
                 let replacement_member = team.members.remove(replacement_id);
 
                 let pos = self
@@ -173,12 +164,6 @@ impl<'a> Mathmaking<'a> {
                         .roles
                         .get_by_simple(&replacement_member.role)
                         .unwrap();
-
-                    console::log_3(
-                        &JsValue::from_str("Add"),
-                        &JsValue::from_str(team.name.as_str()),
-                        &JsValue::from_str(candidate.name.as_str()),
-                    );
 
                     team.add_player(candidate, &add_role);
                     team.update();
@@ -214,19 +199,6 @@ impl<'a> Mathmaking<'a> {
             })
             .collect();
 
-        for (li, ls) in &low_supports {
-            let res = self.t_find_sup(*li, &ls, average);
-            if let Some(rep) = res {
-                let memb1 = self.teams.get(rep.0).members.get(rep.1).unwrap().clone();
-                let memb2 = self.teams.get(rep.2).members.get(rep.3).unwrap().clone();
-                self.teams.get_mut(rep.0).members.remove(rep.1);
-                self.teams.get_mut(rep.2).members.remove(rep.3);
-                self.teams.get_mut(rep.0).members.push(memb2);
-                self.teams.get_mut(rep.2).members.push(memb1);
-                self.teams.update();
-            }
-        }
-
         let low_tanks: Vec<(usize, &Team)> =
             cl.0.iter()
                 .enumerate()
@@ -234,19 +206,6 @@ impl<'a> Mathmaking<'a> {
                     team.members_count() == 6 && team.low_tank_count(self.config.limiter_max) == 2
                 })
                 .collect();
-
-        for (li, ls) in &low_tanks {
-            let res = self.t_find_tank(*li, &ls, average);
-            if let Some(rep) = res {
-                let memb1 = self.teams.get(rep.0).members.get(rep.1).unwrap().clone();
-                let memb2 = self.teams.get(rep.2).members.get(rep.3).unwrap().clone();
-                self.teams.get_mut(rep.0).members.remove(rep.1);
-                self.teams.get_mut(rep.2).members.remove(rep.3);
-                self.teams.get_mut(rep.0).members.push(memb2);
-                self.teams.get_mut(rep.2).members.push(memb1);
-                self.teams.update();
-            }
-        }
 
         let low_dps: Vec<(usize, &Team)> =
             cl.0.iter()
@@ -256,22 +215,31 @@ impl<'a> Mathmaking<'a> {
                 })
                 .collect();
 
-        for (li, ls) in &low_dps {
-            let res = self.t_find_dps(*li, &ls, average);
+        for (li, ls) in &low_supports {
+            let res = self.t_find(SimpleRole::Support, *li, &ls, average);
             if let Some(rep) = res {
-                let memb1 = self.teams.get(rep.0).members.get(rep.1).unwrap().clone();
-                let memb2 = self.teams.get(rep.2).members.get(rep.3).unwrap().clone();
-                self.teams.get_mut(rep.0).members.remove(rep.1);
-                self.teams.get_mut(rep.2).members.remove(rep.3);
-                self.teams.get_mut(rep.0).members.push(memb2);
-                self.teams.get_mut(rep.2).members.push(memb1);
-                self.teams.update();
+                self.teams.swap(rep.0, rep.1, rep.2, rep.3);
+            }
+        }
+
+        for (li, ls) in &low_tanks {
+            let res = self.t_find(SimpleRole::Tank, *li, &ls, average);
+            if let Some(rep) = res {
+                self.teams.swap(rep.0, rep.1, rep.2, rep.3);
+            }
+        }
+
+        for (li, ls) in &low_dps {
+            let res = self.t_find(SimpleRole::Dps, *li, &ls, average);
+            if let Some(rep) = res {
+                self.teams.swap(rep.0, rep.1, rep.2, rep.3);
             }
         }
     }
 
-    fn t_find_sup(
+    fn t_find(
         &self,
+        role: SimpleRole,
         li: usize,
         ls: &Team,
         average: i32,
@@ -292,7 +260,7 @@ impl<'a> Mathmaking<'a> {
                 .members
                 .iter()
                 .enumerate()
-                .filter(|&member| member.1.role == SimpleRole::Support)
+                .filter(|&member| member.1.role == role)
                 .collect();
             for lm in ls_members {
                 // by role
@@ -300,104 +268,7 @@ impl<'a> Mathmaking<'a> {
                     .members
                     .iter()
                     .enumerate()
-                    .filter(|&member| member.1.role == SimpleRole::Support)
-                    .collect();
-                for hm in hs_members {
-                    let new_sr_l = (ls.total_sr - lm.1.rank + hm.1.rank) / 6;
-                    let new_sr_h = (hs.total_sr - hm.1.rank + lm.1.rank) / 6;
-                    if (new_sr_l - average).abs() <= self.config.tolerance as i32
-                        && (new_sr_h - average).abs() <= self.config.tolerance as i32
-                    {
-                        // return team1_id, member1_id, team2_id, member2_id
-                        // perform swap
-                        return Some((li, lm.0, *hi, hm.0));
-                    }
-                }
-            }
-        }
-
-        None
-    }
-    fn t_find_tank(
-        &self,
-        li: usize,
-        ls: &Team,
-        average: i32,
-    ) -> Option<(usize, usize, usize, usize)> {
-        let high_tanks: Vec<(usize, &Team)> = self
-            .teams
-            .0
-            .iter()
-            .enumerate()
-            .filter(|(_, team)| {
-                team.members_count() == 6 && team.low_tank_count(self.config.limiter_max) == 0
-            })
-            .collect();
-
-        for (hi, hs) in &high_tanks {
-            // by role
-            let ls_members: Vec<(usize, &Member)> = ls
-                .members
-                .iter()
-                .enumerate()
-                .filter(|&member| member.1.role == SimpleRole::Tank)
-                .collect();
-            for lm in ls_members {
-                // by role
-                let hs_members: Vec<(usize, &Member)> = hs
-                    .members
-                    .iter()
-                    .enumerate()
-                    .filter(|&member| member.1.role == SimpleRole::Tank)
-                    .collect();
-                for hm in hs_members {
-                    let new_sr_l = (ls.total_sr - lm.1.rank + hm.1.rank) / 6;
-                    let new_sr_h = (hs.total_sr - hm.1.rank + lm.1.rank) / 6;
-                    if (new_sr_l - average).abs() <= self.config.tolerance as i32
-                        && (new_sr_h - average).abs() <= self.config.tolerance as i32
-                    {
-                        // return team1_id, member1_id, team2_id, member2_id
-                        // perform swap
-                        return Some((li, lm.0, *hi, hm.0));
-                    }
-                }
-            }
-        }
-
-        None
-    }
-
-    fn t_find_dps(
-        &self,
-        li: usize,
-        ls: &Team,
-        average: i32,
-    ) -> Option<(usize, usize, usize, usize)> {
-        let high_dps: Vec<(usize, &Team)> = self
-            .teams
-            .0
-            .iter()
-            .enumerate()
-            .filter(|(_, team)| {
-                team.members_count() == 6 && team.low_dps_count(self.config.limiter_max) == 0
-            })
-            .collect();
-
-        for (hi, hs) in &high_dps {
-            // by role
-            let ls_members: Vec<(usize, &Member)> = ls
-                .members
-                .iter()
-                .enumerate()
-                .filter(|&member| member.1.role == SimpleRole::Dps)
-                .collect();
-            for lm in ls_members {
-                // by role
-                let hs_members: Vec<(usize, &Member)> = hs
-                    .members
-                    .iter()
-                    .enumerate()
-                    .filter(|&member| member.1.role == SimpleRole::Dps)
+                    .filter(|&member| member.1.role == role)
                     .collect();
                 for hm in hs_members {
                     let new_sr_l = (ls.total_sr - lm.1.rank + hm.1.rank) / 6;
