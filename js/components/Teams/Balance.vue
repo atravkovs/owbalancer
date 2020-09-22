@@ -187,7 +187,6 @@ export default defineComponent({
               return acc;
             }, []);
 
-            console.log('Teams', teams);
             store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
             store.commit(MutationTypes.ADD_TEAMS, teams);
           } catch (e) {

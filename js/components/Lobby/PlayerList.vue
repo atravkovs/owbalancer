@@ -145,7 +145,6 @@ export default defineComponent({
         teamUuid,
         playerId,
       });
-      console.log(`Hello, ${playerId} from ${teamUuid}!`);
     };
 
     return { state, sort, filter, squireCount, captainCount, allowDrop, drop };

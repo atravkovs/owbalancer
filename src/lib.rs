@@ -8,7 +8,6 @@ use players::Players;
 use serde::{Deserialize, Serialize};
 use teams::Teams;
 use wasm_bindgen::prelude::*;
-use web_sys::console;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
