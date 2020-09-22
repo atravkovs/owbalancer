@@ -4,6 +4,7 @@
     <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
     <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
     <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
+    <button class="btn btn-sm btn-secondary mx-2" @click="empty">Empty</button>
     <export-teams />
   </div>
   <div v-if="teams.length > 0">
@@ -76,7 +77,12 @@ export default defineComponent({
       store.commit(MutationTypes.ADD_TEAM, newTeam);
     };
 
+    const empty = () => {
+      store.commit(MutationTypes.EMPTY_TEAMS);
+    };
+
     return {
+      empty,
       clear,
       maxSr,
       minSr,

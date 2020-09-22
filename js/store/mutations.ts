@@ -8,6 +8,7 @@ import { State } from './state';
 
 export type Mutations<S = State> = {
   [MutationTypes.CLEAR_TEAMS](state: S): void;
+  [MutationTypes.EMPTY_TEAMS](state: S): void;
   [MutationTypes.TOGGLE_BALANCE](state: S): void;
   [MutationTypes.CLEAR_SQUIRES](state: S): void;
   [MutationTypes.CLEAR_CAPTAINS](state: S): void;
@@ -82,6 +83,13 @@ export const mutations: MutationTree<State> & Mutations = {
     }
 
     state.teams.splice(teamIndex, 1);
+  },
+  [MutationTypes.EMPTY_TEAMS](state) {
+    for (let i = 0; i < state.teams.length; i += 1) {
+      const players = state.teams[i].members.map(member => member.uuid);
+      state.reservedPlayers.push(...players);
+      state.teams[i].members = [];
+    }
   },
   [MutationTypes.IMPORT_PLAYERS](state, players) {
     state.players = { ...players, ...state.players };
