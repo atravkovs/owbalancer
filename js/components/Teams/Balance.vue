@@ -52,7 +52,7 @@
         type="range"
         class="form-range"
         min="0"
-        max="60"
+        max="120"
         step="1"
         v-model="range"
       />

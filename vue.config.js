@@ -1,5 +1,6 @@
 const path = require('path');
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
   configureWebpack: {
@@ -12,6 +13,10 @@ module.exports = {
     plugins: [
       new WasmPackPlugin({
         crateDirectory: __dirname,
+      }),
+      new DefinePlugin({
+        '__VUE_OPTIONS_API__': false,
+        '__VUE_PROD_DEVTOOLS__': false,
       }),
     ],
     devServer: {

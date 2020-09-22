@@ -3,7 +3,8 @@
   <div class="d-flex">
     <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
     <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
-    <button class="btn btn-sm btn-danger ml-2" @click="clear">Clear</button>
+    <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
+    <export-teams />
   </div>
   <div v-if="teams.length > 0">
     <span>Min SR: {{ minSr }}</span>
@@ -25,10 +26,11 @@ import MutationTypes from '@/store/mutation-types';
 
 import Team from '@/components/Teams/Team.vue';
 import Balance from '@/components/Teams/Balance.vue';
+import ExportTeams from '@/components/Teams/ExportTeams.vue';
 
 export default defineComponent({
   name: 'Teams',
-  components: { Team, Balance },
+  components: { Team, Balance, ExportTeams },
   setup() {
     const store = useStore();
     const storeTeams = computed(() => store.state.teams);

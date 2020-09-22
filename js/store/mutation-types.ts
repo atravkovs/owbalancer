@@ -1,5 +1,6 @@
 enum MutationTypes {
   ADD_TEAM = 'ADD_TEAM',
+  EDIT_RANK = 'EDIT_RANK',
   ADD_TEAMS = 'ADD_TEAMS',
   ADD_PLAYER = 'ADD_PLAYER',
   ADD_RESERVE = 'ADD_RESERVE',

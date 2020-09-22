@@ -31,10 +31,14 @@ export type Mutations<S = State> = {
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
   [MutationTypes.UPDATE_TEAM_NAME](state: S, data: { teamUuid: string; teamName: string }): void;
+  [MutationTypes.EDIT_RANK](state: S, data: { uuid: string; rank: number; role: 'dps' | 'support' | 'tank' }): void;
   [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamUuid: string; playerName: string; playerId: string; role: ClassType; primary: boolean; secondary: boolean; roleName: 'dps' | 'support' | 'tank' }): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
+  [MutationTypes.EDIT_RANK](state, { uuid, rank, role }) {
+    state.players[uuid].stats.classes[role].rank = rank;
+  },
   [MutationTypes.UPDATE_TEAM_NAME](state, { teamUuid, teamName }) {
     const index = state.teams.findIndex(mTeam => mTeam.uuid === teamUuid);
 

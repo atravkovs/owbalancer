@@ -11,7 +11,7 @@
     </fieldset>
     <fieldset class="EditPlayer-Block">
       <h3>Stats</h3>
-      <EditStats :stats="player.stats" :uuid="player.identity.uuid" />
+      <EditStats :stats="player.stats" :uuid="player.identity.uuid" v-on:update-rank="updateRank" />
     </fieldset>
   </Modal>
 </template>
@@ -49,7 +49,16 @@ export default defineComponent({
       store.commit(MutationTypes.EDIT_PLAYER, player.value.identity.uuid);
     };
 
-    return { player, closeModal, saveChanges };
+    // eslint-ignore-next-line
+    const updateRank = (role: 'dps' | 'support' | 'tank', rank: number) => {
+      store.commit(MutationTypes.EDIT_RANK, {
+        role,
+        rank,
+        uuid: store.state.editPlayer,
+      });
+    };
+
+    return { player, closeModal, saveChanges, updateRank };
   },
 });
 </script>

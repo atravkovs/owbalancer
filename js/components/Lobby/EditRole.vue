@@ -81,7 +81,14 @@
       />
       <label class="btn btn-sm btn-secondary" for="option_projectile">Projectile</label>
     </span>
-    <input type="number" id="level" class="form-control" v-model="mRole.rank" />
+    <input
+      type="number"
+      id="level"
+      class="form-control"
+      min="0"
+      :value="mRole.rank"
+      @input="inpChange"
+    />
   </div>
 </template>
 
@@ -99,11 +106,16 @@ export default defineComponent({
     role: Object as PropType<ClassType>,
   },
   components: { RoleIcon, RankIcon },
-  setup(props) {
+  setup(props, { emit }) {
     const role = computed(() => props.role);
     const mRole = ref(role);
 
-    return { mRole };
+    const inpChange = (e: Event) => {
+      const value = (e.target as HTMLInputElement).valueAsNumber;
+      emit('update-rank', props.rtype, value);
+    };
+
+    return { mRole, inpChange };
   },
 });
 </script>

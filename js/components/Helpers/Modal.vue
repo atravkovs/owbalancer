@@ -1,6 +1,6 @@
 <template>
   <div class="modal fade" tabindex="-1" aria-hidden="true" ref="modalRef">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered" :class="{ 'modal-lg': variant === 'large' }">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ title }}</h5>
@@ -14,6 +14,7 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button
+            v-if="!hideAction"
             class="btn btn-primary"
             @click="$emit('save-changes')"
           >{{ customAction || 'Save changes' }}</button>
@@ -32,7 +33,9 @@ export default defineComponent({
   name: 'Modal',
   props: {
     title: String,
+    variant: String,
     isActive: Boolean,
+    hideAction: Boolean,
     customAction: String,
   },
   setup(props, { emit }) {
