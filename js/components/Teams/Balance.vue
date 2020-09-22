@@ -138,7 +138,8 @@ export default defineComponent({
         store.state.players,
         +range.value,
         lowRankLimiter.value,
-        disallowSecondaryRoles.value
+        disallowSecondaryRoles.value,
+        adjustSr.value
       );
     };
 
@@ -152,7 +153,8 @@ export default defineComponent({
         lowRankLimiter.value,
         disallowSecondaryRoles.value,
         reserveCopy,
-        teamsCopy
+        teamsCopy,
+        adjustSr.value
       );
     };
 

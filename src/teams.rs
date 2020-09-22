@@ -434,7 +434,9 @@ impl Teams {
     pub fn distribute_squires(&mut self, squires: &mut PlayerPool) {
         for team in &mut self.0 {
             if team.members_count() < 2 {
-                team.add_primary_player(&squires.0.pop().unwrap());
+                if let Some(candidate) = squires.0.pop() {
+                    team.add_primary_player(&candidate);
+                }
             }
         }
     }

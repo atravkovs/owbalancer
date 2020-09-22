@@ -57,8 +57,12 @@ pub fn balance_half(
     tolerance: u32,
     rank_limiter: bool,
     duplicate_roles: bool,
+    adjust_sr: &JsValue,
 ) -> JsValue {
-    let players: Players = player_data.into_serde().unwrap();
+    let mut players: Players = player_data.into_serde().unwrap();
+    let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
+    players.adjust_sr(adjust);
+
     let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.balance_half();
 
@@ -73,8 +77,12 @@ pub fn balance_final(
     duplicate_roles: bool,
     reserve_data: &JsValue,
     teams_data: &JsValue,
+    adjust_sr: &JsValue,
 ) -> JsValue {
-    let players: Players = player_data.into_serde().unwrap();
+    let mut players: Players = player_data.into_serde().unwrap();
+    let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
+    players.adjust_sr(adjust);
+
     let teams: Teams = teams_data.into_serde().unwrap();
     let reserve: ReserveData = reserve_data.into_serde().unwrap();
 
