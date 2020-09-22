@@ -1,5 +1,7 @@
 # owbalancer
 
+You can try balancer on Github Pages: [Tournament Balancer](https://atravkovs.github.io/balancer/).
+
 ## Project setup
 ```
 npm install
