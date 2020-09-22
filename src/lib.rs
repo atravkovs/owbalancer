@@ -14,6 +14,18 @@ use web_sys::console;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
+#[derive(Serialize, Deserialize)]
+struct ReserveData(pub Vec<String>);
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AsjustSr {
+    pub dps: i32,
+    pub tank: i32,
+    pub support: i32,
+    pub is_enabled: bool,
+}
+
 #[wasm_bindgen(start)]
 pub fn main_js() -> Result<(), JsValue> {
     // #[cfg(debug_assertions)]
@@ -28,16 +40,12 @@ pub fn balance(
     tolerance: u32,
     rank_limiter: bool,
     duplicate_roles: bool,
+    adjust_sr: &JsValue,
 ) -> JsValue {
-    let players: Players = player_data.into_serde().unwrap();
-    console::log_2(
-        &JsValue::from_str("Rank limiter"),
-        &JsValue::from_bool(rank_limiter),
-    );
-    console::log_2(
-        &JsValue::from_str("Duplicate roles"),
-        &JsValue::from_bool(duplicate_roles),
-    );
+    let mut players: Players = player_data.into_serde().unwrap();
+    let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
+    players.adjust_sr(adjust);
+
     let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.balance_players();
 
@@ -57,9 +65,6 @@ pub fn balance_half(
 
     JsValue::from_serde(&matchmaking.result()).unwrap()
 }
-
-#[derive(Serialize, Deserialize)]
-struct ReserveData(pub Vec<String>);
 
 #[wasm_bindgen]
 pub fn balance_final(

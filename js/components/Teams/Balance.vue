@@ -7,8 +7,7 @@
     @save-changes="balance"
   >
     <div class="mb-3 mt-1">
-      <label class="form-label">Balance Type</label>
-      <br />
+      <label class="form-label w-100">Balance Type</label>
       <div class="btn-group">
         <input type="radio" value="full" id="balance1" class="btn-check" v-model="balanceType" />
         <label class="btn btn-primary" for="balance1">Full</label>
@@ -43,6 +42,35 @@
       </div>
     </div>
     <div class="mb-3">
+      <div class="form-check">
+        <input type="checkbox" id="srScaling" class="form-check-input" v-model="adjustSr.isEnabled" />
+        <label for="srScaling" class="form-check-label">Adjust player SR by main class</label>
+      </div>
+      <div class="d-flex justify-content-between">
+        <div class="input-group mr-2">
+          <input type="number" min="0" class="form-control" v-model="adjustSr.tank" />
+          <span class="input-group-text">
+            <role-icon rtype="tank" />
+          </span>
+          <span class="input-group-text">%</span>
+        </div>
+        <div class="input-group mr-2">
+          <input type="number" min="0" class="form-control" v-model="adjustSr.dps" />
+          <span class="input-group-text">
+            <role-icon rtype="dps" />
+          </span>
+          <span class="input-group-text">%</span>
+        </div>
+        <div class="input-group">
+          <input type="number" min="0" class="form-control" v-model="adjustSr.support" />
+          <span class="input-group-text">
+            <role-icon rtype="support" />
+          </span>
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
       <label for="dispersionRange" class="form-label">
         Dispersion:
         <b>±{{ range }}</b>
@@ -63,18 +91,25 @@
 <script lang="ts">
 /* eslint-disable */
 import { computed, defineComponent, ref } from 'vue';
-
-import Modal from '@/components/Helpers/Modal.vue';
 import MutationTypes from '@/store/mutation-types';
 import { useStore } from '@/store';
+
+import Modal from '@/components/Helpers/Modal.vue';
+import RoleIcon from '@/components/svg/RoleIcon.vue';
 
 const wasm = import('@/../pkg/index.js');
 
 export default defineComponent({
   name: 'Balance',
-  components: { Modal },
+  components: { Modal, RoleIcon },
   setup() {
     const range = ref(30);
+    const adjustSr = ref({
+      isEnabled: false,
+      tank: 100,
+      support: 90,
+      dps: 110,
+    });
     const balanceType = ref('full');
     const lowRankLimiter = ref(false);
     const disallowSecondaryRoles = ref(false);
@@ -93,7 +128,8 @@ export default defineComponent({
         store.state.players,
         +range.value,
         lowRankLimiter.value,
-        disallowSecondaryRoles.value
+        disallowSecondaryRoles.value,
+        adjustSr.value
       );
     };
 
@@ -166,6 +202,7 @@ export default defineComponent({
     return {
       range,
       balance,
+      adjustSr,
       isActive,
       closeModal,
       balanceType,
