@@ -14,7 +14,7 @@
         v-if="members[i - 1]"
         :player="players[members[i - 1].uuid]"
         :prefferedRank="members[i - 1].rank"
-        :rankRole="showBalancerSR ? members[i - 1].role : undefined"
+        :rankRole="showBalancerSR ? undefined : members[i - 1].role"
         :teamUuid="teamUuid"
       />
     </div>
