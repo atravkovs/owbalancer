@@ -49,6 +49,7 @@ export default defineComponent({
     player: Object as PropType<Player>,
     prefferedRole: String,
     prefferedRank: Number,
+    rankRole: String,
   },
   components: { RoleIcon, RankIcon, CrownIcon, SwordIcon },
   setup(props) {
@@ -98,9 +99,16 @@ export default defineComponent({
       icons,
     });
 
-    const sr = computed(() =>
-      !props.player ? 0 : props.prefferedRank || PObj.getTopRank(props.player)
-    );
+    const sr = computed(() => {
+      if (!props.player) return 0;
+
+      if (props.rankRole)
+        return PObj.getRole(props.player.stats.classes, props.rankRole).rank;
+
+      if (props.prefferedRank) return props.prefferedRank;
+
+      return PObj.getTopRank(props.player);
+    });
 
     return {
       sr,

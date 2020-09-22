@@ -14,6 +14,7 @@
         v-if="members[i - 1]"
         :player="players[members[i - 1].uuid]"
         :prefferedRank="members[i - 1].rank"
+        :rankRole="showBalancerSR ? members[i - 1].role : undefined"
         :teamUuid="teamUuid"
       />
     </div>
@@ -145,7 +146,9 @@ export default defineComponent({
       }
     };
 
-    return { players, allowDrop, drop };
+    const showBalancerSR = computed(() => store.state.showBalancerSR);
+
+    return { players, allowDrop, drop, showBalancerSR };
   },
 });
 </script>

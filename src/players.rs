@@ -119,18 +119,22 @@ impl Players {
         }
 
         for (_, player) in &mut self.0 {
-            let role = player.get_primary_role();
-
-            if role == SimpleRole::Dps {
-                player.stats.classes *= adjust.dps as f32 / 100.0;
+            if player.stats.classes.dps.is_active {
+                player.stats.classes.dps.rank = (player.stats.classes.dps.rank as f32
+                    * (adjust.dps as f32 / 100.0))
+                    .floor() as i32;
             }
 
-            if role == SimpleRole::Support {
-                player.stats.classes *= adjust.support as f32 / 100.0;
+            if player.stats.classes.support.is_active {
+                player.stats.classes.support.rank = (player.stats.classes.support.rank as f32
+                    * (adjust.support as f32 / 100.0))
+                    .floor() as i32;
             }
 
-            if role == SimpleRole::Tank {
-                player.stats.classes *= adjust.tank as f32 / 100.0;
+            if player.stats.classes.tank.is_active {
+                player.stats.classes.tank.rank = (player.stats.classes.tank.rank as f32
+                    * (adjust.tank as f32 / 100.0))
+                    .floor() as i32;
             }
         }
     }
@@ -367,36 +371,5 @@ impl PlayerPool {
         self.0.remove(offset);
 
         offset
-    }
-}
-
-impl Player {
-    fn get_primary_role(&self) -> SimpleRole {
-        let mut primary = SimpleRole::Dps;
-        let mut priority = 8;
-
-        if self.stats.classes.dps.is_active {
-            primary = SimpleRole::Dps;
-            priority = self.stats.classes.dps.priority;
-        }
-
-        if self.stats.classes.support.is_active && self.stats.classes.support.priority < priority {
-            primary = SimpleRole::Support;
-            priority = self.stats.classes.support.priority;
-        }
-
-        if self.stats.classes.tank.is_active && self.stats.classes.tank.priority < priority {
-            primary = SimpleRole::Tank;
-        }
-
-        primary
-    }
-}
-
-impl MulAssign<f32> for Classes {
-    fn mul_assign(&mut self, rhs: f32) {
-        self.tank.rank = (self.tank.rank as f32 * rhs).floor() as i32;
-        self.dps.rank = (self.dps.rank as f32 * rhs).floor() as i32;
-        self.support.rank = (self.support.rank as f32 * rhs).floor() as i32;
     }
 }

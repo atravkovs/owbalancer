@@ -1,11 +1,23 @@
 <template>
   <h3>Teams</h3>
-  <div class="d-flex">
-    <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
-    <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
-    <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
-    <button class="btn btn-sm btn-secondary mx-2" @click="empty">Empty</button>
-    <export-teams />
+  <div class="d-flex justify-content-between">
+    <div class="d-flex">
+      <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
+      <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
+      <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
+      <button class="btn btn-sm btn-secondary mx-2" @click="empty">Empty</button>
+      <export-teams />
+    </div>
+    <div class="form-check">
+      <input
+        type="checkbox"
+        id="toggleSRMode"
+        class="form-check-input"
+        :value="showBalancerSR"
+        @change="toggleSR"
+      />
+      <label for="toggleSRMode" class="form-check-label">Show balancer SR</label>
+    </div>
   </div>
   <div v-if="teams.length > 0">
     <span>Min SR: {{ minSr }}</span>
@@ -20,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
 import TObj from '@/objects/team';
 import MutationTypes from '@/store/mutation-types';
@@ -34,6 +46,8 @@ export default defineComponent({
   components: { Team, Balance, ExportTeams },
   setup() {
     const store = useStore();
+    const showBalancerSR = ref(store.state.showBalancerSR);
+
     const storeTeams = computed(() => store.state.teams);
     const maxSr = computed(() =>
       Math.floor(
@@ -81,6 +95,10 @@ export default defineComponent({
       store.commit(MutationTypes.EMPTY_TEAMS);
     };
 
+    const toggleSR = () => {
+      store.commit(MutationTypes.TOGGLE_BALANCER_SR);
+    };
+
     return {
       empty,
       clear,
@@ -90,6 +108,8 @@ export default defineComponent({
       addNew,
       balance,
       teams: storeTeams,
+      toggleSR,
+      showBalancerSR,
     };
   },
 });

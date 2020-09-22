@@ -15,6 +15,7 @@ export const state = {
   editPlayer: '',
   reservedPlayers,
   isBalance: false,
+  showBalancerSR: false,
 };
 
 export type State = typeof state;
