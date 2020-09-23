@@ -28,7 +28,7 @@ export default defineComponent({
 
       const text = teams.reduce((acc, team) => {
         const t = new Table();
-        let teamText = `Team ${team.name}\n=============================\n`;
+        let teamText = `Team ${team.name} - ${team.avgSr}\n=============================\n`;
 
         ['tank', 'dps', 'support'].forEach((role) => {
           team.members
@@ -37,12 +37,15 @@ export default defineComponent({
               const { isSquire, isCaptain } = store.state.players[
                 member.uuid
               ].identity;
+              const { rank } = store.state.players[member.uuid].stats.classes[
+                member.role
+              ];
               const name = `${isSquire ? '⚔ ' : ''}${isCaptain ? '♛ ' : ''}${
                 member.name
               }`;
 
               t.cell('Role', member.role);
-              t.cell('Rank', member.rank);
+              t.cell('Rank', Math.round(rank));
               t.cell('Name', name);
               t.newRow();
             });
