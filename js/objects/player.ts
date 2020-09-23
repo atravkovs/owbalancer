@@ -97,6 +97,12 @@ const getTopRole = (player: Player): ClassType => {
     .sort((a, b) => a.priority - b.priority)[0];
 }
 
+const getTopRoleName = (player: Player): string => {
+  return Object.entries(player.stats.classes)
+    .filter(([, role]) => role.isActive)
+    .sort(([, a], [, b]) => a.priority - b.priority)[0][0];
+};
+
 const getTopRank = (player: Player): number => {
   const topRole = getTopRole(player);
   return topRole ? topRole.rank : 0;
@@ -106,5 +112,6 @@ export default {
   getRole,
   getTopRank,
   getTopRole,
+  getTopRoleName,
   createDefaultPlayer,
 };

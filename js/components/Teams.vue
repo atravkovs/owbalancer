@@ -24,6 +24,7 @@
     <span class="ml-2">Max SR: {{ maxSr }}</span>
     <span class="ml-2">Difference: {{ maxSr - minSr }}</span>
     <span class="ml-2">Average: {{ avgSr }}</span>
+    <span class="ml-2">Off roles: {{ offRolesPercentage }}%</span>
   </div>
   <div class="teams overflow-auto h-80vh">
     <team v-for="team in teams" :key="team.uuid" :team="team" />
@@ -34,8 +35,9 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
-import TObj from '@/objects/team';
 import MutationTypes from '@/store/mutation-types';
+import TObj from '@/objects/team';
+import PObj from '@/objects/player';
 
 import Team from '@/components/Teams/Team.vue';
 import Balance from '@/components/Teams/Balance.vue';
@@ -71,6 +73,31 @@ export default defineComponent({
           store.state.teams.length
       )
     );
+
+    const offRolesPercentage = computed(() => {
+      const [offCount, totalCount] = store.state.teams.reduce(
+        (acc, team) => {
+          let off = acc[0];
+          let total = acc[1];
+
+          team.members.forEach((member) => {
+            total += 1;
+            if (
+              store.state.players[member.uuid] &&
+              member.role !==
+                PObj.getTopRoleName(store.state.players[member.uuid])
+            ) {
+              off += 1;
+            }
+          });
+
+          return [off, total];
+        },
+        [0, 0]
+      );
+
+      return Math.floor((offCount / totalCount) * 1000) / 10;
+    });
 
     const balance = () => {
       store.commit(MutationTypes.TOGGLE_BALANCE);
@@ -110,6 +137,7 @@ export default defineComponent({
       teams: storeTeams,
       toggleSR,
       showBalancerSR,
+      offRolesPercentage,
     };
   },
 });
