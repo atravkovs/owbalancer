@@ -28,7 +28,9 @@ export default defineComponent({
 
       const text = teams.reduce((acc, team) => {
         const t = new Table();
-        let teamText = `Team ${team.name} - ${team.avgSr}\n=============================\n`;
+        let teamText = `Team ${team.name} - ${Math.round(
+          team.avgSr
+        )}\n=============================\n`;
 
         ['tank', 'dps', 'support'].forEach((role) => {
           team.members
