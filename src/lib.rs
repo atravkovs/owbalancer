@@ -40,12 +40,14 @@ pub fn balance(
     rank_limiter: bool,
     duplicate_roles: bool,
     adjust_sr: &JsValue,
+    disable_type: String,
 ) -> JsValue {
     let mut players: Players = player_data.into_serde().unwrap();
     let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
     players.adjust_sr(adjust);
 
     let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
+    matchmaking.set_disable_type(disable_type.clone());
     matchmaking.balance_players();
 
     JsValue::from_serde(&matchmaking.result()).unwrap()

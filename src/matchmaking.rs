@@ -23,6 +23,7 @@ pub struct Mathmaking<'a> {
     players: &'a Players,
     balanced: Vec<String>,
     reserve_pool: PlayerPool,
+    disable_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -47,15 +48,32 @@ impl<'a> Mathmaking<'a> {
             balanced: Vec::default(),
             pool: PlayerPool::default(),
             reserve_pool: PlayerPool::default(),
+            disable_type: String::from("none"),
         }
+    }
+
+    pub fn set_disable_type(&mut self, disable_type: String) {
+        self.disable_type = disable_type;
     }
 
     pub fn balance_players(&mut self) {
         self.init_teams();
-        self.distribute_squires();
+        if self.disable_type.as_str() != "ex_caps" {
+            self.distribute_squires();
+        }
         self.init_pool(false);
-        self.distribute_leutenants();
-        self.distribute_ensigns();
+
+        if self.disable_type.as_str() != "ex_caps" && self.disable_type.as_str() != "leut_ens" {
+            self.distribute_leutenants();
+        }
+
+        if self.disable_type.as_str() != "ex_caps"
+            && self.disable_type.as_str() != "leut_ens"
+            && self.disable_type.as_str() != "ens"
+        {
+            self.distribute_ensigns();
+        }
+
         self.distribute_fillers();
         self.distribute_remaining();
         self.swap_steal();
