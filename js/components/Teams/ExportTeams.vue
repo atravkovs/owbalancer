@@ -3,7 +3,11 @@
     <drop-item @drop-click="exportText">Text</drop-item>
     <drop-item @drop-click="exportCSV">CSV</drop-item>
   </dropdown>
-  <export-modal :isActive="isModalActive" :exportText="modalText" @close-modal="closeModal" />
+  <export-modal
+    :isActive="isModalActive"
+    :exportText="modalText"
+    @close-modal="closeModal"
+  />
 </template>
 
 <script lang="ts">
@@ -28,9 +32,17 @@ export default defineComponent({
 
       const text = teams.reduce((acc, team) => {
         const t = new Table();
-        let teamText = `Team ${team.name} - ${Math.round(
-          team.avgSr
-        )}\n=============================\n`;
+
+        const teamAvgSr = Math.round(
+          team.members.reduce(
+            (accAvg, member) =>
+              accAvg +
+              store.state.players[member.uuid].stats.classes[member.role].rank,
+            0
+          ) / team.members.length
+        );
+
+        let teamText = `Team ${team.name} - ${teamAvgSr}\n=============================\n`;
 
         ['tank', 'dps', 'support'].forEach((role) => {
           team.members

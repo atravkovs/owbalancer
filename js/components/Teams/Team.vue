@@ -11,7 +11,9 @@
           @input="updateTeam"
         />
       </div>
-      <span class="bg-secondary btr px-2 py-1 text-light">{{ teamAverage }}</span>
+      <span class="bg-secondary btr px-2 py-1 text-light">{{
+        teamAverage
+      }}</span>
     </div>
     <div class="card-body p-0 pb-1 fs-small">
       <ul class="list-group list-group-flush">
@@ -42,7 +44,22 @@ export default defineComponent({
     const store = useStore();
     const players = computed(() => store.state.players);
     const teamUuid = computed(() => props.team?.uuid);
-    const teamAverage = computed(() => Math.round(props.team?.avgSr || 0));
+    const teamAverage = computed(() => {
+      if (!props.team) return 0;
+
+      if (!store.state.showBalancerSR) {
+        return Math.round(
+          props.team?.members.reduce(
+            (acc, member) =>
+              acc +
+              store.state.players[member.uuid].stats.classes[member.role].rank,
+            0
+          ) / props.team?.members.length
+        );
+      }
+
+      return Math.round(props.team?.avgSr);
+    });
     const cTeam = computed(() =>
       store.state.teams.find((team) => team.uuid === teamUuid.value)
     );
