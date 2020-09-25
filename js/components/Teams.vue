@@ -3,9 +3,13 @@
   <div class="d-flex justify-content-between">
     <div class="d-flex">
       <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
-      <button class="btn btn-sm btn-primary ml-2" @click="balance">Balance</button>
+      <button class="btn btn-sm btn-primary ml-2" @click="balance">
+        Balance
+      </button>
       <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
-      <button class="btn btn-sm btn-secondary mx-2" @click="empty">Empty</button>
+      <button class="btn btn-sm btn-secondary mx-2" @click="empty">
+        Empty
+      </button>
       <export-teams />
     </div>
     <div class="form-check">
@@ -16,7 +20,9 @@
         :value="showBalancerSR"
         @change="toggleSR"
       />
-      <label for="toggleSRMode" class="form-check-label">Show balancer SR</label>
+      <label for="toggleSRMode" class="form-check-label"
+        >Show balancer SR</label
+      >
     </div>
   </div>
   <div v-if="teams.length > 0">
@@ -36,8 +42,8 @@
 import { computed, defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
-import TObj from '@/objects/team';
-import PObj from '@/objects/player';
+import TObj, { Team as TeamType } from '@/objects/team';
+import PObj, { Players } from '@/objects/player';
 
 import Team from '@/components/Teams/Team.vue';
 import Balance from '@/components/Teams/Balance.vue';
@@ -51,10 +57,24 @@ export default defineComponent({
     const showBalancerSR = ref(store.state.showBalancerSR);
 
     const storeTeams = computed(() => store.state.teams);
+
+    const calcTeamAvg = (team: TeamType, players: Players): number => {
+      return !store.state.showBalancerSR
+        ? team.members.reduce(
+            (acc, member) =>
+              acc + players[member.uuid].stats.classes[member.role].rank,
+            0
+          ) / team.members.length
+        : team.avgSr;
+    };
+
     const maxSr = computed(() =>
       Math.floor(
         store.state.teams.reduce(
-          (acc, team) => (acc < team.avgSr ? team.avgSr : acc),
+          (acc, team) =>
+            acc < calcTeamAvg(team, store.state.players)
+              ? calcTeamAvg(team, store.state.players)
+              : acc,
           0
         )
       )
@@ -62,15 +82,20 @@ export default defineComponent({
     const minSr = computed(() =>
       Math.floor(
         store.state.teams.reduce(
-          (acc, team) => (acc > team.avgSr ? team.avgSr : acc),
+          (acc, team) =>
+            acc > calcTeamAvg(team, store.state.players)
+              ? calcTeamAvg(team, store.state.players)
+              : acc,
           10000
         )
       )
     );
     const avgSr = computed(() =>
       Math.floor(
-        store.state.teams.reduce((acc, team) => acc + team.avgSr, 0) /
-          store.state.teams.length
+        store.state.teams.reduce(
+          (acc, team) => acc + calcTeamAvg(team, store.state.players),
+          0
+        ) / store.state.teams.length
       )
     );
 
