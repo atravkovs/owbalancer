@@ -34,6 +34,14 @@
           v-model="balanceType"
         />
         <label class="btn btn-primary" for="balance3">Final</label>
+        <input
+          type="radio"
+          value="boom"
+          id="balance4"
+          class="btn-check"
+          v-model="balanceType"
+        />
+        <label class="btn btn-primary" for="balance4">Boom</label>
       </div>
     </div>
     <div class="mb-3">
@@ -241,6 +249,21 @@ export default defineComponent({
       );
     };
 
+    const boom: (lib: any, data: any) => any = (
+      lib,
+      { teamsCopy, reserveCopy }
+    ) => {
+      return lib.boom(
+        store.state.players,
+        +range.value,
+        lowRankLimiter.value,
+        disallowSecondaryRoles.value,
+        reserveCopy,
+        teamsCopy,
+        adjustSr.value
+      );
+    };
+
     const conditionalBalance: (lib: any, data: any) => any = (lib, data) => {
       if (balanceType.value === 'half') {
         return halfBalance(lib);
@@ -248,6 +271,10 @@ export default defineComponent({
 
       if (balanceType.value === 'final') {
         return finalBalance(lib, data);
+      }
+
+      if (balanceType.value === 'boom') {
+        return boom(lib, data);
       }
 
       return fullBalance(lib);

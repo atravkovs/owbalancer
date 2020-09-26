@@ -1,5 +1,5 @@
 use crate::matchmaking::Config;
-use crate::players::{Candidate, Direction, PlayerPool};
+use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::roles::{Role, RolesFilter, SimpleRole};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -231,7 +231,7 @@ impl Team {
         if let Some(role) = candidate.roles.get_by_simple(&member.role) {
             let rank = role.decompose().1;
             let new_average = (config.total_sr + rank) as f32 / (config.total_count + 1) as f32;
-            let team_size = 6;
+            let team_size = self.members_count();
             let new_sr = (self.total_sr + rank - member.rank) as f32 / team_size as f32;
 
             ((new_sr - new_average).abs().floor() as u32) <= config.tolerance
@@ -253,7 +253,7 @@ impl Team {
             let rank2 = player_role.decompose().1;
             let new_average = (config.total_sr - member.rank + rank2 + rank) as f32
                 / (config.total_count + 1) as f32;
-            let team_size = 6;
+            let team_size = self.members_count();
             let new_sr = (self.total_sr + rank + rank2 - member.rank) as f32 / team_size as f32;
 
             ((new_sr - new_average).abs().floor() as u32) <= config.tolerance
@@ -267,6 +267,46 @@ impl Team {
         let team_size = self.members_count();
         let new_sr = (self.total_sr + player_sr) as f32 / (team_size + 1) as f32;
         ((new_sr - new_average).abs().floor() as u32) <= tolerance * (6 - team_size as u32)
+    }
+
+    pub fn can_swap(
+        &self,
+        team: &Team,
+        config: &Config,
+        players: &Players,
+    ) -> Option<(usize, usize)> {
+        let avg = config.total_sr / config.total_count as i32;
+
+        for (i, mem) in self.members.iter().enumerate() {
+            let p1 = &players.0.get(mem.uuid.as_str()).unwrap().identity;
+            if p1.is_captain || p1.is_squire {
+                continue;
+            }
+
+            for (j, mem2) in team.members.iter().enumerate() {
+                let p2 = &players.0.get(mem2.uuid.as_str()).unwrap().identity;
+                if p2.is_captain || p2.is_squire {
+                    continue;
+                }
+
+                if mem.role == mem2.role {
+                    let newsr =
+                        (self.total_sr - mem.rank + mem2.rank) / self.members_count() as i32;
+                    let newsr2 =
+                        (team.total_sr - mem2.rank + mem.rank) / team.members_count() as i32;
+                    let disp1 = (self.avg_sr as i32 - avg).abs();
+                    let disp2 = (team.avg_sr as i32 - avg).abs();
+                    let newdisp1 = (newsr - avg).abs();
+                    let newdisp2 = (newsr2 - avg).abs();
+
+                    if newdisp1 < disp1 && newdisp2 < disp2 {
+                        return Some((i, j));
+                    }
+                }
+            }
+        }
+
+        None
     }
 
     fn total_sr(&self) -> i32 {
@@ -505,13 +545,38 @@ impl Teams {
         config: &Config,
         target_role: &Role,
     ) -> Option<&mut Team> {
-        self.0.iter_mut().find(|team| {
-            let team_size = team.members_count();
+        let mut teams: Vec<usize> = self
+            .0
+            .iter()
+            .enumerate()
+            .filter_map(|(index, team)| {
+                let team_size = team.members_count();
 
-            (team_size + 1) <= 6
-                && target_role.fits_team(team, config)
-                && team.fits_sr(player_sr, new_average, config.tolerance)
-        })
+                if (team_size + 1) <= 6
+                    && target_role.fits_team(team, config)
+                    && team.fits_sr(player_sr, new_average, config.tolerance)
+                {
+                    Some(index)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        teams.sort_by(|&a, &b| {
+            let team1 = &self.0[a];
+            let team2 = &self.0[b];
+            let c1 = team1.members_count();
+            let c2 = team2.members_count();
+
+            c1.cmp(&c2)
+        });
+
+        if let Some(&a) = teams.get(0) {
+            self.0.get_mut(a)
+        } else {
+            None
+        }
     }
 
     fn teams_count(&self) -> usize {

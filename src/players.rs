@@ -47,7 +47,7 @@ pub struct Classes {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Players(HashMap<String, Player>);
+pub struct Players(pub HashMap<String, Player>);
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Candidate {
@@ -354,10 +354,33 @@ impl PlayerPool {
     }
 
     fn filter_range(&self, range: (i32, i32), team: &Team, config: &Config) -> Option<&Candidate> {
-        self.0.iter().find(|&candidate| {
-            let role = candidate.get_primary_role();
-            role.is_in_range(range) && role.fits_team(team, config)
-        })
+        let mut candidates: Vec<&Candidate> = self
+            .0
+            .iter()
+            .filter(|&candidate| {
+                let role = candidate.get_primary_role();
+                role.is_in_range(range) && role.fits_team(team, config)
+            })
+            .collect();
+
+        candidates.sort_by(|a, b| {
+            let role1 = a.get_primary_role().decompose();
+            let role2 = b.get_primary_role().decompose();
+            let new_count = team.members_count() as i32 + 1;
+            let new_sr1 = (team.total_sr + role1.1) / new_count;
+            let new_sr2 = (team.total_sr + role2.1) / new_count;
+
+            let disp1 = (config.players_average - new_sr1).abs();
+            let disp2 = (config.players_average - new_sr2).abs();
+
+            disp1.cmp(&disp2)
+        });
+
+        if let Some(&a) = candidates.get(0) {
+            Some(a)
+        } else {
+            None
+        }
     }
 
     fn add_player_to_team(

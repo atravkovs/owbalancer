@@ -89,6 +89,13 @@ impl<'a> Mathmaking<'a> {
         self.teams.sort(Direction::ASC);
     }
 
+    pub fn boom(&mut self) {
+        self.update();
+        self.minimize_dispersion();
+        self.increase_quality();
+        self.teams.sort(Direction::ASC);
+    }
+
     pub fn balance_remaining(&mut self) {
         self.init_pool(true);
         self.distribute_fillers();
@@ -127,9 +134,38 @@ impl<'a> Mathmaking<'a> {
         self.teams = Teams::from(captains);
     }
 
+    fn minimize_dispersion(&mut self) {
+        while let Some(swap) = self.try_minimize() {
+            let first = self.teams.0[swap.0].members.remove(swap.1);
+            let second = self.teams.0[swap.2].members.remove(swap.3);
+            self.teams.0[swap.2].members.push(first);
+            self.teams.0[swap.0].members.push(second);
+            self.teams.0[swap.2].update();
+            self.teams.0[swap.0].update();
+        }
+    }
+
+    fn try_minimize(&self) -> Option<(usize, usize, usize, usize)> {
+        let mut clonned = self.teams.clone();
+        clonned.reverse();
+
+        for (t1, team) in self.teams.0.iter().enumerate() {
+            for (t2, team2) in clonned.0.iter().enumerate() {
+                if let Some((a, b)) = team.can_swap(&team2, &self.config, &self.players) {
+                    return Some((t1, a, clonned.0.len() - t2 - 1, b));
+                }
+            }
+        }
+
+        None
+    }
+
     fn swap_steal(&mut self) {
         self.teams.update();
         let not_complete_teams = self.teams.get_not_complete();
+        let not_complete_len = not_complete_teams.len();
+
+        let mut inserted = 0;
 
         for id in not_complete_teams {
             let team = self.teams.get(id);
@@ -188,12 +224,17 @@ impl<'a> Mathmaking<'a> {
                     self.config.total_count += 1;
                     self.config.total_sr += add_role.decompose().1;
                     self.pool.0.remove(index);
+                    inserted += 1;
                 }
             }
         }
 
         if self.config.rank_limiter {
             self.config.rank_limiter = false;
+            self.swap_steal();
+        }
+
+        if inserted > 0 && inserted != not_complete_len {
             self.swap_steal();
         }
 
