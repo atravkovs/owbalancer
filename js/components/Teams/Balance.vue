@@ -41,10 +41,10 @@
           class="btn-check"
           v-model="balanceType"
         />
-        <label class="btn btn-primary" for="balance4">Boom</label>
+        <label class="btn btn-warning" for="balance4">Boom</label>
       </div>
     </div>
-    <div class="mb-3">
+    <div class="mb-3" v-if="balanceType === 'full'">
       <label class="form-label w-100">Disable</label>
       <div class="btn-group">
         <input
