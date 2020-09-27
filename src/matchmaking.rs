@@ -136,7 +136,12 @@ impl<'a> Mathmaking<'a> {
     fn calculate_dispersion(&self) -> i32 {
         let first = self.teams.0.first().unwrap();
         let last = self.teams.0.last().unwrap();
-        let avg = self.config.total_sr / self.config.total_count as i32;
+        let avg = self.config.total_sr
+            / if self.config.total_count <= 0 {
+                1
+            } else {
+                self.config.total_count as i32
+            };
 
         let low_disp = (first.avg_sr as i32 - avg).abs();
         let high_disp = (last.avg_sr as i32 - avg).abs();
