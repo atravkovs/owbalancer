@@ -8,11 +8,14 @@ const storage = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
 const teams: Teams = storage.teams || [];
 const players: Players = storage.players || {};
 const reservedPlayers: ReservedPlayers = storage.reservedPlayers || [];
+// eslint-disable-next-line
+const balancerResults: any[] = [];
 
 export const state = {
   teams,
   players,
   editPlayer: '',
+  balancerResults,
   reservedPlayers,
   isBalance: false,
   showBalancerSR: false,

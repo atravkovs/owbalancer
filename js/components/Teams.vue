@@ -36,6 +36,7 @@
     <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
   <balance />
+  <result-selection />
 </template>
 
 <script lang="ts">
@@ -48,10 +49,11 @@ import PObj, { Players } from '@/objects/player';
 import Team from '@/components/Teams/Team.vue';
 import Balance from '@/components/Teams/Balance.vue';
 import ExportTeams from '@/components/Teams/ExportTeams.vue';
+import ResultSelection from '@/components/Teams/ResultSelection.vue';
 
 export default defineComponent({
   name: 'Teams',
-  components: { Team, Balance, ExportTeams },
+  components: { Team, Balance, ExportTeams, ResultSelection },
   setup() {
     const store = useStore();
     const showBalancerSR = ref(store.state.showBalancerSR);

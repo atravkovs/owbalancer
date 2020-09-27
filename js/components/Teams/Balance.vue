@@ -34,14 +34,6 @@
           v-model="balanceType"
         />
         <label class="btn btn-primary" for="balance3">Final</label>
-        <input
-          type="radio"
-          value="boom"
-          id="balance4"
-          class="btn-check"
-          v-model="balanceType"
-        />
-        <label class="btn btn-warning" for="balance4">Boom</label>
       </div>
     </div>
     <div class="mb-3" v-if="balanceType === 'full'">
@@ -105,6 +97,17 @@
         />
         <label for="disallowSecondaryRoles" class="form-check-label"
           >Disallow duplicate secondary roles</label
+        >
+      </div>
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="dispersionMiminizer"
+          class="form-check-input"
+          v-model="dispersionMiminizer"
+        />
+        <label for="dispersionMiminizer" class="form-check-label"
+          >Enable dispersion minimizer</label
         >
       </div>
     </div>
@@ -174,12 +177,44 @@
         v-model="range"
       />
     </div>
+    <div class="mb-3">
+      <label for="triesRange" class="form-label">
+        Tries count:
+        <b>{{ triesCount }}</b>
+      </label>
+      <input
+        id="triesRange"
+        type="range"
+        class="form-range"
+        min="0"
+        max="30"
+        step="1"
+        v-model.number="triesCount"
+      />
+    </div>
+    <div class="mb-3">
+      <div class="progress">
+        <div
+          class="progress-bar progress-bar-striped"
+          :class="{
+            'progress-bar-animated': progress.current / progress.total !== 1,
+          }"
+          role="progressbar"
+          :aria-valuenow="Math.floor((progress.current / progress.total) * 100)"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          :style="`width: ${Math.floor(
+            (progress.current / progress.total) * 100
+          )}%`"
+        ></div>
+      </div>
+    </div>
   </Modal>
 </template>
 
 <script lang="ts">
 /* eslint-disable */
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, reactive, ref } from 'vue';
 import MutationTypes from '@/store/mutation-types';
 import { useStore } from '@/store';
 
@@ -193,6 +228,7 @@ export default defineComponent({
   components: { Modal, RoleIcon },
   setup() {
     const range = ref(30);
+    const triesCount = ref(1);
     const adjustSr = ref({
       isEnabled: false,
       tank: 100,
@@ -202,12 +238,20 @@ export default defineComponent({
     const balanceType = ref('full');
     const disableType = ref('none');
     const lowRankLimiter = ref(false);
+    const dispersionMiminizer = ref(false);
     const disallowSecondaryRoles = ref(false);
 
     const store = useStore();
     const isActive = computed(() => store.state.isBalance);
     const reservedPlayers = computed(() => store.state.reservedPlayers);
     const stateTeams = computed(() => store.state.teams);
+    const progress = reactive({ total: 11, current: 0 });
+
+    document.addEventListener('wasm-update', (e) => {
+      // eslint-disable-next-line
+      console.log('Step: ', e.detail.message());
+      progress.current += 1;
+    });
 
     const closeModal = () => {
       store.commit(MutationTypes.TOGGLE_BALANCE);
@@ -220,7 +264,9 @@ export default defineComponent({
         lowRankLimiter.value,
         disallowSecondaryRoles.value,
         adjustSr.value,
-        disableType.value
+        disableType.value,
+        dispersionMiminizer.value,
+        triesCount.value
       );
     };
 
@@ -249,21 +295,6 @@ export default defineComponent({
       );
     };
 
-    const boom: (lib: any, data: any) => any = (
-      lib,
-      { teamsCopy, reserveCopy }
-    ) => {
-      return lib.boom(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        reserveCopy,
-        teamsCopy,
-        adjustSr.value
-      );
-    };
-
     const conditionalBalance: (lib: any, data: any) => any = (lib, data) => {
       if (balanceType.value === 'half') {
         return halfBalance(lib);
@@ -271,10 +302,6 @@ export default defineComponent({
 
       if (balanceType.value === 'final') {
         return finalBalance(lib, data);
-      }
-
-      if (balanceType.value === 'boom') {
-        return boom(lib, data);
       }
 
       return fullBalance(lib);
@@ -285,14 +312,24 @@ export default defineComponent({
       const reserveCopy = [...reservedPlayers.value];
 
       store.commit(MutationTypes.CLEAR_TEAMS);
+      progress.current = 0;
 
       wasm
         .then((lib) => {
           try {
-            const { leftovers, teams } = conditionalBalance(lib, {
+            const results = conditionalBalance(lib, {
               teamsCopy,
               reserveCopy,
             });
+
+            console.log('Results', results);
+
+            if (results.length != 1) {
+              store.commit(MutationTypes.SET_RESULTS, results);
+              return;
+            }
+
+            const [{ leftovers, teams }] = results;
 
             const ignoredUuids = leftovers.reduce((acc, leftover) => {
               acc.push(leftover.uuid);
@@ -315,10 +352,13 @@ export default defineComponent({
       balance,
       adjustSr,
       isActive,
+      progress,
       closeModal,
+      triesCount,
       balanceType,
       disableType,
       lowRankLimiter,
+      dispersionMiminizer,
       disallowSecondaryRoles,
     };
   },
@@ -326,7 +366,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.form-range {
+#dispersionRange {
   &::-webkit-slider-runnable-track {
     background: linear-gradient(to right, #33ccff 0%, #ff0000 100%);
   }

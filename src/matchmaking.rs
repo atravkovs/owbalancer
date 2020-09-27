@@ -1,7 +1,9 @@
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::roles::SimpleRole;
 use crate::teams::{Member, Team, Teams};
+use crate::wasm_log;
 use serde::{Deserialize, Serialize};
+use std::cmp;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
@@ -14,6 +16,7 @@ pub struct Config {
     pub players_average: i32,
     pub duplicate_roles: bool,
     pub rank_limiter2: bool,
+    pub dispersion_minimizer: bool,
 }
 
 pub struct Mathmaking<'a> {
@@ -30,6 +33,7 @@ pub struct Mathmaking<'a> {
 pub struct BalancerResult {
     pub teams: Teams,
     pub leftovers: PlayerPool,
+    pub dispersion: i32,
 }
 
 impl<'a> Mathmaking<'a> {
@@ -56,17 +60,26 @@ impl<'a> Mathmaking<'a> {
         self.disable_type = disable_type;
     }
 
+    pub fn enable_dispersion_minimizer(&mut self) {
+        self.config.dispersion_minimizer = true;
+    }
+
     pub fn balance_players(&mut self) {
+        self.log("Init");
         self.init_teams();
+        self.log("Distribute squires");
         if self.disable_type.as_str() != "ex_caps" {
             self.distribute_squires();
         }
+        self.log("Init pool");
         self.init_pool(false);
 
+        self.log("Distribute leutenants");
         if self.disable_type.as_str() != "ex_caps" && self.disable_type.as_str() != "leut_ens" {
             self.distribute_leutenants();
         }
 
+        self.log("Distribute ensigns");
         if self.disable_type.as_str() != "ex_caps"
             && self.disable_type.as_str() != "leut_ens"
             && self.disable_type.as_str() != "ens"
@@ -74,10 +87,19 @@ impl<'a> Mathmaking<'a> {
             self.distribute_ensigns();
         }
 
+        self.log("Distribute fillers");
         self.distribute_fillers();
+        self.log("Distribute remaining");
         self.distribute_remaining();
+        self.log("Swap Steal");
         self.swap_steal();
+        self.log("Increase quiality");
         self.increase_quality();
+        self.log("Minimize dispersion");
+        self.minimize_dispersion();
+        self.log("Increase quality");
+        self.increase_quality();
+        self.teams.sort(Direction::ASC);
     }
 
     pub fn balance_half(&mut self) {
@@ -89,23 +111,18 @@ impl<'a> Mathmaking<'a> {
         self.teams.sort(Direction::ASC);
     }
 
-    pub fn boom(&mut self) {
-        self.update();
-        self.minimize_dispersion();
-        self.increase_quality();
-        self.teams.sort(Direction::ASC);
-    }
-
     pub fn balance_remaining(&mut self) {
         self.init_pool(true);
         self.distribute_fillers();
         self.distribute_remaining();
         self.swap_steal();
         self.increase_quality();
+        self.teams.sort(Direction::ASC);
     }
 
     pub fn result(self) -> BalancerResult {
-        BalancerResult::new(self.teams, self.pool)
+        let dispersion = self.calculate_dispersion();
+        BalancerResult::new(self.teams, self.pool, dispersion)
     }
 
     pub fn add_reserve(&mut self, reserve: Vec<String>) {
@@ -114,6 +131,21 @@ impl<'a> Mathmaking<'a> {
 
     pub fn add_teams(&mut self, teams: Teams) {
         self.teams = teams;
+    }
+
+    fn calculate_dispersion(&self) -> i32 {
+        let first = self.teams.0.first().unwrap();
+        let last = self.teams.0.last().unwrap();
+        let avg = self.config.total_sr / self.config.total_count as i32;
+
+        let low_disp = (first.avg_sr as i32 - avg).abs();
+        let high_disp = (last.avg_sr as i32 - avg).abs();
+
+        cmp::max(low_disp, high_disp)
+    }
+
+    fn log(&self, message: &str) {
+        wasm_log(String::from(message));
     }
 
     fn preserve_players(&mut self, players: &PlayerPool) {
@@ -135,6 +167,13 @@ impl<'a> Mathmaking<'a> {
     }
 
     fn minimize_dispersion(&mut self) {
+        let not_complete_teams = self.teams.get_not_complete();
+        if !self.config.dispersion_minimizer
+            || (self.config.dispersion_minimizer && not_complete_teams.len() > 0)
+        {
+            return;
+        }
+
         while let Some(swap) = self.try_minimize() {
             let first = self.teams.0[swap.0].members.remove(swap.1);
             let second = self.teams.0[swap.2].members.remove(swap.3);
@@ -146,13 +185,12 @@ impl<'a> Mathmaking<'a> {
     }
 
     fn try_minimize(&self) -> Option<(usize, usize, usize, usize)> {
-        let mut clonned = self.teams.clone();
-        clonned.reverse();
+        let teams = &self.teams.0;
 
-        for (t1, team) in self.teams.0.iter().enumerate() {
-            for (t2, team2) in clonned.0.iter().enumerate() {
+        for (t1, team) in teams.iter().enumerate() {
+            for (t2, team2) in teams.iter().rev().enumerate() {
                 if let Some((a, b)) = team.can_swap(&team2, &self.config, &self.players) {
-                    return Some((t1, a, clonned.0.len() - t2 - 1, b));
+                    return Some((t1, a, teams.len() - t2 - 1, b));
                 }
             }
         }
@@ -482,12 +520,17 @@ impl Config {
             limiter_max: 2500,
             players_average: 0,
             rank_limiter2: rank_limiter,
+            dispersion_minimizer: false,
         }
     }
 }
 
 impl BalancerResult {
-    fn new(teams: Teams, leftovers: PlayerPool) -> BalancerResult {
-        BalancerResult { teams, leftovers }
+    fn new(teams: Teams, leftovers: PlayerPool, dispersion: i32) -> BalancerResult {
+        BalancerResult {
+            teams,
+            leftovers,
+            dispersion,
+        }
     }
 }

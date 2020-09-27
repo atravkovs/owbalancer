@@ -26,6 +26,8 @@ export type Mutations<S = State> = {
   [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
   [MutationTypes.ASSIGN_CAPTAINS](state: S, minSR: number): void;
   [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
+  // eslint-disable-next-line
+  [MutationTypes.SET_RESULTS](state: S, results: Array<any>): void;
   [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
   [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
@@ -38,6 +40,9 @@ export type Mutations<S = State> = {
 };
 
 export const mutations: MutationTree<State> & Mutations = {
+  [MutationTypes.SET_RESULTS](state, results) {
+    state.balancerResults = results;
+  },
   [MutationTypes.EDIT_RANK](state, { uuid, rank, role }) {
     state.players[uuid].stats.classes[role].rank = rank;
   },
