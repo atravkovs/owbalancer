@@ -34,6 +34,7 @@ pub struct BalancerResult {
     pub teams: Teams,
     pub leftovers: PlayerPool,
     pub dispersion: i32,
+    pub anchors: i32,
 }
 
 impl<'a> Mathmaking<'a> {
@@ -97,8 +98,6 @@ impl<'a> Mathmaking<'a> {
         self.increase_quality();
         self.log("Minimize dispersion");
         self.minimize_dispersion();
-        self.log("Increase quality");
-        self.increase_quality();
         self.teams.sort(Direction::ASC);
     }
 
@@ -122,7 +121,8 @@ impl<'a> Mathmaking<'a> {
 
     pub fn result(self) -> BalancerResult {
         let dispersion = self.calculate_dispersion();
-        BalancerResult::new(self.teams, self.pool, dispersion)
+        let lows = self.teams.total_low_role_count(self.config.limiter_max);
+        BalancerResult::new(self.teams, self.pool, dispersion, lows)
     }
 
     pub fn add_reserve(&mut self, reserve: Vec<String>) {
@@ -526,11 +526,12 @@ impl Config {
 }
 
 impl BalancerResult {
-    fn new(teams: Teams, leftovers: PlayerPool, dispersion: i32) -> BalancerResult {
+    fn new(teams: Teams, leftovers: PlayerPool, dispersion: i32, lows: usize) -> BalancerResult {
         BalancerResult {
             teams,
             leftovers,
             dispersion,
+            anchors: lows as i32,
         }
     }
 }

@@ -104,6 +104,34 @@ impl Team {
         self.count_role(&SimpleRole::Dps)
     }
 
+    pub fn low_role_count(&self, role: &SimpleRole, threshold: i32) -> usize {
+        match role {
+            SimpleRole::Dps => self.low_dps_count(threshold),
+            SimpleRole::Tank => self.low_tank_count(threshold),
+            SimpleRole::Support => self.low_support_count(threshold),
+        }
+    }
+
+    pub fn total_low_role_count(&self, threshold: i32) -> usize {
+        let dps = if self.low_dps_count(threshold) > 1 {
+            1
+        } else {
+            0
+        };
+        let support = if self.low_support_count(threshold) > 1 {
+            1
+        } else {
+            0
+        };
+        let tank = if self.low_tank_count(threshold) > 1 {
+            1
+        } else {
+            0
+        };
+
+        dps + support + tank
+    }
+
     pub fn low_dps_count(&self, threshold: i32) -> usize {
         self.count_role_lows(&SimpleRole::Dps, threshold)
     }
@@ -290,6 +318,16 @@ impl Team {
                 }
 
                 if mem.role == mem2.role {
+                    if (config.rank_limiter2
+                        && mem.rank < 2500
+                        && team.low_role_count(&mem.role, 2500) > 0)
+                        || (config.rank_limiter2
+                            && mem2.rank < 2500
+                            && self.low_role_count(&mem2.role, 2500) > 0)
+                    {
+                        continue;
+                    }
+
                     let newsr =
                         (self.total_sr - mem.rank + mem2.rank) / self.members_count() as i32;
                     let newsr2 =
@@ -371,6 +409,13 @@ impl Teams {
 
     pub fn get(&self, index: usize) -> &Team {
         self.0.get(index).unwrap()
+    }
+
+    pub fn total_low_role_count(&self, threshold: i32) -> usize {
+        self.0
+            .iter()
+            .map(|team| team.total_low_role_count(threshold))
+            .sum()
     }
 
     pub fn get_stats(&self) -> (i32, usize) {

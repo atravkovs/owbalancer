@@ -4,6 +4,7 @@
       <div>Dispersion: {{ balance.dispersion }}</div>
       <div>Unbalanced: {{ balance.leftovers.length }}</div>
       <div>Offroles: {{ offRolesPercentage }}%</div>
+      <div>Anchors: {{ balance.anchors }}</div>
     </div>
   </div>
 </template>
