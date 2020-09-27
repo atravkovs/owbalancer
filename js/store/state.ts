@@ -17,6 +17,7 @@ export const state = {
   editPlayer: '',
   balancerResults,
   reservedPlayers,
+  isSelection: false,
   isBalance: false,
   showBalancerSR: false,
 };

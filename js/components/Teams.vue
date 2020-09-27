@@ -7,6 +7,7 @@
         Balance
       </button>
       <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
+      <button class="btn btn-sm btn-warning mx-2" v-if="canChange" @click="select">Choose balance</button>
       <button class="btn btn-sm btn-secondary mx-2" @click="empty">
         Empty
       </button>
@@ -57,6 +58,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const showBalancerSR = ref(store.state.showBalancerSR);
+    const canChange = computed(() => store.state.balancerResults.length > 1);
 
     const storeTeams = computed(() => store.state.teams);
 
@@ -153,14 +155,20 @@ export default defineComponent({
       store.commit(MutationTypes.TOGGLE_BALANCER_SR);
     };
 
+    const select = () => {
+      store.commit(MutationTypes.TOGGLE_SELECTION);
+    };
+
     return {
       empty,
       clear,
       maxSr,
       minSr,
       avgSr,
+      select,
       addNew,
       balance,
+      canChange,
       teams: storeTeams,
       toggleSR,
       showBalancerSR,

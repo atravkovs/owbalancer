@@ -197,14 +197,17 @@
         <div
           class="progress-bar progress-bar-striped"
           :class="{
-            'progress-bar-animated': progress.current / progress.total !== 1,
+            'progress-bar-animated':
+              progress.current / (progress.total * triesCount) !== 1,
           }"
           role="progressbar"
-          :aria-valuenow="Math.floor((progress.current / progress.total) * 100)"
+          :aria-valuenow="
+            Math.floor((progress.current / (progress.total * triesCount)) * 100)
+          "
           aria-valuemin="0"
           aria-valuemax="100"
           :style="`width: ${Math.floor(
-            (progress.current / progress.total) * 100
+            (progress.current / (progress.total * triesCount)) * 100
           )}%`"
         ></div>
       </div>
@@ -245,7 +248,7 @@ export default defineComponent({
     const isActive = computed(() => store.state.isBalance);
     const reservedPlayers = computed(() => store.state.reservedPlayers);
     const stateTeams = computed(() => store.state.teams);
-    const progress = reactive({ total: 11, current: 0 });
+    const progress = reactive({ total: 10, current: 0 });
 
     document.addEventListener('wasm-update', (e) => {
       // eslint-disable-next-line
@@ -326,6 +329,7 @@ export default defineComponent({
 
             if (results.length != 1) {
               store.commit(MutationTypes.SET_RESULTS, results);
+              store.commit(MutationTypes.TOGGLE_SELECTION);
               return;
             }
 

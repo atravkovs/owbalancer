@@ -10,6 +10,7 @@ export type Mutations<S = State> = {
   [MutationTypes.CLEAR_TEAMS](state: S): void;
   [MutationTypes.EMPTY_TEAMS](state: S): void;
   [MutationTypes.TOGGLE_BALANCE](state: S): void;
+  [MutationTypes.TOGGLE_SELECTION](state: S): void;
   [MutationTypes.TOGGLE_BALANCER_SR](state: S): void;
   [MutationTypes.CLEAR_SQUIRES](state: S): void;
   [MutationTypes.CLEAR_CAPTAINS](state: S): void;
@@ -58,6 +59,9 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.TOGGLE_BALANCE](state) {
     state.isBalance = !state.isBalance;
+  },
+  [MutationTypes.TOGGLE_SELECTION](state) {
+    state.isSelection = !state.isSelection;
   },
   [MutationTypes.TOGGLE_BALANCER_SR](state) {
     state.showBalancerSR = !state.showBalancerSR;

@@ -25,11 +25,11 @@ export default defineComponent({
   components: { Modal, Result },
   setup() {
     const store = useStore();
-    const isActive = computed(() => store.state.balancerResults.length > 0);
+    const isActive = computed(() => store.state.isSelection);
     const results = computed(() => store.state.balancerResults);
 
     const closeModal = () => {
-      store.commit(MutationTypes.SET_RESULTS, []);
+      store.commit(MutationTypes.TOGGLE_SELECTION);
     };
 
     return { isActive, closeModal, results };
