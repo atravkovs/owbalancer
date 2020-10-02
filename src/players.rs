@@ -65,6 +65,16 @@ pub enum Direction {
     DESC,
 }
 
+impl Classes {
+    pub fn get_class(&self, role: &SimpleRole) -> &ClassType {
+        match role {
+            SimpleRole::Dps => &self.dps,
+            SimpleRole::Tank => &self.tank,
+            SimpleRole::Support => &self.support,
+        }
+    }
+}
+
 impl Players {
     pub fn get_captains(&self) -> PlayerPool {
         let players = self

@@ -13,9 +13,10 @@ pub struct Config {
     pub limiter_max: i32,
     pub total_count: usize,
     pub rank_limiter: bool,
+    pub rank_limiter2: bool,
     pub players_average: i32,
     pub duplicate_roles: bool,
-    pub rank_limiter2: bool,
+    pub duplicate_roles2: bool,
     pub dispersion_minimizer: bool,
 }
 
@@ -136,12 +137,13 @@ impl<'a> Mathmaking<'a> {
     fn calculate_dispersion(&self) -> i32 {
         let first = self.teams.0.first().unwrap();
         let last = self.teams.0.last().unwrap();
-        let avg = self.config.total_sr
-            / if self.config.total_count <= 0 {
-                1
-            } else {
-                self.config.total_count as i32
-            };
+        let total_count = if self.config.total_count <= 0 {
+            1
+        } else {
+            self.config.total_count as i32
+        };
+
+        let avg = self.config.total_sr / total_count;
 
         let low_disp = (first.avg_sr as i32 - avg).abs();
         let high_disp = (last.avg_sr as i32 - avg).abs();
@@ -149,8 +151,11 @@ impl<'a> Mathmaking<'a> {
         cmp::max(low_disp, high_disp)
     }
 
+    #[allow(unused_unsafe)]
     fn log(&self, message: &str) {
-        wasm_log(String::from(message));
+        unsafe {
+            wasm_log(String::from(message));
+        }
     }
 
     fn preserve_players(&mut self, players: &PlayerPool) {
@@ -518,14 +523,15 @@ impl Config {
         Config {
             tolerance,
             rank_limiter,
-            duplicate_roles,
             total_sr: 0,
             total_count: 0,
+            duplicate_roles,
             sec_roles: false,
             limiter_max: 2500,
             players_average: 0,
             rank_limiter2: rank_limiter,
             dispersion_minimizer: false,
+            duplicate_roles2: duplicate_roles,
         }
     }
 }

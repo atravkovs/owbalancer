@@ -306,26 +306,37 @@ impl Team {
         let avg = config.total_sr / config.total_count as i32;
 
         for (i, mem) in self.members.iter().enumerate() {
-            let p1 = &players.0.get(mem.uuid.as_str()).unwrap().identity;
+            let p1_base = &players.0.get(mem.uuid.as_str()).unwrap();
+            let p1 = &p1_base.identity;
             if p1.is_captain || p1.is_squire {
                 continue;
             }
 
             for (j, mem2) in team.members.iter().enumerate() {
-                let p2 = &players.0.get(mem2.uuid.as_str()).unwrap().identity;
+                let p2_base = &players.0.get(mem2.uuid.as_str()).unwrap();
+                let p2 = &p2_base.identity;
                 if p2.is_captain || p2.is_squire {
                     continue;
                 }
 
                 if mem.role == mem2.role {
-                    if (config.rank_limiter2
-                        && mem.rank < 2500
-                        && team.low_role_count(&mem.role, 2500) > 0)
-                        || (config.rank_limiter2
-                            && mem2.rank < 2500
-                            && self.low_role_count(&mem2.role, 2500) > 0)
-                    {
-                        continue;
+                    if config.rank_limiter2 {
+                        if (mem.rank < 2500 && team.low_role_count(&mem.role, 2500) == 1)
+                            || (mem2.rank < 2500 && self.low_role_count(&mem2.role, 2500) == 1)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if config.duplicate_roles2 {
+                        let mem1_class = p1_base.stats.classes.get_class(&mem.role);
+                        let mem2_class = p2_base.stats.classes.get_class(&mem2.role);
+
+                        if mem1_class.primary == mem2_class.primary
+                            || mem1_class.secondary == mem2_class.secondary
+                        {
+                            continue;
+                        }
                     }
 
                     let newsr =
