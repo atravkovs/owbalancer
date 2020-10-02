@@ -24,10 +24,19 @@
     <div class="row">
       <label for="playerFilter" class="col-2 col-form-label">Filter:</label>
       <div class="col-10">
-        <input id="playerFilter" type="text" class="form-control form-control-sm" @input="filter" />
+        <input
+          id="playerFilter"
+          type="text"
+          class="form-control form-control-sm"
+          @input="filter"
+        />
       </div>
     </div>
-    <div class="overflow-auto h40r bg-secondary border p-1" @dragover="allowDrop" @drop="drop">
+    <div
+      class="overflow-auto h40r bg-secondary border p-1"
+      @dragover="allowDrop"
+      @drop="drop"
+    >
       <PlayerCard
         class="bg-light mb-1"
         v-for="[uuid, player] in state.players"
@@ -140,11 +149,14 @@ export default defineComponent({
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
-      store.commit(MutationTypes.ADD_RESERVE, playerId);
-      store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-        teamUuid,
-        playerId,
-      });
+
+      if (store.state.teams.length > 0) {
+        store.commit(MutationTypes.ADD_RESERVE, playerId);
+        store.commit(MutationTypes.REMOVE_FROM_TEAM, {
+          teamUuid,
+          playerId,
+        });
+      }
     };
 
     return { state, sort, filter, squireCount, captainCount, allowDrop, drop };
