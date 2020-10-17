@@ -332,8 +332,9 @@ impl Team {
                         let mem1_class = p1_base.stats.classes.get_class(&mem.role);
                         let mem2_class = p2_base.stats.classes.get_class(&mem2.role);
 
-                        if mem1_class.primary == mem2_class.primary
-                            || mem1_class.secondary == mem2_class.secondary
+                        if (mem1_class.primary && mem1_class.primary == mem2_class.primary)
+                            || (mem1_class.secondary
+                                && mem1_class.secondary == mem2_class.secondary)
                         {
                             continue;
                         }
