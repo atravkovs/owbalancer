@@ -187,7 +187,7 @@
         type="range"
         class="form-range"
         min="0"
-        max="30"
+        max="50"
         step="1"
         v-model.number="triesCount"
       />
@@ -231,7 +231,7 @@ export default defineComponent({
   components: { Modal, RoleIcon },
   setup() {
     const range = ref(30);
-    const triesCount = ref(1);
+    const triesCount = ref(25);
     const adjustSr = ref({
       isEnabled: false,
       tank: 100,

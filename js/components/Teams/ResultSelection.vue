@@ -6,8 +6,11 @@
     :hideAction="true"
     @close-modal="closeModal"
   >
-    <div class="ResultSelection">
+    <div v-if="results.length > 0" class="ResultSelection">
       <result v-for="(balance, i) in results" :key="i" :balance="balance" />
+    </div>
+    <div v-else>
+      Were unable to balance
     </div>
   </modal>
 </template>
@@ -26,7 +29,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const isActive = computed(() => store.state.isSelection);
-    const results = computed(() => store.state.balancerResults);
+    const results = computed(() => store.state.balancerResults.filter(v => v.leftovers.length === 0).sort((a, b) => a.dispersion - b.dispersion));
 
     const closeModal = () => {
       store.commit(MutationTypes.TOGGLE_SELECTION);
