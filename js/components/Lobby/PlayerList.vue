@@ -24,19 +24,10 @@
     <div class="row">
       <label for="playerFilter" class="col-2 col-form-label">Filter:</label>
       <div class="col-10">
-        <input
-          id="playerFilter"
-          type="text"
-          class="form-control form-control-sm"
-          @input="filter"
-        />
+        <input id="playerFilter" type="text" class="form-control form-control-sm" @input="filter" />
       </div>
     </div>
-    <div
-      class="overflow-auto h40r bg-secondary border p-1"
-      @dragover="allowDrop"
-      @drop="drop"
-    >
+    <div class="overflow-auto h40r bg-secondary border p-1" @dragover="allowDrop" @drop="drop">
       <PlayerCard
         class="bg-light mb-1"
         v-for="[uuid, player] in state.players"
@@ -93,11 +84,7 @@ export default defineComponent({
       }
     );
 
-    const sort = (
-      rule: string,
-      order: 'asc' | 'desc',
-      pl?: [string, Player][]
-    ) => {
+    const sort = (rule: string, order: 'asc' | 'desc', pl?: [string, Player][]) => {
       const mPlayers = pl || state.players;
 
       const sortedPlayers = orderBy(
@@ -130,16 +117,10 @@ export default defineComponent({
     });
 
     const squireCount = computed(
-      () =>
-        state.storePlayers.filter(
-          ([, player]) => player.identity.isSquire === true
-        ).length
+      () => state.storePlayers.filter(([, player]) => player.identity.isSquire === true).length
     );
     const captainCount = computed(
-      () =>
-        state.storePlayers.filter(
-          ([, player]) => player.identity.isCaptain === true
-        ).length
+      () => state.storePlayers.filter(([, player]) => player.identity.isCaptain === true).length
     );
 
     const allowDrop = (ev: DragEvent) => {

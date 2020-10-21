@@ -11,9 +11,7 @@
           @input="updateTeam"
         />
       </div>
-      <span class="bg-secondary btr px-2 py-1 text-light">{{
-        teamAverage
-      }}</span>
+      <span class="bg-secondary btr px-2 py-1 text-light">{{ teamAverage }}</span>
     </div>
     <div class="card-body p-0 pb-1 fs-small">
       <ul class="list-group list-group-flush">
@@ -50,9 +48,7 @@ export default defineComponent({
       if (!store.state.showBalancerSR) {
         return Math.round(
           props.team?.members.reduce(
-            (acc, member) =>
-              acc +
-              store.state.players[member.uuid].stats.classes[member.role].rank,
+            (acc, member) => acc + store.state.players[member.uuid].stats.classes[member.role].rank,
             0
           ) / props.team?.members.length
         );
@@ -60,19 +56,13 @@ export default defineComponent({
 
       return Math.round(props.team?.avgSr);
     });
-    const cTeam = computed(() =>
-      store.state.teams.find((team) => team.uuid === teamUuid.value)
-    );
+    const cTeam = computed(() => store.state.teams.find(team => team.uuid === teamUuid.value));
     const mTeam = ref(cTeam);
 
-    const tanks = computed(() =>
-      mTeam.value?.members.filter((member) => member.role === 'tank')
-    );
-    const dps = computed(() =>
-      mTeam.value?.members.filter((member) => member.role === 'dps')
-    );
+    const tanks = computed(() => mTeam.value?.members.filter(member => member.role === 'tank'));
+    const dps = computed(() => mTeam.value?.members.filter(member => member.role === 'dps'));
     const supports = computed(() =>
-      mTeam.value?.members.filter((member) => member.role === 'support')
+      mTeam.value?.members.filter(member => member.role === 'support')
     );
 
     const updateTeam = debounce((e: Event) => {

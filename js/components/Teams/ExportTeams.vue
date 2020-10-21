@@ -3,11 +3,7 @@
     <drop-item @drop-click="exportText">Text</drop-item>
     <drop-item @drop-click="exportCSV">CSV</drop-item>
   </dropdown>
-  <export-modal
-    :isActive="isModalActive"
-    :exportText="modalText"
-    @close-modal="closeModal"
-  />
+  <export-modal :isActive="isModalActive" :exportText="modalText" @close-modal="closeModal" />
 </template>
 
 <script lang="ts">
@@ -36,27 +32,20 @@ export default defineComponent({
         const teamAvgSr = Math.round(
           team.members.reduce(
             (accAvg, member) =>
-              accAvg +
-              store.state.players[member.uuid].stats.classes[member.role].rank,
+              accAvg + store.state.players[member.uuid].stats.classes[member.role].rank,
             0
           ) / team.members.length
         );
 
         let teamText = `Team ${team.name} - ${teamAvgSr}\n=============================\n`;
 
-        ['tank', 'dps', 'support'].forEach((role) => {
+        ['tank', 'dps', 'support'].forEach(role => {
           team.members
-            .filter((member) => member.role === role)
-            .forEach((member) => {
-              const { isSquire, isCaptain } = store.state.players[
-                member.uuid
-              ].identity;
-              const { rank } = store.state.players[member.uuid].stats.classes[
-                member.role
-              ];
-              const name = `${isSquire ? '⚔ ' : ''}${isCaptain ? '♛ ' : ''}${
-                member.name
-              }`;
+            .filter(member => member.role === role)
+            .forEach(member => {
+              const { isSquire, isCaptain } = store.state.players[member.uuid].identity;
+              const { rank } = store.state.players[member.uuid].stats.classes[member.role];
+              const name = `${isSquire ? '⚔ ' : ''}${isCaptain ? '♛ ' : ''}${member.name}`;
 
               t.cell('Role', member.role);
               t.cell('Rank', Math.round(rank));
@@ -80,18 +69,14 @@ export default defineComponent({
 
       const extendText = teams.reduce((acc, team) => {
         let teamText = '';
-        ['tank', 'dps', 'support'].forEach((role) => {
+        ['tank', 'dps', 'support'].forEach(role => {
           team.members
-            .filter((member) => member.role === role)
-            .forEach((member) => {
-              const { isSquire, isCaptain } = store.state.players[
-                member.uuid
-              ].identity;
-              teamText = `${teamText}"${team.name}";"${member.role}";"${
-                member.rank
-              }";"${member.name}";${isCaptain ? '1' : '0'};${
-                isSquire ? '1' : '0'
-              }\n`;
+            .filter(member => member.role === role)
+            .forEach(member => {
+              const { isSquire, isCaptain } = store.state.players[member.uuid].identity;
+              teamText = `${teamText}"${team.name}";"${member.role}";"${member.rank}";"${
+                member.name
+              }";${isCaptain ? '1' : '0'};${isSquire ? '1' : '0'}\n`;
             });
         });
 

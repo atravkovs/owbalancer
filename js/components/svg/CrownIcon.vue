@@ -47,7 +47,6 @@ l-652 845 46 39 c209 179 315 387 315 617 0 172 -47 303 -159 442 -132 164
   </svg>
 </template>
 
-
 <script lang="ts">
 import { defineComponent } from 'vue';
 

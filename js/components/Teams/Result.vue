@@ -49,8 +49,7 @@ export default defineComponent({
             total += 1;
             if (
               store.state.players[member.uuid] &&
-              member.role !==
-                PObj.getTopRoleName(store.state.players[member.uuid])
+              member.role !== PObj.getTopRoleName(store.state.players[member.uuid])
             ) {
               off += 1;
             }

@@ -34,9 +34,7 @@ export default defineComponent({
     const store = useStore();
     const emptyPlayer = PlayerEditor.createDefaultPlayer('');
 
-    const playerData = computed(
-      () => store.state.players[store.state.editPlayer] || emptyPlayer
-    );
+    const playerData = computed(() => store.state.players[store.state.editPlayer] || emptyPlayer);
 
     const player = ref(playerData);
 

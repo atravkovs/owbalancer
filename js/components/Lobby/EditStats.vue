@@ -17,12 +17,7 @@ import { SortableEvent } from 'sortablejs';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 
-import {
-  Classes,
-  ClassType,
-  DescribedClassType,
-  Stats,
-} from '@/objects/player';
+import { Classes, ClassType, DescribedClassType, Stats } from '@/objects/player';
 
 import Sortable from '@/components/Helpers/Sortable.vue';
 import EditRole from '@/components/Lobby/EditRole.vue';
@@ -71,7 +66,7 @@ export default defineComponent({
 
       const classes = { ...playerStats.value.classes };
 
-      Object.keys(classes).forEach((role) => {
+      Object.keys(classes).forEach(role => {
         const sRole = getRole(classes, role);
 
         if (sRole.priority === oldIndex) {
@@ -79,19 +74,11 @@ export default defineComponent({
           return;
         }
 
-        if (
-          directionUp &&
-          sRole.priority < oldIndex &&
-          sRole.priority >= newIndex
-        ) {
+        if (directionUp && sRole.priority < oldIndex && sRole.priority >= newIndex) {
           sRole.priority += 1;
         }
 
-        if (
-          !directionUp &&
-          sRole.priority > oldIndex &&
-          sRole.priority <= newIndex
-        ) {
+        if (!directionUp && sRole.priority > oldIndex && sRole.priority <= newIndex) {
           sRole.priority -= 1;
         }
       });

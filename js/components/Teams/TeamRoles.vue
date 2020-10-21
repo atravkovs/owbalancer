@@ -3,7 +3,7 @@
     v-for="i in 2"
     :key="i"
     @dragover="allowDrop"
-    @drop="(e) => drop(e, i)"
+    @drop="e => drop(e, i)"
     class="list-group-item d-flex p-0 pl-3 pr-1"
   >
     <div class="fs-b pr-2">
@@ -84,14 +84,12 @@ export default defineComponent({
             secondary: role.secondary,
           });
         } else {
-          const teamF = store.state.teams.findIndex(
-            (team) => team.uuid === teamUuid
-          );
+          const teamF = store.state.teams.findIndex(team => team.uuid === teamUuid);
           const swapCandidate = store.state.players[member.uuid];
 
           if (teamF >= 0 && swapCandidate) {
             const memF = store.state.teams[teamF].members.find(
-              (lmember) => lmember.uuid === playerId
+              lmember => lmember.uuid === playerId
             );
 
             if (!memF) return;

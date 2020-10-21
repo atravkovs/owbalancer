@@ -1,9 +1,7 @@
 <template>
-  <div
-    @dragover="allowDrop"
-    @drop="drop"
-    class="border border-danger w-100 delete-player"
-  >==== Delete Player ====</div>
+  <div @dragover="allowDrop" @drop="drop" class="border border-danger w-100 delete-player">
+    ==== Delete Player ====
+  </div>
 </template>
 
 <script lang="ts">

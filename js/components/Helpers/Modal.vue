@@ -13,11 +13,9 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button
-            v-if="!hideAction"
-            class="btn btn-primary"
-            @click="$emit('save-changes')"
-          >{{ customAction || 'Save changes' }}</button>
+          <button v-if="!hideAction" class="btn btn-primary" @click="$emit('save-changes')">
+            {{ customAction || 'Save changes' }}
+          </button>
         </div>
       </div>
     </div>
@@ -41,11 +39,11 @@ export default defineComponent({
   setup(props, { emit }) {
     const modalRef = ref(null);
 
-    const setIsActive: (
-      modal: Modal,
-      isActive: boolean,
-      isActiveP: boolean
-    ) => void = (modal, isActive, isActiveP) => {
+    const setIsActive: (modal: Modal, isActive: boolean, isActiveP: boolean) => void = (
+      modal,
+      isActive,
+      isActiveP
+    ) => {
       if (isActive === isActiveP) {
         return;
       }
@@ -62,12 +60,9 @@ export default defineComponent({
     onMounted(() => {
       modal = new Modal(modalRef.value);
 
-      ((modalRef.value as unknown) as Element).addEventListener(
-        'hidden.bs.modal',
-        () => {
-          emit('close-modal');
-        }
-      );
+      ((modalRef.value as unknown) as Element).addEventListener('hidden.bs.modal', () => {
+        emit('close-modal');
+      });
 
       setIsActive(modal, props.isActive || false, !props.isActive);
     });

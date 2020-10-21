@@ -7,7 +7,9 @@
         Balance
       </button>
       <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
-      <button class="btn btn-sm btn-warning mx-2" v-if="canChange" @click="select">Choose balance</button>
+      <button class="btn btn-sm btn-warning mx-2" v-if="canChange" @click="select">
+        Choose balance
+      </button>
       <button class="btn btn-sm btn-secondary mx-2" @click="empty">
         Empty
       </button>
@@ -21,9 +23,7 @@
         :value="showBalancerSR"
         @change="toggleSR"
       />
-      <label for="toggleSRMode" class="form-check-label"
-        >Show balancer SR</label
-      >
+      <label for="toggleSRMode" class="form-check-label">Show balancer SR</label>
     </div>
   </div>
   <div v-if="teams.length > 0">
@@ -65,8 +65,7 @@ export default defineComponent({
     const calcTeamAvg = (team: TeamType, players: Players): number => {
       return !store.state.showBalancerSR
         ? team.members.reduce(
-            (acc, member) =>
-              acc + players[member.uuid].stats.classes[member.role].rank,
+            (acc, member) => acc + players[member.uuid].stats.classes[member.role].rank,
             0
           ) / team.members.length
         : team.avgSr;
@@ -96,10 +95,8 @@ export default defineComponent({
     );
     const avgSr = computed(() =>
       Math.floor(
-        store.state.teams.reduce(
-          (acc, team) => acc + calcTeamAvg(team, store.state.players),
-          0
-        ) / store.state.teams.length
+        store.state.teams.reduce((acc, team) => acc + calcTeamAvg(team, store.state.players), 0) /
+          store.state.teams.length
       )
     );
 
@@ -109,12 +106,11 @@ export default defineComponent({
           let off = acc[0];
           let total = acc[1];
 
-          team.members.forEach((member) => {
+          team.members.forEach(member => {
             total += 1;
             if (
               store.state.players[member.uuid] &&
-              member.role !==
-                PObj.getTopRoleName(store.state.players[member.uuid])
+              member.role !== PObj.getTopRoleName(store.state.players[member.uuid])
             ) {
               off += 1;
             }

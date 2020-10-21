@@ -65,10 +65,7 @@ export default defineComponent({
         // eslint-disable-next-line
         player.stats.classes[roleSelect[firstRole]].priority = 0;
         // eslint-disable-next-line
-        player.stats.classes[roleSelect[firstRole]].rank = getRandomInt(
-          MIN_SR,
-          MAX_SR
-        );
+        player.stats.classes[roleSelect[firstRole]].rank = getRandomInt(MIN_SR, MAX_SR);
         roleSelect.splice(firstRole, 1);
 
         // Second role if needed
@@ -79,10 +76,7 @@ export default defineComponent({
           // eslint-disable-next-line
           player.stats.classes[roleSelect[secondRole]].priority = 1;
           // eslint-disable-next-line
-          player.stats.classes[roleSelect[secondRole]].rank = getRandomInt(
-            MIN_SR,
-            MAX_SR
-          );
+          player.stats.classes[roleSelect[secondRole]].rank = getRandomInt(MIN_SR, MAX_SR);
 
           roleSelect.splice(secondRole, 1);
           if (flipCoin()) {
@@ -91,17 +85,14 @@ export default defineComponent({
             // eslint-disable-next-line
             player.stats.classes[roleSelect[0]].priority = 2;
             // eslint-disable-next-line
-            player.stats.classes[roleSelect[0]].rank = getRandomInt(
-              MIN_SR,
-              MAX_SR
-            );
+            player.stats.classes[roleSelect[0]].rank = getRandomInt(MIN_SR, MAX_SR);
 
             roleSelect.splice(0, 1);
           }
         }
 
         let j = 1;
-        roleSelect.forEach((v) => {
+        roleSelect.forEach(v => {
           // eslint-disable-next-line
           player.stats.classes[v].priority = j;
           j += 1;

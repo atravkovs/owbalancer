@@ -10,50 +10,20 @@
     <div class="mb-3 mt-1">
       <label class="form-label w-100">Balance Type</label>
       <div class="btn-group">
-        <input
-          type="radio"
-          value="full"
-          id="balance1"
-          class="btn-check"
-          v-model="balanceType"
-        />
+        <input type="radio" value="full" id="balance1" class="btn-check" v-model="balanceType" />
         <label class="btn btn-primary" for="balance1">Full</label>
-        <input
-          type="radio"
-          value="half"
-          id="balance2"
-          class="btn-check"
-          v-model="balanceType"
-        />
+        <input type="radio" value="half" id="balance2" class="btn-check" v-model="balanceType" />
         <label class="btn btn-primary" for="balance2">Half</label>
-        <input
-          type="radio"
-          value="final"
-          id="balance3"
-          class="btn-check"
-          v-model="balanceType"
-        />
+        <input type="radio" value="final" id="balance3" class="btn-check" v-model="balanceType" />
         <label class="btn btn-primary" for="balance3">Final</label>
       </div>
     </div>
     <div class="mb-3" v-if="balanceType === 'full'">
       <label class="form-label w-100">Disable</label>
       <div class="btn-group">
-        <input
-          type="radio"
-          value="none"
-          id="disable1"
-          class="btn-check"
-          v-model="disableType"
-        />
+        <input type="radio" value="none" id="disable1" class="btn-check" v-model="disableType" />
         <label class="btn btn-primary" for="disable1">None</label>
-        <input
-          type="radio"
-          value="ex_caps"
-          id="disable2"
-          class="btn-check"
-          v-model="disableType"
-        />
+        <input type="radio" value="ex_caps" id="disable2" class="btn-check" v-model="disableType" />
         <label class="btn btn-primary" for="disable2">Except captains</label>
         <input
           type="radio"
@@ -62,16 +32,8 @@
           class="btn-check"
           v-model="disableType"
         />
-        <label class="btn btn-primary" for="disable3"
-          >Leutenants and Ensigns</label
-        >
-        <input
-          type="radio"
-          value="ens"
-          id="disable4"
-          class="btn-check"
-          v-model="disableType"
-        />
+        <label class="btn btn-primary" for="disable3">Leutenants and Ensigns</label>
+        <input type="radio" value="ens" id="disable4" class="btn-check" v-model="disableType" />
         <label class="btn btn-primary" for="disable4">Ensigns</label>
       </div>
     </div>
@@ -84,9 +46,7 @@
           class="form-check-input"
           v-model="lowRankLimiter"
         />
-        <label for="lowRankLimiter" class="form-check-label"
-          >Low rank limiter</label
-        >
+        <label for="lowRankLimiter" class="form-check-label">Low rank limiter</label>
       </div>
       <div class="form-check">
         <input
@@ -119,42 +79,25 @@
           class="form-check-input"
           v-model="adjustSr.isEnabled"
         />
-        <label for="srScaling" class="form-check-label"
-          >Adjust player SR by main class</label
-        >
+        <label for="srScaling" class="form-check-label">Adjust player SR by main class</label>
       </div>
       <div class="d-flex justify-content-between">
         <div class="input-group mr-2">
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            v-model.number="adjustSr.tank"
-          />
+          <input type="number" min="0" class="form-control" v-model.number="adjustSr.tank" />
           <span class="input-group-text">
             <role-icon rtype="tank" />
           </span>
           <span class="input-group-text">%</span>
         </div>
         <div class="input-group mr-2">
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            v-model.number="adjustSr.dps"
-          />
+          <input type="number" min="0" class="form-control" v-model.number="adjustSr.dps" />
           <span class="input-group-text">
             <role-icon rtype="dps" />
           </span>
           <span class="input-group-text">%</span>
         </div>
         <div class="input-group">
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            v-model.number="adjustSr.support"
-          />
+          <input type="number" min="0" class="form-control" v-model.number="adjustSr.support" />
           <span class="input-group-text">
             <role-icon rtype="support" />
           </span>
@@ -197,18 +140,13 @@
         <div
           class="progress-bar progress-bar-striped"
           :class="{
-            'progress-bar-animated':
-              progress.current / (progress.total * triesCount) !== 1,
+            'progress-bar-animated': progress.current / (progress.total * triesCount) !== 1,
           }"
           role="progressbar"
-          :aria-valuenow="
-            Math.floor((progress.current / (progress.total * triesCount)) * 100)
-          "
+          :aria-valuenow="Math.floor((progress.current / (progress.total * triesCount)) * 100)"
           aria-valuemin="0"
           aria-valuemax="100"
-          :style="`width: ${Math.floor(
-            (progress.current / (progress.total * triesCount)) * 100
-          )}%`"
+          :style="`width: ${Math.floor((progress.current / (progress.total * triesCount)) * 100)}%`"
         ></div>
       </div>
     </div>
@@ -250,7 +188,7 @@ export default defineComponent({
     const stateTeams = computed(() => store.state.teams);
     const progress = reactive({ total: 10, current: 0 });
 
-    document.addEventListener('wasm-update', (e) => {
+    document.addEventListener('wasm-update', e => {
       // eslint-disable-next-line
       console.log('Step: ', e.detail.message());
       progress.current += 1;
@@ -260,7 +198,7 @@ export default defineComponent({
       store.commit(MutationTypes.TOGGLE_BALANCE);
     };
 
-    const fullBalance: (lib: any) => any = (lib) => {
+    const fullBalance: (lib: any) => any = lib => {
       return lib.balance(
         store.state.players,
         +range.value,
@@ -273,7 +211,7 @@ export default defineComponent({
       );
     };
 
-    const halfBalance: (lib: any) => any = (lib) => {
+    const halfBalance: (lib: any) => any = lib => {
       return lib.balance_half(
         store.state.players,
         +range.value,
@@ -283,10 +221,7 @@ export default defineComponent({
       );
     };
 
-    const finalBalance: (lib: any, data: any) => any = (
-      lib,
-      { teamsCopy, reserveCopy }
-    ) => {
+    const finalBalance: (lib: any, data: any) => any = (lib, { teamsCopy, reserveCopy }) => {
       return lib.balance_final(
         store.state.players,
         +range.value,
@@ -318,7 +253,7 @@ export default defineComponent({
       progress.current = 0;
 
       wasm
-        .then((lib) => {
+        .then(lib => {
           try {
             const results = conditionalBalance(lib, {
               teamsCopy,
@@ -346,7 +281,7 @@ export default defineComponent({
             console.error(e.message);
           }
         })
-        .catch((e) => {
+        .catch(e => {
           console.error(e.message);
         });
     };

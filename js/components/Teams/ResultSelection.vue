@@ -29,7 +29,16 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const isActive = computed(() => store.state.isSelection);
-    const results = computed(() => store.state.balancerResults.filter(v => v.leftovers.length === 0).sort((a, b) => a.dispersion - b.dispersion));
+    const results = computed(() =>
+      store.state.balancerResults
+        .filter(v => v.leftovers.length === 0)
+        .sort((a, b) => a.dispersion - b.dispersion)
+        .concat(
+          store.state.balancerResults
+            .filter(v => v.leftovers.length !== 0)
+            .sort((a, b) => a.dispersion - b.dispersion)
+        )
+    );
 
     const closeModal = () => {
       store.commit(MutationTypes.TOGGLE_SELECTION);

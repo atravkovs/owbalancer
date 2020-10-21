@@ -13,10 +13,7 @@
         </div>
         <div>{{ sr }}</div>
       </div>
-      <div
-        class="text-ellip"
-        :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, 'wt': !!teamUuid }"
-      >
+      <div class="text-ellip" :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, wt: !!teamUuid }">
         <span class="extra-icon">
           <CrownIcon v-if="player.identity.isCaptain" />
           <SwordIcon v-if="player.identity.isSquire" />
@@ -58,10 +55,7 @@ export default defineComponent({
     const drag = (ev: DragEvent) => {
       let a = null;
       if (ev?.dataTransfer) {
-        a = ev.dataTransfer.setData(
-          'playerTag',
-          props.player?.identity.uuid || ''
-        );
+        a = ev.dataTransfer.setData('playerTag', props.player?.identity.uuid || '');
         a = ev.dataTransfer?.setData('team', props.teamUuid || '');
       }
 
@@ -86,8 +80,7 @@ export default defineComponent({
       return classes
         .filter(
           ([rname, role]) =>
-            role.isActive &&
-            (props.prefferedRole ? rname !== props.prefferedRole : true)
+            role.isActive && (props.prefferedRole ? rname !== props.prefferedRole : true)
         )
         .sort(([, role], [, role2]) => role2.priority - role.priority)
         .reduce((acc: string[], [name]) => {
@@ -102,8 +95,7 @@ export default defineComponent({
     const sr = computed(() => {
       if (!props.player) return 0;
 
-      if (props.rankRole)
-        return PObj.getRole(props.player.stats.classes, props.rankRole).rank;
+      if (props.rankRole) return PObj.getRole(props.player.stats.classes, props.rankRole).rank;
 
       if (props.prefferedRank) return props.prefferedRank;
 

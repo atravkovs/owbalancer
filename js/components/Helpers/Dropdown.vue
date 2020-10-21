@@ -6,7 +6,9 @@
       data-toggle="dropdown"
       aria-expanded="false"
       ref="dropdownRef"
-    >{{ title }}</button>
+    >
+      {{ title }}
+    </button>
     <ul class="dropdown-menu" :aria-labelledby="`dropdown_${id}`">
       <slot />
     </ul>

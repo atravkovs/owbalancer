@@ -36,8 +36,22 @@ export type Mutations<S = State> = {
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
   [MutationTypes.UPDATE_TEAM_NAME](state: S, data: { teamUuid: string; teamName: string }): void;
-  [MutationTypes.EDIT_RANK](state: S, data: { uuid: string; rank: number; role: 'dps' | 'support' | 'tank' }): void;
-  [MutationTypes.ADD_TEAMPLAYER](state: S, data: { teamUuid: string; playerName: string; playerId: string; role: ClassType; primary: boolean; secondary: boolean; roleName: 'dps' | 'support' | 'tank' }): void;
+  [MutationTypes.EDIT_RANK](
+    state: S,
+    data: { uuid: string; rank: number; role: 'dps' | 'support' | 'tank' }
+  ): void;
+  [MutationTypes.ADD_TEAMPLAYER](
+    state: S,
+    data: {
+      teamUuid: string;
+      playerName: string;
+      playerId: string;
+      role: ClassType;
+      primary: boolean;
+      secondary: boolean;
+      roleName: 'dps' | 'support' | 'tank';
+    }
+  ): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
@@ -136,7 +150,10 @@ export const mutations: MutationTree<State> & Mutations = {
       state.teams[teamF].totalSr = totalSr;
     }
   },
-  [MutationTypes.ADD_TEAMPLAYER](state, { playerName, teamUuid, playerId, role, roleName, primary, secondary }) {
+  [MutationTypes.ADD_TEAMPLAYER](
+    state,
+    { playerName, teamUuid, playerId, role, roleName, primary, secondary }
+  ) {
     const teamF = state.teams.findIndex(team => team.uuid === teamUuid);
 
     if (teamF !== -1) {
@@ -145,7 +162,8 @@ export const mutations: MutationTree<State> & Mutations = {
         name: playerName,
         rank: role.rank,
         role: roleName,
-        primary, secondary,
+        primary,
+        secondary,
       });
       const { avgSr, totalSr } = TObj.calcStats(state.teams[teamF]);
       state.teams[teamF].avgSr = avgSr;
@@ -155,7 +173,8 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.ASSIGN_CAPTAINS](state, minSR) {
     const players = Object.entries(state.players);
     const captainsCount = Math.floor(players.length / PLAYERS_IN_TEAM);
-    const eligible = players.filter(([, player]) => PObj.getTopRank(player) >= minSR)
+    const eligible = players
+      .filter(([, player]) => PObj.getTopRank(player) >= minSR)
       .sort(([, player], [, player2]) => PObj.getTopRank(player2) - PObj.getTopRank(player));
 
     let i = 0;
@@ -168,7 +187,8 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.ASSIGN_SQUIRES](state, maxSR) {
     const players = Object.entries(state.players);
     const squiresCount = Math.floor(players.length / PLAYERS_IN_TEAM);
-    const eligible = players.filter(([, player]) => PObj.getTopRank(player) <= maxSR)
+    const eligible = players
+      .filter(([, player]) => PObj.getTopRank(player) <= maxSR)
       .sort(([, player], [, player2]) => PObj.getTopRank(player) - PObj.getTopRank(player2));
 
     let i = 0;
@@ -183,20 +203,28 @@ export const mutations: MutationTree<State> & Mutations = {
     state.reservedPlayers = [];
   },
   [MutationTypes.CLEAR_CAPTAINS](state) {
-    Object.entries(state.players).filter(([, player]) => player.identity.isCaptain === true).forEach(([uuid]) => {
-      state.players[uuid].identity.isCaptain = false;
-    });
+    Object.entries(state.players)
+      .filter(([, player]) => player.identity.isCaptain === true)
+      .forEach(([uuid]) => {
+        state.players[uuid].identity.isCaptain = false;
+      });
   },
   [MutationTypes.CLEAR_SQUIRES](state) {
-    Object.entries(state.players).filter(([, player]) => player.identity.isSquire === true).forEach(([uuid]) => {
-      state.players[uuid].identity.isSquire = false;
-    });
+    Object.entries(state.players)
+      .filter(([, player]) => player.identity.isSquire === true)
+      .forEach(([uuid]) => {
+        state.players[uuid].identity.isSquire = false;
+      });
   },
   [MutationTypes.CLEAR_ALL_EXTRA](state) {
-    Object.entries(state.players).filter(([, player]) => player.identity.isSquire === true || player.identity.isCaptain === true).forEach(([uuid]) => {
-      state.players[uuid].identity.isCaptain = false;
-      state.players[uuid].identity.isSquire = false;
-    });
+    Object.entries(state.players)
+      .filter(
+        ([, player]) => player.identity.isSquire === true || player.identity.isCaptain === true
+      )
+      .forEach(([uuid]) => {
+        state.players[uuid].identity.isCaptain = false;
+        state.players[uuid].identity.isSquire = false;
+      });
   },
   [MutationTypes.RESERVE_PLAYERS](state, players) {
     state.reservedPlayers = players;

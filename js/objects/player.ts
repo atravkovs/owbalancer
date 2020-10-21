@@ -89,13 +89,13 @@ const getRole = (roles: Classes, role: string): ClassType => {
   }
 
   return roles.support;
-}
+};
 
 const getTopRole = (player: Player): ClassType => {
   return Object.values(player.stats.classes)
-    .filter((role) => role.isActive)
+    .filter(role => role.isActive)
     .sort((a, b) => a.priority - b.priority)[0];
-}
+};
 
 const getTopRoleName = (player: Player): string => {
   return Object.entries(player.stats.classes)
