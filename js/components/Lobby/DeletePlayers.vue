@@ -27,7 +27,9 @@ export default defineComponent({
     const store = useStore();
 
     const deletePlayers = () => {
-      store.commit(MutationTypes.DELETE_PLAYERS);
+      // eslint-disable-next-line
+      if (window.confirm('Do you really want to Delete ALL players?'))
+        store.commit(MutationTypes.DELETE_PLAYERS);
     };
 
     return { deletePlayers };
