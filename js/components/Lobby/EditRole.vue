@@ -24,7 +24,7 @@
         autocomplete="off"
         v-model="mRole.primary"
       />
-      <label class="btn btn-sm btn-secondary" for="option_main_tank">Main Tank</label>
+      <label class="btn btn-sm btn-outline-dark" for="option_main_tank">Main Tank</label>
     </span>
     <span class="input-group-text w-7rem" v-if="rtype === 'tank'">
       <input
@@ -35,7 +35,7 @@
         autocomplete="off"
         v-model="mRole.secondary"
       />
-      <label class="btn btn-sm btn-secondary" for="option_off_tank">Off Tank</label>
+      <label class="btn btn-sm btn-outline-dark" for="option_off_tank">Off Tank</label>
     </span>
     <span class="input-group-text w-7rem" v-if="rtype === 'support'">
       <input
@@ -46,7 +46,7 @@
         autocomplete="off"
         v-model="mRole.primary"
       />
-      <label class="btn btn-sm btn-secondary" for="option_heal">Heal</label>
+      <label class="btn btn-sm btn-outline-dark" for="option_heal">Heal</label>
     </span>
     <span class="input-group-text w-7rem" v-if="rtype === 'support'">
       <input
@@ -57,7 +57,7 @@
         autocomplete="off"
         v-model="mRole.secondary"
       />
-      <label class="btn btn-sm btn-secondary" for="option_light_heal">Light Heal</label>
+      <label class="btn btn-sm btn-outline-dark" for="option_light_heal">Light Heal</label>
     </span>
     <span class="input-group-text w-7rem" v-if="rtype === 'dps'">
       <input
@@ -68,7 +68,7 @@
         autocomplete="off"
         v-model="mRole.primary"
       />
-      <label class="btn btn-sm btn-secondary" for="option_hitscan">Hitscan</label>
+      <label class="btn btn-sm btn-outline-dark" for="option_hitscan">Hitscan</label>
     </span>
     <span class="input-group-text w-7rem" v-if="rtype === 'dps'">
       <input
@@ -79,7 +79,7 @@
         autocomplete="off"
         v-model="mRole.secondary"
       />
-      <label class="btn btn-sm btn-secondary" for="option_projectile">Projectile</label>
+      <label class="btn btn-sm btn-outline-dark" for="option_projectile">Projectile</label>
     </span>
     <input
       type="number"

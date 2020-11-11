@@ -93,7 +93,8 @@ export default defineComponent({
           ([, p]) => {
             if (rule === 'name') return p.identity.name.toLowerCase();
             if (rule === 'sr') return PObj.getTopRank(p);
-            return p.createdAt;
+
+            return new Date(p.createdAt).getTime();
           },
         ],
         order

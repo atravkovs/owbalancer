@@ -130,7 +130,7 @@
         type="range"
         class="form-range"
         min="0"
-        max="50"
+        max="500"
         step="1"
         v-model.number="triesCount"
       />
