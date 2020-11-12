@@ -158,11 +158,10 @@
 import { computed, defineComponent, reactive, ref } from 'vue';
 import MutationTypes from '@/store/mutation-types';
 import { useStore } from '@/store';
+import wasm from '@/mworker';
 
 import Modal from '@/components/Helpers/Modal.vue';
 import RoleIcon from '@/components/svg/RoleIcon.vue';
-
-const wasm = import('@/../pkg/index.js');
 
 export default defineComponent({
   name: 'Balance',
@@ -199,37 +198,43 @@ export default defineComponent({
     };
 
     const fullBalance: (lib: any) => any = lib => {
-      return lib.balance(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        adjustSr.value,
-        disableType.value,
-        dispersionMiminizer.value,
-        triesCount.value
-      );
+      const data = JSON.stringify({
+        players: store.state.players,
+        range: +range.value,
+        lowRankLimiter: lowRankLimiter.value,
+        disallowSecondaryRoles: disallowSecondaryRoles.value,
+        adjustSr: adjustSr.value,
+        disableType: disableType.value,
+        dispersionMiminizer: dispersionMiminizer.value,
+        triesCount: triesCount.value,
+      });
+
+      return lib.fullBalance(data);
     };
 
     const halfBalance: (lib: any) => any = lib => {
-      return lib.balance_half(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        adjustSr.value
+      return lib.halfBalance(
+        JSON.stringify({
+          players: store.state.players,
+          range: +range.value,
+          lowRankLimiter: lowRankLimiter.value,
+          disallowSecondaryRoles: disallowSecondaryRoles.value,
+          adjustSr: adjustSr.value,
+        })
       );
     };
 
     const finalBalance: (lib: any, data: any) => any = (lib, { teamsCopy, reserveCopy }) => {
-      return lib.balance_final(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        reserveCopy,
-        teamsCopy,
-        adjustSr.value
+      return lib.finalBalance(
+        JSON.stringify({
+          players: store.state.players,
+          range: +range.value,
+          lowRankLimiter: lowRankLimiter.value,
+          disallowSecondaryRoles: disallowSecondaryRoles.value,
+          reserveCopy: reserveCopy,
+          teamsCopy: teamsCopy,
+          adjustSr: adjustSr.value,
+        })
       );
     };
 
@@ -245,45 +250,41 @@ export default defineComponent({
       return fullBalance(lib);
     };
 
-    const balance = () => {
+    const balance = async () => {
       const teamsCopy = [...stateTeams.value];
       const reserveCopy = [...reservedPlayers.value];
 
       store.commit(MutationTypes.CLEAR_TEAMS);
       progress.current = 0;
 
-      wasm
-        .then(lib => {
-          try {
-            const results = conditionalBalance(lib, {
-              teamsCopy,
-              reserveCopy,
-            });
+      const lib = await wasm;
 
-            console.log('Results', results);
-
-            if (results.length != 1) {
-              store.commit(MutationTypes.SET_RESULTS, results);
-              store.commit(MutationTypes.TOGGLE_SELECTION);
-              return;
-            }
-
-            const [{ leftovers, teams }] = results;
-
-            const ignoredUuids = leftovers.reduce((acc, leftover) => {
-              acc.push(leftover.uuid);
-              return acc;
-            }, []);
-
-            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-            store.commit(MutationTypes.ADD_TEAMS, teams);
-          } catch (e) {
-            console.error(e.message);
-          }
-        })
-        .catch(e => {
-          console.error(e.message);
+      try {
+        const results = await conditionalBalance(lib, {
+          teamsCopy,
+          reserveCopy,
         });
+
+        console.log('Results', results);
+
+        if (results.length != 1) {
+          store.commit(MutationTypes.SET_RESULTS, results);
+          store.commit(MutationTypes.TOGGLE_SELECTION);
+          return;
+        }
+
+        const [{ leftovers, teams }] = results;
+
+        const ignoredUuids = leftovers.reduce((acc, leftover) => {
+          acc.push(leftover.uuid);
+          return acc;
+        }, []);
+
+        store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
+        store.commit(MutationTypes.ADD_TEAMS, teams);
+      } catch (e) {
+        console.error(e.message);
+      }
     };
 
     return {

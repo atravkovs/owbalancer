@@ -1,3 +1,3 @@
 export function wasm_log(message) {
-    document.dispatchEvent(new CustomEvent('wasm-update', { detail: { message: () => message } }));
+    self.postMessage({ type: 'pop', message }); /* eslint-disable-line no-restricted-globals */
 }
