@@ -9,7 +9,7 @@ const teams: Teams = storage.teams || [];
 const players: Players = storage.players || {};
 const reservedPlayers: ReservedPlayers = storage.reservedPlayers || [];
 // eslint-disable-next-line
-const balancerResults: any[] = [];
+const balancerResults: any[] = storage.balancerResults || [];
 
 export const state = {
   teams,
