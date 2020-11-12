@@ -162,6 +162,7 @@ import wasm from '@/mworker';
 
 import Modal from '@/components/Helpers/Modal.vue';
 import RoleIcon from '@/components/svg/RoleIcon.vue';
+import player from '@/objects/player';
 
 export default defineComponent({
   name: 'Balance',
@@ -250,7 +251,28 @@ export default defineComponent({
       return fullBalance(lib);
     };
 
+    const checkCaps: () => boolean = () => {
+      return Object.values(store.state.players).some(player => player.identity.isCaptain);
+    };
+
+    const checkSquires: () => boolean = () => {
+      const caps = Object.values(store.state.players).filter(player => player.identity.isCaptain);
+      const squires = Object.values(store.state.players).filter(player => player.identity.isSquire);
+
+      return squires.length >= caps.length;
+    };
+
     const balance = async () => {
+      if (!checkCaps()) {
+        alert('Please select at least one captain');
+        return;
+      }
+
+      if (!checkSquires()) {
+        alert('Please make sure that every captain has at least one squire');
+        return;
+      }
+
       const teamsCopy = [...stateTeams.value];
       const reserveCopy = [...reservedPlayers.value];
 
