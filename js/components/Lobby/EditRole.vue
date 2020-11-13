@@ -111,7 +111,7 @@ export default defineComponent({
     const mRole = ref(role);
 
     const inpChange = (e: Event) => {
-      const value = (e.target as HTMLInputElement).valueAsNumber;
+      const value = (e.target as HTMLInputElement).valueAsNumber || 0;
       emit('update-rank', props.rtype, value);
     };
 
