@@ -3,8 +3,11 @@ import { createLogger, Store } from 'vuex';
 import { State, STORAGE_KEY } from './state';
 
 const localStoragePlugin: (store: Store<State>) => void = store => {
-  store.subscribe((_, { players, teams, reservedPlayers }) => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, teams, reservedPlayers }));
+  store.subscribe((_, { players, teams, reservedPlayers, balancerOptions }) => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ players, teams, reservedPlayers, balancerOptions })
+    );
   });
 };
 

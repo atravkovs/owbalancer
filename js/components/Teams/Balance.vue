@@ -44,7 +44,7 @@
           type="checkbox"
           id="lowRankLimiter"
           class="form-check-input"
-          v-model="lowRankLimiter"
+          v-model="bOptions.lowRankLimiter"
         />
         <label for="lowRankLimiter" class="form-check-label">Low rank limiter</label>
       </div>
@@ -53,7 +53,7 @@
           type="checkbox"
           id="disallowSecondaryRoles"
           class="form-check-input"
-          v-model="disallowSecondaryRoles"
+          v-model="bOptions.disallowSecondaryRoles"
         />
         <label for="disallowSecondaryRoles" class="form-check-label"
           >Disallow duplicate secondary roles</label
@@ -64,7 +64,7 @@
           type="checkbox"
           id="dispersionMiminizer"
           class="form-check-input"
-          v-model="dispersionMiminizer"
+          v-model="bOptions.dispersionMiminizer"
         />
         <label for="dispersionMiminizer" class="form-check-label"
           >Enable dispersion minimizer</label
@@ -77,27 +77,42 @@
           type="checkbox"
           id="srScaling"
           class="form-check-input"
-          v-model="adjustSr.isEnabled"
+          v-model="bOptions.adjustSr.isEnabled"
         />
         <label for="srScaling" class="form-check-label">Adjust player SR by main class</label>
       </div>
       <div class="d-flex justify-content-between">
         <div class="input-group mr-2">
-          <input type="number" min="0" class="form-control" v-model.number="adjustSr.tank" />
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            v-model.number="bOptions.adjustSr.tank"
+          />
           <span class="input-group-text">
             <role-icon rtype="tank" />
           </span>
           <span class="input-group-text">%</span>
         </div>
         <div class="input-group mr-2">
-          <input type="number" min="0" class="form-control" v-model.number="adjustSr.dps" />
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            v-model.number="bOptions.adjustSr.dps"
+          />
           <span class="input-group-text">
             <role-icon rtype="dps" />
           </span>
           <span class="input-group-text">%</span>
         </div>
         <div class="input-group">
-          <input type="number" min="0" class="form-control" v-model.number="adjustSr.support" />
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            v-model.number="bOptions.adjustSr.support"
+          />
           <span class="input-group-text">
             <role-icon rtype="support" />
           </span>
@@ -108,7 +123,7 @@
     <div class="mb-3">
       <label for="dispersionRange" class="form-label">
         Dispersion:
-        <b>±{{ range }}</b>
+        <b>±{{ bOptions.range }}</b>
       </label>
       <input
         id="dispersionRange"
@@ -117,22 +132,22 @@
         min="0"
         max="120"
         step="1"
-        v-model="range"
+        v-model.number="bOptions.range"
       />
     </div>
     <div class="mb-3">
       <label for="triesRange" class="form-label">
         Tries count:
-        <b>{{ triesCount }}</b>
+        <b>{{ bOptions.triesCount }}</b>
       </label>
       <input
         id="triesRange"
         type="range"
         class="form-range"
         min="0"
-        max="500"
+        max="2500"
         step="1"
-        v-model.number="triesCount"
+        v-model.number="bOptions.triesCount"
       />
     </div>
     <div class="mb-3">
@@ -140,13 +155,20 @@
         <div
           class="progress-bar progress-bar-striped"
           :class="{
-            'progress-bar-animated': progress.current / (progress.total * triesCount) !== 1,
+            'progress-bar-animated':
+              progress.current / (progress.total * bOptions.triesCount) !== 1,
           }"
           role="progressbar"
-          :aria-valuenow="Math.floor((progress.current / (progress.total * triesCount)) * 100)"
+          :aria-valuenow="
+            Math.floor((progress.current / (progress.total * bOptions.triesCount)) * 100)
+          "
           aria-valuemin="0"
           aria-valuemax="100"
-          :style="`width: ${Math.floor((progress.current / (progress.total * triesCount)) * 100)}%`"
+          :style="
+            `width: ${Math.floor(
+              (progress.current / (progress.total * bOptions.triesCount)) * 100
+            )}%`
+          "
         ></div>
       </div>
     </div>
@@ -158,31 +180,24 @@
 import { computed, defineComponent, reactive, ref } from 'vue';
 import MutationTypes from '@/store/mutation-types';
 import { useStore } from '@/store';
+import wasm from '@/mworker';
 
 import Modal from '@/components/Helpers/Modal.vue';
 import RoleIcon from '@/components/svg/RoleIcon.vue';
-
-const wasm = import('@/../pkg/index.js');
+import player from '@/objects/player';
 
 export default defineComponent({
   name: 'Balance',
   components: { Modal, RoleIcon },
   setup() {
-    const range = ref(30);
-    const triesCount = ref(25);
-    const adjustSr = ref({
-      isEnabled: false,
-      tank: 100,
-      support: 90,
-      dps: 110,
-    });
+    const store = useStore();
+
+    const sbOptions = computed(() => store.state.balancerOptions);
+    const bOptions = ref(sbOptions);
+
     const balanceType = ref('full');
     const disableType = ref('none');
-    const lowRankLimiter = ref(false);
-    const dispersionMiminizer = ref(false);
-    const disallowSecondaryRoles = ref(false);
 
-    const store = useStore();
     const isActive = computed(() => store.state.isBalance);
     const reservedPlayers = computed(() => store.state.reservedPlayers);
     const stateTeams = computed(() => store.state.teams);
@@ -199,37 +214,43 @@ export default defineComponent({
     };
 
     const fullBalance: (lib: any) => any = lib => {
-      return lib.balance(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        adjustSr.value,
-        disableType.value,
-        dispersionMiminizer.value,
-        triesCount.value
-      );
+      const data = JSON.stringify({
+        players: store.state.players,
+        range: +bOptions.value.range,
+        lowRankLimiter: bOptions.value.lowRankLimiter,
+        disallowSecondaryRoles: bOptions.value.disallowSecondaryRoles,
+        adjustSr: bOptions.value.adjustSr,
+        disableType: disableType.value,
+        dispersionMiminizer: bOptions.value.dispersionMiminizer,
+        triesCount: bOptions.value.triesCount,
+      });
+
+      return lib.fullBalance(data);
     };
 
     const halfBalance: (lib: any) => any = lib => {
-      return lib.balance_half(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        adjustSr.value
+      return lib.halfBalance(
+        JSON.stringify({
+          players: store.state.players,
+          range: +bOptions.value.range,
+          lowRankLimiter: bOptions.value.lowRankLimiter,
+          disallowSecondaryRoles: bOptions.value.disallowSecondaryRoles,
+          adjustSr: bOptions.value.adjustSr,
+        })
       );
     };
 
     const finalBalance: (lib: any, data: any) => any = (lib, { teamsCopy, reserveCopy }) => {
-      return lib.balance_final(
-        store.state.players,
-        +range.value,
-        lowRankLimiter.value,
-        disallowSecondaryRoles.value,
-        reserveCopy,
-        teamsCopy,
-        adjustSr.value
+      return lib.finalBalance(
+        JSON.stringify({
+          players: store.state.players,
+          range: +bOptions.value.range,
+          lowRankLimiter: bOptions.value.lowRankLimiter,
+          disallowSecondaryRoles: bOptions.value.disallowSecondaryRoles,
+          reserveCopy: reserveCopy,
+          teamsCopy: teamsCopy,
+          adjustSr: bOptions.value.adjustSr,
+        })
       );
     };
 
@@ -245,60 +266,72 @@ export default defineComponent({
       return fullBalance(lib);
     };
 
-    const balance = () => {
+    const checkCaps: () => boolean = () => {
+      return Object.values(store.state.players).some(player => player.identity.isCaptain);
+    };
+
+    const checkSquires: () => boolean = () => {
+      const caps = Object.values(store.state.players).filter(player => player.identity.isCaptain);
+      const squires = Object.values(store.state.players).filter(player => player.identity.isSquire);
+
+      return squires.length >= caps.length;
+    };
+
+    const balance = async () => {
+      if (!checkCaps()) {
+        alert('Please select at least one captain');
+        return;
+      }
+
+      if (!checkSquires()) {
+        alert('Please make sure that every captain has at least one squire');
+        return;
+      }
+
       const teamsCopy = [...stateTeams.value];
       const reserveCopy = [...reservedPlayers.value];
 
       store.commit(MutationTypes.CLEAR_TEAMS);
       progress.current = 0;
 
-      wasm
-        .then(lib => {
-          try {
-            const results = conditionalBalance(lib, {
-              teamsCopy,
-              reserveCopy,
-            });
+      const lib = await wasm;
 
-            console.log('Results', results);
-
-            if (results.length != 1) {
-              store.commit(MutationTypes.SET_RESULTS, results);
-              store.commit(MutationTypes.TOGGLE_SELECTION);
-              return;
-            }
-
-            const [{ leftovers, teams }] = results;
-
-            const ignoredUuids = leftovers.reduce((acc, leftover) => {
-              acc.push(leftover.uuid);
-              return acc;
-            }, []);
-
-            store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-            store.commit(MutationTypes.ADD_TEAMS, teams);
-          } catch (e) {
-            console.error(e.message);
-          }
-        })
-        .catch(e => {
-          console.error(e.message);
+      try {
+        const results = await conditionalBalance(lib, {
+          teamsCopy,
+          reserveCopy,
         });
+
+        console.log('Results', results);
+
+        if (results.length != 1) {
+          store.commit(MutationTypes.SET_RESULTS, results);
+          store.commit(MutationTypes.TOGGLE_SELECTION);
+          return;
+        }
+
+        const [{ leftovers, teams }] = results;
+
+        const ignoredUuids = leftovers.reduce((acc, leftover) => {
+          acc.push(leftover.uuid);
+          return acc;
+        }, []);
+
+        store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
+        store.commit(MutationTypes.ADD_TEAMS, teams);
+      } catch (e) {
+        console.error(e.message);
+      }
     };
 
     return {
-      range,
       balance,
-      adjustSr,
       isActive,
       progress,
+      bOptions,
       closeModal,
-      triesCount,
       balanceType,
       disableType,
-      lowRankLimiter,
-      dispersionMiminizer,
-      disallowSecondaryRoles,
     };
   },
 });

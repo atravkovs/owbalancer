@@ -9,6 +9,7 @@ import { State } from './state';
 export type Mutations<S = State> = {
   [MutationTypes.CLEAR_TEAMS](state: S): void;
   [MutationTypes.EMPTY_TEAMS](state: S): void;
+  [MutationTypes.EMPTY_NO_RANK](state: S): void;
   [MutationTypes.TOGGLE_BALANCE](state: S): void;
   [MutationTypes.TOGGLE_SELECTION](state: S): void;
   [MutationTypes.TOGGLE_BALANCER_SR](state: S): void;
@@ -66,6 +67,19 @@ export const mutations: MutationTree<State> & Mutations = {
 
     if (index >= 0) {
       state.teams[index].name = teamName;
+    }
+  },
+  [MutationTypes.EMPTY_NO_RANK](state) {
+    if (state.editPlayer === '') return;
+
+    if (state.players[state.editPlayer].stats.classes.dps.rank === 0) {
+      state.players[state.editPlayer].stats.classes.dps.isActive = false;
+    }
+    if (state.players[state.editPlayer].stats.classes.tank.rank === 0) {
+      state.players[state.editPlayer].stats.classes.tank.isActive = false;
+    }
+    if (state.players[state.editPlayer].stats.classes.support.rank === 0) {
+      state.players[state.editPlayer].stats.classes.support.isActive = false;
     }
   },
   [MutationTypes.CLEAR_EDIT_PLAYER](state) {

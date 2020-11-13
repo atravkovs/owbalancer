@@ -411,6 +411,11 @@ impl<'a> Mathmaking<'a> {
         self.teams.update();
         self.teams.sort(Direction::DESC);
         self.teams.distribute_squires(&mut squires);
+
+        if squires.0.len() > 0 {
+            self.balanced
+                .retain(|uuid| !squires.0.iter().any(|c| &c.uuid == uuid));
+        }
     }
 
     fn distribute_leutenants(&mut self) {
