@@ -39,10 +39,12 @@ export default defineComponent({
     const player = ref(playerData);
 
     const closeModal = () => {
+      store.commit(MutationTypes.EMPTY_NO_RANK);
       store.commit(MutationTypes.CLEAR_EDIT_PLAYER);
     };
 
     const saveChanges = () => {
+      store.commit(MutationTypes.EMPTY_NO_RANK);
       // By executing mutation changes are being synchronized from object to local storage
       store.commit(MutationTypes.EDIT_PLAYER, player.value.identity.uuid);
     };
