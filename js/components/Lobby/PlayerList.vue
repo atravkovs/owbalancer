@@ -77,13 +77,6 @@ export default defineComponent({
       players: storePlayers.value,
     });
 
-    watch(
-      () => state.storePlayers,
-      () => {
-        state.players = storePlayers.value;
-      }
-    );
-
     const sort = (rule: string, order: 'asc' | 'desc', pl?: [string, Player][]) => {
       const mPlayers = pl || state.players;
 
@@ -104,6 +97,13 @@ export default defineComponent({
       state.activeSort.order = order;
       state.players = sortedPlayers;
     };
+
+    watch(
+      () => state.storePlayers,
+      () => {
+        sort(state.activeSort.rule, state.activeSort.order, storePlayers.value);
+      }
+    );
 
     const filter = (e: Event) => {
       const filterValue = (e.target as HTMLInputElement).value.toLowerCase();
