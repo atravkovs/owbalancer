@@ -487,6 +487,18 @@ impl Teams {
         None
     }
 
+    pub fn sort_by_cap(&mut self, direction: Direction) {
+        self.0.sort_by(|a, b| {
+            let ordering = a.get_captain().rank.cmp(&b.get_captain().rank);
+
+            if direction == Direction::DESC {
+                return ordering.reverse();
+            }
+
+            ordering
+        })
+    }
+
     pub fn sort(&mut self, direction: Direction) {
         self.0.sort_by(|a, b| {
             if let Some(ordering) = a.avg_sr.partial_cmp(&b.avg_sr) {

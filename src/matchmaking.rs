@@ -95,7 +95,7 @@ impl<'a> Mathmaking<'a> {
         self.distribute_remaining();
         self.log("Swap Steal");
         self.swap_steal();
-        self.log("Increase quiality");
+        self.log("Increase quality");
         self.increase_quality();
         self.log("Minimize dispersion");
         self.minimize_dispersion();
@@ -419,6 +419,7 @@ impl<'a> Mathmaking<'a> {
     }
 
     fn distribute_leutenants(&mut self) {
+        self.teams.sort_by_cap(Direction::ASC);
         self.teams
             .distribute_leutenants(&mut self.pool, &self.config);
     }
