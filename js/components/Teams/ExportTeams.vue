@@ -2,6 +2,7 @@
   <dropdown id="exportTeams" title="Export">
     <drop-item @drop-click="exportText">Text</drop-item>
     <drop-item @drop-click="exportCSV">CSV</drop-item>
+    <drop-item @drop-click="exportCaptains">Captains</drop-item>
   </dropdown>
   <export-modal :isActive="isModalActive" :exportText="modalText" @close-modal="closeModal" />
 </template>
@@ -88,11 +89,23 @@ export default defineComponent({
       isModalActive.value = true;
     };
 
+    const exportCaptains = () => {
+      const { players } = store.state;
+      const text = Object.entries(players)
+        .filter(([, player]) => player.identity.isCaptain)
+        .reduce((acc, [, player]) => {
+          return `${acc}${player.identity.name}\n`;
+        }, '');
+
+      modalText.value = text;
+      isModalActive.value = true;
+    };
+
     const closeModal = () => {
       isModalActive.value = false;
     };
 
-    return { exportText, modalText, isModalActive, closeModal, exportCSV };
+    return { exportText, modalText, isModalActive, closeModal, exportCSV, exportCaptains };
   },
 });
 </script>
