@@ -2,33 +2,23 @@
   <div class="w-100">
     <div class="d-flex justify-content-between">
       <div>
-        <Sort v-on:sort="sort" />
+        <sort @sort="sort" />
       </div>
       <div>
-        <Assign />
+        <assign />
       </div>
       <div class="d-flex">
-        <Export />
-        <ImportFile />
+        <export />
+        <import-file />
       </div>
       <div>
-        <DeletePlayers />
+        <delete-players />
       </div>
     </div>
-    <div class="d-flex justify-content-between">
-      <div>Total: {{ state.storePlayers.length }}</div>
-      <div>Seen: {{ state.players.length }}</div>
-      <div>Cap's: {{ captainCount }}</div>
-      <div>Squires: {{ squireCount }}</div>
-    </div>
-    <div class="row">
-      <label for="playerFilter" class="col-2 col-form-label">Filter:</label>
-      <div class="col-10">
-        <input id="playerFilter" type="text" class="form-control form-control-sm" @input="filter" />
-      </div>
-    </div>
+    <stats :players="state.storePlayers" :currentCount="state.players.length" />
+    <player-filter :players="state.storePlayers" @filter="filter" />
     <div class="overflow-auto h40r bg-secondary border p-1" @dragover="allowDrop" @drop="drop">
-      <PlayerCard
+      <player-card
         class="bg-light mb-1"
         v-for="[uuid, player] in state.players"
         :player="player"
@@ -46,16 +36,18 @@ import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 
 import Sort from '@/components/Lobby/Sort.vue';
+import Stats from '@/components/Lobby/Stats.vue';
+import PlayerFilter from '@/components/Lobby/Filter.vue';
 import Assign from '@/components/Lobby/Assign.vue';
 import PlayerCard from '@/components/PlayerCard.vue';
 import Export from '@/components/Lobby/Export.vue';
 import ImportFile from '@/components/Lobby/Import.vue';
 import DeletePlayers from '@/components/Lobby/DeletePlayers.vue';
-import PObj, { Player } from '@/objects/player';
+import PObj, { Player, PlayerEntries } from '@/objects/player';
 
 export default defineComponent({
   name: 'App',
-  components: { Assign, Sort, PlayerCard, Export, ImportFile, DeletePlayers },
+  components: { Assign, Sort, Stats, PlayerFilter, PlayerCard, Export, ImportFile, DeletePlayers },
   setup() {
     const store = useStore();
     const teamsLen = computed(() => store.state.teams.length);
@@ -105,24 +97,13 @@ export default defineComponent({
       }
     );
 
-    const filter = (e: Event) => {
-      const filterValue = (e.target as HTMLInputElement).value.toLowerCase();
-      const filtered = state.storePlayers.filter(([, p]) =>
-        p.identity.name.toLowerCase().startsWith(filterValue)
-      );
+    const filter = (filtered: PlayerEntries) => {
       sort(state.activeSort.rule, state.activeSort.order, filtered);
     };
 
     onMounted(() => {
       sort(state.activeSort.rule, state.activeSort.order);
     });
-
-    const squireCount = computed(
-      () => state.storePlayers.filter(([, player]) => player.identity.isSquire === true).length
-    );
-    const captainCount = computed(
-      () => state.storePlayers.filter(([, player]) => player.identity.isCaptain === true).length
-    );
 
     const allowDrop = (ev: DragEvent) => {
       ev.preventDefault();
@@ -131,6 +112,8 @@ export default defineComponent({
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
+
+      if (playerId === undefined || teamUuid === undefined) return;
 
       if (store.state.teams.length > 0) {
         store.commit(MutationTypes.ADD_RESERVE, playerId);
@@ -141,7 +124,7 @@ export default defineComponent({
       }
     };
 
-    return { state, sort, filter, squireCount, captainCount, allowDrop, drop };
+    return { state, sort, filter, allowDrop, drop };
   },
 });
 </script>

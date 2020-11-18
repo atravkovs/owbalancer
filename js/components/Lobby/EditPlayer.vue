@@ -1,5 +1,5 @@
 <template>
-  <Modal
+  <modal
     :isActive="player.identity.name.length > 0"
     :title="player.identity.name"
     @close-modal="closeModal"
@@ -7,13 +7,17 @@
   >
     <fieldset class="EditPlayer-Block">
       <h3>Identity</h3>
-      <EditIdentity :identity="player.identity" />
+      <edit-identity :identity="player.identity" />
     </fieldset>
     <fieldset class="EditPlayer-Block">
       <h3>Stats</h3>
-      <EditStats :stats="player.stats" :uuid="player.identity.uuid" v-on:update-rank="updateRank" />
+      <edit-stats
+        :stats="player.stats"
+        :uuid="player.identity.uuid"
+        v-on:update-rank="updateRank"
+      />
     </fieldset>
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -39,12 +43,12 @@ export default defineComponent({
     const player = ref(playerData);
 
     const closeModal = () => {
-      store.commit(MutationTypes.EMPTY_NO_RANK);
-      store.commit(MutationTypes.CLEAR_EDIT_PLAYER);
+      store.commit(MutationTypes.EMPTY_NO_RANK, undefined);
+      store.commit(MutationTypes.CLEAR_EDIT_PLAYER, undefined);
     };
 
     const saveChanges = () => {
-      store.commit(MutationTypes.EMPTY_NO_RANK);
+      store.commit(MutationTypes.EMPTY_NO_RANK, undefined);
       // By executing mutation changes are being synchronized from object to local storage
       store.commit(MutationTypes.EDIT_PLAYER, player.value.identity.uuid);
     };

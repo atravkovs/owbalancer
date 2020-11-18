@@ -77,6 +77,7 @@ export default defineComponent({
     }, 1000);
 
     const removeTeam = () => {
+      if (!cTeam.value) return;
       store.commit(MutationTypes.REMOVE_TEAM, cTeam.value.uuid);
     };
 
@@ -107,5 +108,17 @@ export default defineComponent({
 }
 .c-pointer {
   cursor: pointer;
+}
+.form-control-plaintext:focus {
+  outline: 0;
+}
+u {
+  opacity: 0.4;
+  text-decoration: none;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
 }
 </style>

@@ -33,6 +33,7 @@ export default defineComponent({
       for (let i = 0; i < playerCount; i += 1) {
         const roleSelect: ('dps' | 'support' | 'tank')[] = ['dps', 'support', 'tank'];
         const player = PlayerEditor.createDefaultPlayer(`Player ${i + 1}`);
+        let j = 1;
 
         const firstRole = getRandomInt(0, 3);
         player.stats.classes[roleSelect[firstRole]].isActive = true;
@@ -47,6 +48,7 @@ export default defineComponent({
           player.stats.classes[roleSelect[secondRole]].priority = 1;
           player.stats.classes[roleSelect[secondRole]].rank = getRandomInt(MIN_SR, MAX_SR);
 
+          j += 1;
           roleSelect.splice(secondRole, 1);
           if (flipCoin()) {
             player.stats.classes[roleSelect[0]].isActive = true;
@@ -57,7 +59,6 @@ export default defineComponent({
           }
         }
 
-        let j = 1;
         roleSelect.forEach(v => {
           player.stats.classes[v].priority = j;
           j += 1;

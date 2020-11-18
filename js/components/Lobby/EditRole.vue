@@ -1,7 +1,7 @@
 <template>
   <div class="input-group">
     <span class="input-group-text cursor-pointer sortable-handler">
-      <RoleIcon :rtype="rtype" />
+      <role-icon :rtype="rtype" />
     </span>
     <span class="input-group-text">
       <rank-icon :rank="mRole.rank" />

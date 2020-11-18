@@ -23,6 +23,9 @@ export default defineComponent({
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
+
+      if (playerId === undefined) return;
+
       store.commit(MutationTypes.DELETE_PLAYER, playerId);
 
       if (teamUuid) {

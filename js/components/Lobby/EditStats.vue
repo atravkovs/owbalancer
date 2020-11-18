@@ -1,13 +1,13 @@
 <template>
-  <Sortable v-on:update-position="updatePosition" handle=".sortable-handler">
-    <EditRole
+  <sortable v-on:update-position="updatePosition" handle=".sortable-handler">
+    <edit-role
       v-for="role in roles"
       :key="role.role"
       :rtype="role.role"
       :role="playerStats.classes[role.role]"
       @update-rank="(a, b) => $emit('update-rank', a, b)"
     />
-  </Sortable>
+  </sortable>
 </template>
 
 <script lang="ts">
@@ -85,7 +85,7 @@ export default defineComponent({
 
       store.commit(MutationTypes.UPDATE_STATS, {
         uuid: uuid.value,
-        stats: { rank: stats.value.rank, classes },
+        stats: { classes },
       });
     };
 

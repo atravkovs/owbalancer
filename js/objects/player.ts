@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Entries } from '@/objects/common';
 
 export type Identity = {
   uuid: string;
@@ -36,6 +37,8 @@ export type Player = {
 export type Players = {
   [tag: string]: Player;
 };
+
+export type PlayerEntries = Entries<Players>;
 
 export type ReservedPlayers = string[];
 

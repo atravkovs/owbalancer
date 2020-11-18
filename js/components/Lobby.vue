@@ -2,9 +2,9 @@
   <div class="w-100 h-100">
     <h3>Lobby</h3>
 
-    <AddPlayer />
-    <PlayerList class="mt-2" />
-    <DeletePlayer class="mt-2" />
+    <add-player />
+    <player-list class="mt-2" />
+    <delete-player class="mt-2" />
     <edit-player />
   </div>
 </template>

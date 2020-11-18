@@ -41,15 +41,15 @@ export default defineComponent({
     };
 
     const clearCaptains = () => {
-      store.commit(MutationTypes.CLEAR_CAPTAINS);
+      store.commit(MutationTypes.CLEAR_CAPTAINS, undefined);
     };
 
     const clearSquires = () => {
-      store.commit(MutationTypes.CLEAR_SQUIRES);
+      store.commit(MutationTypes.CLEAR_SQUIRES, undefined);
     };
 
     const clearAll = () => {
-      store.commit(MutationTypes.CLEAR_ALL_EXTRA);
+      store.commit(MutationTypes.CLEAR_ALL_EXTRA, undefined);
     };
 
     return {

@@ -15,14 +15,14 @@
       </div>
       <div class="text-ellip" :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, wt: !!teamUuid }">
         <span class="extra-icon">
-          <CrownIcon v-if="player.identity.isCaptain" />
-          <SwordIcon v-if="player.identity.isSquire" />
+          <crown-icon v-if="player.identity.isCaptain" />
+          <sword-icon v-if="player.identity.isSquire" />
         </span>
         {{ player.identity.name }}
       </div>
     </div>
     <div class="role-icons">
-      <RoleIcon v-for="role in state.icons" :rtype="role" :key="role" />
+      <role-icon v-for="role in state.icons" :rtype="role" :key="role" />
     </div>
   </div>
 </template>

@@ -41,7 +41,7 @@ export default defineComponent({
     );
 
     const closeModal = () => {
-      store.commit(MutationTypes.TOGGLE_SELECTION);
+      store.commit(MutationTypes.TOGGLE_SELECTION, undefined);
     };
 
     return { isActive, closeModal, results };

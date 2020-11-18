@@ -29,7 +29,8 @@ export default defineComponent({
       if (!props.balance) return;
 
       const { leftovers, teams } = props.balance;
-      const ignoredUuids = leftovers.reduce((acc, leftover) => {
+      // TODO leftover type
+      const ignoredUuids = leftovers.reduce((acc: string[], leftover) => {
         acc.push(leftover.uuid);
         return acc;
       }, []);
@@ -67,7 +68,7 @@ export default defineComponent({
     const dupsecCount = computed(() => {
       if (!props.balance) return 0;
 
-      const c = props.balance.teams.reduce((acc, team: Team) => {
+      const c = props.balance.teams.reduce((acc: number, team: Team) => {
         let accCount = acc;
         const dps = team.members.filter((member: TeamMembers) => member.role === 'dps');
         const tank = team.members.filter((member: TeamMembers) => member.role === 'tank');

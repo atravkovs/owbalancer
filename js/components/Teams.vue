@@ -125,11 +125,11 @@ export default defineComponent({
     });
 
     const balance = () => {
-      store.commit(MutationTypes.TOGGLE_BALANCE);
+      store.commit(MutationTypes.TOGGLE_BALANCE, undefined);
     };
 
     const clear = () => {
-      store.commit(MutationTypes.CLEAR_TEAMS);
+      store.commit(MutationTypes.CLEAR_TEAMS, undefined);
     };
 
     const addNew = () => {
@@ -144,15 +144,15 @@ export default defineComponent({
     };
 
     const empty = () => {
-      store.commit(MutationTypes.EMPTY_TEAMS);
+      store.commit(MutationTypes.EMPTY_TEAMS, undefined);
     };
 
     const toggleSR = () => {
-      store.commit(MutationTypes.TOGGLE_BALANCER_SR);
+      store.commit(MutationTypes.TOGGLE_BALANCER_SR, undefined);
     };
 
     const select = () => {
-      store.commit(MutationTypes.TOGGLE_SELECTION);
+      store.commit(MutationTypes.TOGGLE_SELECTION, undefined);
     };
 
     return {

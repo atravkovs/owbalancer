@@ -1,5 +1,5 @@
 <template>
-  <Modal
+  <modal
     title="Export"
     :isActive="isActive"
     @close-modal="$emit('close-modal')"
@@ -8,7 +8,7 @@
   >
     <button @click="copyText" class="btn btn-outline-primary btn-lg mb-2">Copy</button>
     <textarea ref="tarea" :value="exportText"></textarea>
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">

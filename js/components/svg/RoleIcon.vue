@@ -1,7 +1,7 @@
 <template>
-  <TankIcon v-if="rtype === 'tank'" />
-  <DamageIcon v-else-if="rtype === 'dps'" />
-  <SupportIcon v-else-if="rtype === 'support'" />
+  <tank-icon v-if="rtype === 'tank'" />
+  <damage-icon v-else-if="rtype === 'dps'" />
+  <support-icon v-else-if="rtype === 'support'" />
   <span v-else></span>
 </template>
 

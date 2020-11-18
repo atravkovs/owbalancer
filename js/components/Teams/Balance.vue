@@ -1,5 +1,5 @@
 <template>
-  <Modal
+  <modal
     title="Balance"
     variant="large"
     :isActive="isActive"
@@ -172,7 +172,7 @@
         ></div>
       </div>
     </div>
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -182,13 +182,13 @@ import MutationTypes from '@/store/mutation-types';
 import { useStore } from '@/store';
 import wasm from '@/mworker';
 
-import Modal from '@/components/Helpers/Modal.vue';
+import modal from '@/components/Helpers/Modal.vue';
 import RoleIcon from '@/components/svg/RoleIcon.vue';
 import player from '@/objects/player';
 
 export default defineComponent({
   name: 'Balance',
-  components: { Modal, RoleIcon },
+  components: { modal, RoleIcon },
   setup() {
     const store = useStore();
 
@@ -210,7 +210,7 @@ export default defineComponent({
     });
 
     const closeModal = () => {
-      store.commit(MutationTypes.TOGGLE_BALANCE);
+      store.commit(MutationTypes.TOGGLE_BALANCE, undefined);
     };
 
     const fullBalance: (lib: any) => any = lib => {
@@ -291,7 +291,7 @@ export default defineComponent({
       const teamsCopy = [...stateTeams.value];
       const reserveCopy = [...reservedPlayers.value];
 
-      store.commit(MutationTypes.CLEAR_TEAMS);
+      store.commit(MutationTypes.CLEAR_TEAMS, undefined);
       progress.current = 0;
 
       const lib = await wasm;
@@ -306,13 +306,13 @@ export default defineComponent({
 
         if (results.length != 1) {
           store.commit(MutationTypes.SET_RESULTS, results);
-          store.commit(MutationTypes.TOGGLE_SELECTION);
+          store.commit(MutationTypes.TOGGLE_SELECTION, undefined);
           return;
         }
 
         const [{ leftovers, teams }] = results;
 
-        const ignoredUuids = leftovers.reduce((acc, leftover) => {
+        const ignoredUuids = leftovers.reduce((acc: string[], leftover) => {
           acc.push(leftover.uuid);
           return acc;
         }, []);

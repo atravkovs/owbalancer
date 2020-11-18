@@ -7,17 +7,17 @@ import MutationTypes from './mutation-types';
 import { State } from './state';
 
 export type Mutations<S = State> = {
-  [MutationTypes.CLEAR_TEAMS](state: S): void;
-  [MutationTypes.EMPTY_TEAMS](state: S): void;
-  [MutationTypes.EMPTY_NO_RANK](state: S): void;
-  [MutationTypes.TOGGLE_BALANCE](state: S): void;
-  [MutationTypes.TOGGLE_SELECTION](state: S): void;
-  [MutationTypes.TOGGLE_BALANCER_SR](state: S): void;
-  [MutationTypes.CLEAR_SQUIRES](state: S): void;
-  [MutationTypes.CLEAR_CAPTAINS](state: S): void;
-  [MutationTypes.DELETE_PLAYERS](state: S): void;
-  [MutationTypes.CLEAR_ALL_EXTRA](state: S): void;
-  [MutationTypes.CLEAR_EDIT_PLAYER](state: S): void;
+  [MutationTypes.CLEAR_TEAMS](state: S, _: undefined): void;
+  [MutationTypes.EMPTY_TEAMS](state: S, _: undefined): void;
+  [MutationTypes.EMPTY_NO_RANK](state: S, _: undefined): void;
+  [MutationTypes.TOGGLE_BALANCE](state: S, _: undefined): void;
+  [MutationTypes.TOGGLE_SELECTION](state: S, _: undefined): void;
+  [MutationTypes.TOGGLE_BALANCER_SR](state: S, _: undefined): void;
+  [MutationTypes.CLEAR_SQUIRES](state: S, _: undefined): void;
+  [MutationTypes.CLEAR_CAPTAINS](state: S, _: undefined): void;
+  [MutationTypes.DELETE_PLAYERS](state: S, _: undefined): void;
+  [MutationTypes.CLEAR_ALL_EXTRA](state: S, _: undefined): void;
+  [MutationTypes.CLEAR_EDIT_PLAYER](state: S, _: undefined): void;
   [MutationTypes.ADD_TEAM](state: S, team: Team): void;
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
