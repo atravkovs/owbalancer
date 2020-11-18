@@ -15,71 +15,31 @@
         :aria-label="rtype"
       />
     </span>
-    <span class="input-group-text w-7rem" v-if="rtype === 'tank'">
+    <span class="input-group-text w-7rem">
       <input
         type="checkbox"
         class="btn-check"
         name="options"
-        id="option_main_tank"
+        :id="`option_main_${rtype}`"
         autocomplete="off"
         v-model="mRole.primary"
       />
-      <label class="btn btn-sm btn-outline-dark" for="option_main_tank">Main Tank</label>
+      <label class="btn btn-sm btn-outline-dark" :for="`option_main_${rtype}`">{{
+        roles[rtype].primary
+      }}</label>
     </span>
-    <span class="input-group-text w-7rem" v-if="rtype === 'tank'">
+    <span class="input-group-text w-7rem">
       <input
         type="checkbox"
         class="btn-check"
         name="options"
-        id="option_off_tank"
+        :id="`option_off_${rtype}`"
         autocomplete="off"
         v-model="mRole.secondary"
       />
-      <label class="btn btn-sm btn-outline-dark" for="option_off_tank">Off Tank</label>
-    </span>
-    <span class="input-group-text w-7rem" v-if="rtype === 'support'">
-      <input
-        type="checkbox"
-        class="btn-check"
-        name="options"
-        id="option_heal"
-        autocomplete="off"
-        v-model="mRole.primary"
-      />
-      <label class="btn btn-sm btn-outline-dark" for="option_heal">Heal</label>
-    </span>
-    <span class="input-group-text w-7rem" v-if="rtype === 'support'">
-      <input
-        type="checkbox"
-        class="btn-check"
-        name="options"
-        id="option_light_heal"
-        autocomplete="off"
-        v-model="mRole.secondary"
-      />
-      <label class="btn btn-sm btn-outline-dark" for="option_light_heal">Light Heal</label>
-    </span>
-    <span class="input-group-text w-7rem" v-if="rtype === 'dps'">
-      <input
-        type="checkbox"
-        class="btn-check"
-        name="options"
-        id="option_hitscan"
-        autocomplete="off"
-        v-model="mRole.primary"
-      />
-      <label class="btn btn-sm btn-outline-dark" for="option_hitscan">Hitscan</label>
-    </span>
-    <span class="input-group-text w-7rem" v-if="rtype === 'dps'">
-      <input
-        type="checkbox"
-        class="btn-check"
-        name="options"
-        id="option_projectile"
-        autocomplete="off"
-        v-model="mRole.secondary"
-      />
-      <label class="btn btn-sm btn-outline-dark" for="option_projectile">Projectile</label>
+      <label class="btn btn-sm btn-outline-dark" :for="`option_off_${rtype}`">{{
+        roles[rtype].secondary
+      }}</label>
     </span>
     <input
       type="number"
@@ -99,6 +59,13 @@ import RoleIcon from '@/components/svg/RoleIcon.vue';
 import RankIcon from '@/components/svg/RankIcon.vue';
 import { ClassType } from '@/objects/player';
 
+type RoleDecription = {
+  primary: string;
+  secondary: string;
+};
+
+type RoleDescriptions = { [role: string]: RoleDecription };
+
 export default defineComponent({
   name: 'EditRole',
   props: {
@@ -110,12 +77,18 @@ export default defineComponent({
     const role = computed(() => props.role);
     const mRole = ref(role);
 
+    const roles: RoleDescriptions = {
+      tank: { primary: 'Main Tank', secondary: 'Off Tank' },
+      support: { primary: 'Heal', secondary: 'Light Heal' },
+      dps: { primary: 'Hitscan', secondary: 'Projectile' },
+    };
+
     const inpChange = (e: Event) => {
       const value = (e.target as HTMLInputElement).valueAsNumber || 0;
       emit('update-rank', props.rtype, value);
     };
 
-    return { mRole, inpChange };
+    return { roles, mRole, inpChange };
   },
 });
 </script>
