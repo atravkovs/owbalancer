@@ -149,33 +149,33 @@ export default defineComponent({
       const reserveCopy = [...reservedPlayers.value];
 
       store.commit(MutationTypes.CLEAR_TEAMS, undefined);
+      store.commit(MutationTypes.SET_RESULTS, []);
       progress.current = 0;
 
       const lib = await wasm;
 
       try {
-        const results = await conditionalBalance(lib, {
+        let results = await conditionalBalance(lib, {
           teamsCopy,
           reserveCopy,
         });
 
-        console.log('Results', results);
-
         if (results.length != 1) {
           store.commit(MutationTypes.SET_RESULTS, results);
           store.commit(MutationTypes.TOGGLE_SELECTION, undefined);
+          results = null;
           return;
         }
 
-        const [{ leftovers, teams }] = results;
-
-        const ignoredUuids = leftovers.reduce((acc: string[], leftover) => {
+        const ignoredUuids = results[0].leftovers.reduce((acc: string[], leftover) => {
           acc.push(leftover.uuid);
           return acc;
         }, []);
 
         store.commit(MutationTypes.RESERVE_PLAYERS, ignoredUuids);
-        store.commit(MutationTypes.ADD_TEAMS, teams);
+        store.commit(MutationTypes.ADD_TEAMS, results[0].teams);
+
+        results = null;
       } catch (e) {
         console.error(e.message);
       }
