@@ -22,7 +22,14 @@
       <tbody>
         <tr v-for="(entry, i) in archive" :key="i">
           <td>{{ i + 1 }}</td>
-          <td>{{ entry.name }}</td>
+          <td>
+            <input
+              type="text"
+              class="form-control-plaintext p-0 pl-1"
+              :value="entry.name"
+              @input="e => updateName(e, i)"
+            />
+          </td>
           <td>{{ entry.date }}</td>
           <td>
             <button class="btn btn-primary btn-sm" @click="() => select(i)">
@@ -43,6 +50,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import debounce from 'lodash/debounce';
 
 import { useStore } from '@/store';
 import Utils from '@/utils';
@@ -78,6 +86,17 @@ export default defineComponent({
       store.commit(MutationTypes.SELECT_ARCHIVE, id);
     };
 
+    const updateName = debounce((e: Event, id: number) => {
+      const name = (e.target as HTMLInputElement).value;
+
+      if (name) {
+        store.commit(MutationTypes.UPDATE_ARCHIVE_NAME, {
+          id,
+          name,
+        });
+      }
+    }, 1000);
+
     const download = (id: number) => {
       const exportData = {
         format: 'xva-1',
@@ -87,7 +106,22 @@ export default defineComponent({
       Utils.download(`archive-${archive.value[id].name}`, JSON.stringify(exportData));
     };
 
-    return { archive, isActive, closeModal, saveCurrent, removeFromArchive, select, download };
+    return {
+      archive,
+      isActive,
+      closeModal,
+      saveCurrent,
+      removeFromArchive,
+      select,
+      download,
+      updateName,
+    };
   },
 });
 </script>
+
+<style scoped>
+.form-control-plaintext:focus {
+  outline: 0;
+}
+</style>

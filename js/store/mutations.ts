@@ -44,6 +44,7 @@ export type Mutations<S = State> = {
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
   [MutationTypes.REMOVE_FROM_RESERVE](state: S, playerId: string): void;
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
+  [MutationTypes.UPDATE_ARCHIVE_NAME](state: S, udpate: { id: number; name: string }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
   [MutationTypes.UPDATE_TEAM_NAME](state: S, data: { teamUuid: string; teamName: string }): void;
   [MutationTypes.EDIT_RANK](
@@ -77,6 +78,9 @@ export const mutations: MutationTree<State> & Mutations = {
     if (index >= 0) {
       state.teams[index].name = teamName;
     }
+  },
+  [MutationTypes.UPDATE_ARCHIVE_NAME](state, { id, name }) {
+    state.archive[id].name = name;
   },
   [MutationTypes.EMPTY_NO_RANK](state) {
     if (state.editPlayer === '') return;
