@@ -5,8 +5,11 @@
       Balance
     </button>
     <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
-    <button class="btn btn-sm btn-warning mx-2" v-if="canChange" @click="select">
+    <button class="btn btn-sm btn-warning ml-2 rounded-right-0" v-if="canChange" @click="select">
       Choose balance
+    </button>
+    <button class="btn btn-sm btn-danger rounded-left-0" v-if="canChange" @click="clearSelect">
+      <bin-icon />
     </button>
     <button class="btn btn-sm btn-secondary mx-2" @click="empty">
       Empty
@@ -23,11 +26,12 @@ import MutationTypes from '@/store/mutation-types';
 
 import TObj from '@/objects/team';
 
+import BinIcon from '@/components/svg/BinIcon.vue';
 import ExportTeams from '@/components/Teams/ExportTeams.vue';
 
 export default defineComponent({
   name: 'Actions',
-  components: { ExportTeams },
+  components: { BinIcon, ExportTeams },
   setup() {
     const store = useStore();
 
@@ -60,6 +64,11 @@ export default defineComponent({
       store.commit(MutationTypes.TOGGLE_SELECTION, undefined);
     };
 
+    const clearSelect = () => {
+      store.commit(MutationTypes.CLEAR_TEAMS, undefined);
+      store.commit(MutationTypes.SET_RESULTS, []);
+    };
+
     return {
       empty,
       clear,
@@ -67,7 +76,20 @@ export default defineComponent({
       addNew,
       balance,
       canChange,
+      clearSelect,
     };
   },
 });
 </script>
+
+<style scoped>
+.rounded-left-0 {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.rounded-right-0 {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+</style>

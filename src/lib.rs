@@ -75,6 +75,7 @@ pub fn balance(
     tries_count: u32,
 ) -> JsValue {
     let mut results = Vec::default();
+    let mut success_flag = false;
 
     for _ in 0..tries_count {
         let result = run_matchmaking(
@@ -86,7 +87,20 @@ pub fn balance(
             disable_type.clone(),
             dispersion_minimizer,
         );
+
+        if result.leftovers.0.len() == 0 && !success_flag {
+            success_flag = true;
+        }
+
+        if success_flag && result.leftovers.0.len() > 0 {
+            continue;
+        }
+
         results.push(result);
+    }
+
+    if success_flag {
+        results.retain(|result| result.leftovers.0.len() == 0);
     }
 
     JsValue::from_serde(&results).unwrap()

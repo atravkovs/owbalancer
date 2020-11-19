@@ -2,6 +2,7 @@ import { MutationTree } from 'vuex';
 import { PLAYERS_IN_TEAM } from '@/constants';
 import PObj, { Player, Stats, Players, ClassType } from '@/objects/player';
 import TObj, { Teams, Team } from '@/objects/team';
+import { Results } from '@/objects/balance';
 
 import MutationTypes from './mutation-types';
 import { State } from './state';
@@ -28,8 +29,7 @@ export type Mutations<S = State> = {
   [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
   [MutationTypes.ASSIGN_CAPTAINS](state: S, minSR: number): void;
   [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
-  // eslint-disable-next-line
-  [MutationTypes.SET_RESULTS](state: S, results: Array<any>): void;
+  [MutationTypes.SET_RESULTS](state: S, results: Results): void;
   [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
   [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;

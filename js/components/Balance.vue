@@ -25,6 +25,8 @@ import { useStore } from '@/store';
 import wasm from '@/mworker';
 
 import player from '@/objects/player';
+import { Teams } from '@/objects/team';
+import { Results } from '@/objects/balance';
 
 import Modal from '@/components/Helpers/Modal.vue';
 import TriesCount from '@/components/Balance/TriesCount.vue';
@@ -34,6 +36,11 @@ import AdjustRating from '@/components/Balance/AdjustRating.vue';
 import BalanceOptions from '@/components/Balance/BalanceOptions.vue';
 import BalanceDisable from '@/components/Balance/BalanceDisable.vue';
 import BalancerProgress from '@/components/Balance/BalancerProgress.vue';
+
+type DataType = {
+  teamsCopy: Teams;
+  reserveCopy: string[];
+};
 
 export default defineComponent({
   name: 'Balance',
@@ -70,7 +77,7 @@ export default defineComponent({
       store.commit(MutationTypes.TOGGLE_BALANCE, undefined);
     };
 
-    const fullBalance: (lib: any) => any = lib => {
+    const fullBalance: (lib: any) => Results = lib => {
       const data = JSON.stringify({
         players: store.state.players,
         range: +sbOptions.value.range,
@@ -85,7 +92,7 @@ export default defineComponent({
       return lib.fullBalance(data);
     };
 
-    const halfBalance: (lib: any) => any = lib => {
+    const halfBalance: (lib: any) => Results = lib => {
       return lib.halfBalance(
         JSON.stringify({
           players: store.state.players,
@@ -97,7 +104,10 @@ export default defineComponent({
       );
     };
 
-    const finalBalance: (lib: any, data: any) => any = (lib, { teamsCopy, reserveCopy }) => {
+    const finalBalance: (lib: any, data: DataType) => Results = (
+      lib,
+      { teamsCopy, reserveCopy }
+    ) => {
       return lib.finalBalance(
         JSON.stringify({
           players: store.state.players,
@@ -111,7 +121,7 @@ export default defineComponent({
       );
     };
 
-    const conditionalBalance: (lib: any, data: any) => any = (lib, data) => {
+    const conditionalBalance: (lib: any, data: DataType) => Results = (lib, data) => {
       if (balanceType.value === 'half') {
         return halfBalance(lib);
       }
@@ -155,7 +165,7 @@ export default defineComponent({
       const lib = await wasm;
 
       try {
-        let results = await conditionalBalance(lib, {
+        let results: Results | null = await conditionalBalance(lib, {
           teamsCopy,
           reserveCopy,
         });
