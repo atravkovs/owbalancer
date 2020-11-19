@@ -1,7 +1,9 @@
 use crate::matchmaking::Config;
+use crate::rating_scaler::RatingScaler;
 use crate::roles::{Role, Roles, RolesFilter, SimpleRole};
 use crate::teams::{Team, Teams};
-use crate::AsjustSr;
+use crate::AdjustSr;
+
 use rand::rngs::OsRng;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
@@ -122,28 +124,23 @@ impl Players {
         }
     }
 
-    pub fn adjust_sr(&mut self, adjust: AsjustSr) {
+    pub fn adjust_sr(&mut self, adjust: AdjustSr) {
         if !adjust.is_enabled {
             return;
         }
 
+        let rs = RatingScaler::from(adjust);
+
         for (_, player) in &mut self.0 {
             if player.stats.classes.dps.is_active {
-                player.stats.classes.dps.rank = (player.stats.classes.dps.rank as f32
-                    * (adjust.dps as f32 / 100.0))
-                    .floor() as i32;
+                player.stats.classes.dps.rank = rs.scale("dps", player.stats.classes.dps.rank);
             }
-
-            if player.stats.classes.support.is_active {
-                player.stats.classes.support.rank = (player.stats.classes.support.rank as f32
-                    * (adjust.support as f32 / 100.0))
-                    .floor() as i32;
-            }
-
             if player.stats.classes.tank.is_active {
-                player.stats.classes.tank.rank = (player.stats.classes.tank.rank as f32
-                    * (adjust.tank as f32 / 100.0))
-                    .floor() as i32;
+                player.stats.classes.tank.rank = rs.scale("tank", player.stats.classes.tank.rank);
+            }
+            if player.stats.classes.support.is_active {
+                player.stats.classes.support.rank =
+                    rs.scale("support", player.stats.classes.support.rank);
             }
         }
     }

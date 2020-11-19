@@ -1,5 +1,6 @@
 pub mod matchmaking;
 pub mod players;
+pub mod rating_scaler;
 pub mod roles;
 pub mod teams;
 
@@ -17,11 +18,23 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 struct ReserveData(pub Vec<String>);
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct Point {
+    pub x: f64,
+    pub y: f64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct BezierPoint {
+    pub position: Point,
+    pub control: Point,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct AsjustSr {
-    pub dps: i32,
-    pub tank: i32,
-    pub support: i32,
+pub struct AdjustSr {
+    pub dps: Vec<BezierPoint>,
+    pub tank: Vec<BezierPoint>,
+    pub support: Vec<BezierPoint>,
     pub is_enabled: bool,
 }
 
@@ -48,7 +61,7 @@ pub fn run_matchmaking(
     dispersion_minimizer: bool,
 ) -> BalancerResult {
     let mut players: Players = player_data.into_serde().unwrap();
-    let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
+    let adjust: AdjustSr = adjust_sr.into_serde().unwrap();
     players.adjust_sr(adjust);
 
     let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
@@ -115,7 +128,7 @@ pub fn balance_half(
     adjust_sr: &JsValue,
 ) -> JsValue {
     let mut players: Players = player_data.into_serde().unwrap();
-    let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
+    let adjust: AdjustSr = adjust_sr.into_serde().unwrap();
     players.adjust_sr(adjust);
 
     let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
@@ -138,7 +151,7 @@ pub fn balance_final(
     adjust_sr: &JsValue,
 ) -> JsValue {
     let mut players: Players = player_data.into_serde().unwrap();
-    let adjust: AsjustSr = adjust_sr.into_serde().unwrap();
+    let adjust: AdjustSr = adjust_sr.into_serde().unwrap();
     players.adjust_sr(adjust);
 
     let teams: Teams = teams_data.into_serde().unwrap();

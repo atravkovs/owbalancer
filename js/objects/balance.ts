@@ -1,4 +1,5 @@
 import { Teams } from '@/objects/team';
+import { Points } from '@/objects/bezier';
 
 export type BalanceRole = {
   [roleName in 'Tank' | 'Dps' | 'Support']: [number, boolean, boolean];
@@ -22,9 +23,9 @@ export type BalancerOptions = {
   triesCount: number;
   adjustSr: {
     isEnabled: boolean;
-    tank: number;
-    support: number;
-    dps: number;
+    tank: Points;
+    support: Points;
+    dps: Points;
   };
   lowRankLimiter: boolean;
   dispersionMinimizer: boolean;

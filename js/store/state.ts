@@ -1,5 +1,6 @@
 import { Teams } from '@/objects/team';
 import { Archive } from '@/objects/archive';
+import { defaultPoints } from '@/objects/bezier';
 import { Results, BalancerOptions } from '@/objects/balance';
 import { Players, ReservedPlayers } from '@/objects/player';
 
@@ -18,9 +19,9 @@ const balancerOptions: BalancerOptions = storage.balancerOptions || {
   triesCount: 25,
   adjustSr: {
     isEnabled: false,
-    tank: 100,
-    support: 90,
-    dps: 110,
+    tank: defaultPoints(),
+    support: defaultPoints(),
+    dps: defaultPoints(),
   },
   lowRankLimiter: false,
   dispersionMiminizer: false,

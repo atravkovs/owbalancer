@@ -12,24 +12,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, PropType, ref } from 'vue';
+import { Point, Points, defaultPoints } from '@/objects/bezier';
 
 const offset = 16;
 const width = 250;
 const height = 150;
 const halfHeight = height / 2;
-
-type Point = {
-  x: number;
-  y: number;
-};
-
-type BezierPoint = {
-  position: Point;
-  control: Point;
-};
-
-type Points = BezierPoint[];
 
 const normalize = (p: Point): Point => {
   return {
@@ -58,12 +47,16 @@ const drawGrid = (c: HTMLCanvasElement) => {
   const xSteps = 10;
 
   ctx.clearRect(0, 0, width, height);
-
-  /* Axis */
-  ctx.lineWidth = 0.75;
   ctx.strokeStyle = '#000';
   ctx.fillStyle = '#000';
 
+  /* Reload icon */
+  ctx.font = '14px Arial';
+  ctx.fillText('↻', width - 14, 14);
+
+  ctx.font = '9px Arial';
+  /* Axis */
+  ctx.lineWidth = 0.75;
   ctx.beginPath();
   ctx.moveTo(0, halfHeight);
   ctx.lineTo(width, halfHeight);
@@ -77,7 +70,6 @@ const drawGrid = (c: HTMLCanvasElement) => {
   /* Value Lines */
   ctx.lineWidth = 0.8;
   ctx.strokeStyle = '#adadad';
-  ctx.font = '9px Arial';
   for (let i = 0, j = percent; i <= height; i += height / ySteps, j -= ySteps) {
     let shift = -2;
     let shiftX = 1;
@@ -127,7 +119,7 @@ const drawBezier = (c: HTMLCanvasElement, points: Points) => {
   const ctx = c.getContext('2d');
   if (!ctx) return;
 
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1.2;
   ctx.strokeStyle = '#4334eb';
 
   for (let i = 1; i < points.length; i += 1) {
@@ -211,15 +203,16 @@ const inArea = (
 
 export default defineComponent({
   name: 'Bezier',
-  setup() {
+  props: {
+    modelValue: Array as PropType<Points>,
+  },
+  setup(props, { emit }) {
     // eslint-disable-next-line
     const canva: any = ref(null);
 
-    const points: Points = [
-      { position: { x: 0, y: 0 }, control: { x: 0.05982905982905983, y: 1 } },
-      { position: { x: 0.5, y: 0.7333333333333333 }, control: { x: 0.017094017094017096, y: 1 } },
-      { position: { x: 1, y: 0 }, control: { x: 0.05982905982905983, y: 1 } },
-    ];
+    let points: Points = defaultPoints();
+
+    if (props.modelValue) points = [...props.modelValue];
 
     let activePoint = -1;
     let activeBullet = { point: -1, bullet: 0 };
@@ -228,6 +221,12 @@ export default defineComponent({
       const c = canva.value as HTMLCanvasElement;
       drawGrid(c);
       drawBezier(c, denormalizePoints(points));
+    };
+
+    const reset = () => {
+      points = defaultPoints();
+
+      emit('update:modelValue', points);
     };
 
     onMounted(() => {
@@ -244,6 +243,7 @@ export default defineComponent({
       if (found !== -1) {
         if (found !== 0 && found !== points.length - 1) {
           points.splice(found, 1);
+          emit('update:modelValue', points);
         }
 
         updateCanva();
@@ -260,6 +260,7 @@ export default defineComponent({
           control: normalize({ x: 5, y: 0 }),
         });
       points.sort((a, b) => a.position.x - b.position.x);
+      emit('update:modelValue', points);
       updateCanva();
     };
 
@@ -297,10 +298,17 @@ export default defineComponent({
       activePoint = dPoints.findIndex(point =>
         inArea(e.offsetX, e.offsetY, point.position.x - 3, point.position.y - 3, 6, 6)
       );
+
+      if (activePoint > -1) return;
+
+      if (inArea(e.offsetX, e.offsetY, width - 14, 0, 14, 14)) {
+        reset();
+        updateCanva();
+      }
     };
 
     const deselect = () => {
-      // TODO save changes
+      emit('update:modelValue', points);
       activePoint = -1;
       activeBullet = { point: -1, bullet: 0 };
     };
