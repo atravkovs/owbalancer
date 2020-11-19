@@ -4,6 +4,9 @@
       <input type="checkbox" id="srScaling" class="form-check-input" v-model="adjustSr.isEnabled" />
       <label for="srScaling" class="form-check-label">Adjust player SR by main class</label>
     </div>
+    <div>
+      <bezier />
+    </div>
     <div class="d-flex justify-content-between">
       <div class="input-group mr-2">
         <input type="number" min="0" class="form-control" v-model.number="adjustSr.tank" />
@@ -35,11 +38,12 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useStore } from '@/store';
 
+import Bezier from '@/components/Helpers/Bezier.vue';
 import RoleIcon from '@/components/svg/RoleIcon.vue';
 
 export default defineComponent({
   name: 'AdjustSr',
-  components: { RoleIcon },
+  components: { Bezier, RoleIcon },
   setup() {
     const store = useStore();
     const storeOptions = computed(() => store.state.balancerOptions.adjustSr);
