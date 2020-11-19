@@ -5,7 +5,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { PLAYERS_IN_TEAM } from '@/constants';
 import PObj, { Player, Stats, Players, ClassType } from '@/objects/player';
 import TObj, { Teams, Team } from '@/objects/team';
-import { Results } from '@/objects/balance';
+import { BalancerOptions, Results } from '@/objects/balance';
 import { ArchiveEntry } from '@/objects/archive';
 
 import MutationTypes from './mutation-types';
@@ -43,6 +43,7 @@ export type Mutations<S = State> = {
   [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
   [MutationTypes.REMOVE_FROM_RESERVE](state: S, playerId: string): void;
+  [MutationTypes.SET_BALANCER_OPTIONS](state: S, options: BalancerOptions): void;
   [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
   [MutationTypes.UPDATE_ARCHIVE_NAME](state: S, udpate: { id: number; name: string }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
@@ -174,6 +175,9 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.IMPORT_PLAYERS](state, players) {
     state.players = { ...players, ...state.players };
+  },
+  [MutationTypes.SET_BALANCER_OPTIONS](state, options) {
+    state.balancerOptions = options;
   },
   [MutationTypes.IMPORT_ARCHIVE](state, data) {
     state.archive.push(data);

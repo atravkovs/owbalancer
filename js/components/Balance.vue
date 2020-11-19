@@ -7,6 +7,9 @@
     @close-modal="closeModal"
     @save-changes="balance"
   >
+    <div class="position-relative w-100">
+      <sync />
+    </div>
     <balance-type v-model="balanceType" />
     <balance-disable v-model="disableType" v-if="balanceType === 'full'" />
     <balance-options />
@@ -28,6 +31,7 @@ import player from '@/objects/player';
 import { Teams } from '@/objects/team';
 import { Results } from '@/objects/balance';
 
+import Sync from '@/components/Balance/Sync.vue';
 import Modal from '@/components/Helpers/Modal.vue';
 import TriesCount from '@/components/Balance/TriesCount.vue';
 import Dispersion from '@/components/Balance/Dispersion.vue';
@@ -45,6 +49,7 @@ type DataType = {
 export default defineComponent({
   name: 'Balance',
   components: {
+    Sync,
     Modal,
     TriesCount,
     Dispersion,

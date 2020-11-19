@@ -1,6 +1,6 @@
 import { Teams } from '@/objects/team';
 import { Archive } from '@/objects/archive';
-import { Results } from '@/objects/balance';
+import { Results, BalancerOptions } from '@/objects/balance';
 import { Players, ReservedPlayers } from '@/objects/player';
 
 export const STORAGE_KEY = 'owbalancer';
@@ -13,7 +13,7 @@ const players: Players = storage.players || {};
 const reservedPlayers: ReservedPlayers = storage.reservedPlayers || [];
 const balancerResults: Results = [];
 
-const balancerOptions = storage.balancerOptions || {
+const balancerOptions: BalancerOptions = storage.balancerOptions || {
   range: 30,
   triesCount: 25,
   adjustSr: {

@@ -1,7 +1,7 @@
 import { Teams } from '@/objects/team';
 
 export type BalanceRole = {
-  [roleName in 'Tank' | 'Dps' | 'Support']: [Number, Boolean, Boolean];
+  [roleName in 'Tank' | 'Dps' | 'Support']: [number, boolean, boolean];
 };
 
 export type Leftover = {
@@ -11,10 +11,24 @@ export type Leftover = {
 };
 
 export type Balance = {
-  anchors: Number;
-  dispersion: Number;
+  anchors: number;
+  dispersion: number;
   leftovers: Leftover[];
   teams: Teams;
+};
+
+export type BalancerOptions = {
+  range: number;
+  triesCount: number;
+  adjustSr: {
+    isEnabled: boolean;
+    tank: number;
+    support: number;
+    dps: number;
+  };
+  lowRankLimiter: boolean;
+  dispersionMinimizer: boolean;
+  disallowSecondaryRoles: boolean;
 };
 
 export type Results = Balance[];
