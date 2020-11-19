@@ -8,13 +8,18 @@
     <button class="btn btn-sm btn-warning ml-2 rounded-right-0" v-if="canChange" @click="select">
       Choose balance
     </button>
-    <button class="btn btn-sm btn-danger rounded-left-0" v-if="canChange" @click="clearSelect">
+    <button
+      class="btn btn-sm btn-outline-warning rounded-left-0"
+      v-if="canChange"
+      @click="clearSelect"
+    >
       <bin-icon />
     </button>
     <button class="btn btn-sm btn-secondary mx-2" @click="empty">
       Empty
     </button>
     <export-teams />
+    <button class="btn btn-sm btn-primary mx-2" @click="archive"><archive-icon /></button>
   </div>
 </template>
 
@@ -27,11 +32,12 @@ import MutationTypes from '@/store/mutation-types';
 import TObj from '@/objects/team';
 
 import BinIcon from '@/components/svg/BinIcon.vue';
+import ArchiveIcon from '@/components/svg/ArchiveIcon.vue';
 import ExportTeams from '@/components/Teams/ExportTeams.vue';
 
 export default defineComponent({
   name: 'Actions',
-  components: { BinIcon, ExportTeams },
+  components: { BinIcon, ExportTeams, ArchiveIcon },
   setup() {
     const store = useStore();
 
@@ -39,6 +45,10 @@ export default defineComponent({
 
     const balance = () => {
       store.commit(MutationTypes.TOGGLE_BALANCE, undefined);
+    };
+
+    const archive = () => {
+      store.commit(MutationTypes.TOGGLE_ARCHIVE, undefined);
     };
 
     const clear = () => {
@@ -74,6 +84,7 @@ export default defineComponent({
       clear,
       select,
       addNew,
+      archive,
       balance,
       canChange,
       clearSelect,

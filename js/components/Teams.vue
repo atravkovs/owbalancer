@@ -9,6 +9,7 @@
     <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
   <balance />
+  <archive />
   <result-selection />
 </template>
 
@@ -16,6 +17,7 @@
 import { computed, defineComponent } from 'vue';
 import { useStore } from '@/store';
 
+import Archive from '@/components/Archive.vue';
 import Balance from '@/components/Balance.vue';
 import Team from '@/components/Teams/Team.vue';
 import Stats from '@/components/Teams/Stats.vue';
@@ -25,7 +27,7 @@ import ResultSelection from '@/components/Teams/ResultSelection.vue';
 
 export default defineComponent({
   name: 'Teams',
-  components: { Team, Balance, Stats, Actions, ModeToggler, ResultSelection },
+  components: { Archive, Team, Balance, Stats, Actions, ModeToggler, ResultSelection },
   setup() {
     const store = useStore();
     const storeTeams = computed(() => store.state.teams);
