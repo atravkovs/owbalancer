@@ -4,6 +4,7 @@ use crate::teams::{Member, Team, Teams};
 use crate::wasm_log;
 use serde::{Deserialize, Serialize};
 use std::cmp;
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
@@ -18,6 +19,7 @@ pub struct Config {
     pub duplicate_roles: bool,
     pub duplicate_roles2: bool,
     pub dispersion_minimizer: bool,
+    pub roles_avg: HashMap<String, i32>,
 }
 
 pub struct Mathmaking<'a> {
@@ -184,6 +186,8 @@ impl<'a> Mathmaking<'a> {
             return;
         }
 
+        self.update_role_avg();
+
         while let Some(swap) = self.try_minimize() {
             let first = self.teams.0[swap.0].members.remove(swap.1);
             let second = self.teams.0[swap.2].members.remove(swap.3);
@@ -192,6 +196,23 @@ impl<'a> Mathmaking<'a> {
             self.teams.0[swap.2].update();
             self.teams.0[swap.0].update();
         }
+    }
+
+    fn update_role_avg(&mut self) {
+        let role_players = self.teams.teams_count() * 2;
+
+        self.config.roles_avg.insert(
+            "dps".to_string(),
+            (self.teams.total_role_sr(&SimpleRole::Dps)) / role_players as i32,
+        );
+        self.config.roles_avg.insert(
+            "support".to_string(),
+            self.teams.total_role_sr(&SimpleRole::Support) / role_players as i32,
+        );
+        self.config.roles_avg.insert(
+            "tank".to_string(),
+            self.teams.total_role_sr(&SimpleRole::Tank) / role_players as i32,
+        );
     }
 
     fn try_minimize(&self) -> Option<(usize, usize, usize, usize)> {
@@ -535,6 +556,7 @@ impl Config {
             sec_roles: false,
             limiter_max: 2500,
             players_average: 0,
+            roles_avg: HashMap::new(),
             rank_limiter2: rank_limiter,
             dispersion_minimizer: false,
             duplicate_roles2: duplicate_roles,

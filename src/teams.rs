@@ -340,16 +340,35 @@ impl Team {
                         }
                     }
 
+                    let global_role_avg = *config.roles_avg.get(&mem.role.get_string()).unwrap();
+
                     let newsr =
                         (self.total_sr - mem.rank + mem2.rank) / self.members_count() as i32;
                     let newsr2 =
                         (team.total_sr - mem2.rank + mem.rank) / team.members_count() as i32;
-                    let disp1 = (self.avg_sr as i32 - avg).abs();
-                    let disp2 = (team.avg_sr as i32 - avg).abs();
                     let newdisp1 = (newsr - avg).abs();
                     let newdisp2 = (newsr2 - avg).abs();
 
-                    if newdisp1 < disp1 && newdisp2 < disp2 {
+                    let team1_role_sr = self.total_role_sr(&mem.role);
+                    let team2_role_sr = team.total_role_sr(&mem2.role);
+
+                    let team1_role_avg = team1_role_sr / 2;
+                    let team2_role_avg = team2_role_sr / 2;
+
+                    let new_role_avg = (team1_role_sr - mem.rank + mem2.rank) / 2;
+                    let new_role_avg2 = (team.total_role_sr(&mem2.role) - mem2.rank + mem.rank) / 2;
+
+                    let role_disp1 = (team1_role_avg - global_role_avg).abs();
+                    let role_disp2 = (team2_role_avg - global_role_avg).abs();
+
+                    let new_role_disp1 = (new_role_avg - global_role_avg).abs();
+                    let new_role_disp2 = (new_role_avg2 - global_role_avg).abs();
+
+                    if new_role_disp1 < role_disp1
+                        && new_role_disp2 < role_disp2
+                        && newdisp1 <= config.tolerance as i32
+                        && newdisp2 <= config.tolerance as i32
+                    {
                         return Some((i, j));
                     }
                 }
@@ -361,6 +380,14 @@ impl Team {
 
     fn total_sr(&self) -> i32 {
         self.members.iter().map(|member| member.rank).sum()
+    }
+
+    pub fn total_role_sr(&self, role: &SimpleRole) -> i32 {
+        self.members
+            .iter()
+            .filter(|&member| member.role == *role)
+            .map(|member| member.rank)
+            .sum()
     }
 
     fn count_role(&self, role: &SimpleRole) -> usize {
@@ -465,6 +492,10 @@ impl Teams {
                 }
             })
             .collect()
+    }
+
+    pub fn total_role_sr(&self, role: &SimpleRole) -> i32 {
+        self.0.iter().map(|team| team.total_role_sr(role)).sum()
     }
 
     pub fn replace_leftover(
@@ -648,7 +679,7 @@ impl Teams {
         }
     }
 
-    fn teams_count(&self) -> usize {
+    pub fn teams_count(&self) -> usize {
         self.0.len()
     }
 }

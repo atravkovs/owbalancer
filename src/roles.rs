@@ -241,6 +241,16 @@ impl From<&Classes> for Roles {
     }
 }
 
+impl SimpleRole {
+    pub fn get_string(&self) -> String {
+        match self {
+            SimpleRole::Dps => "dps".to_string(),
+            SimpleRole::Tank => "tank".to_string(),
+            SimpleRole::Support => "support".to_string(),
+        }
+    }
+}
+
 impl RolesFilter {
     pub fn has_same(&self, role: &Role) -> bool {
         self.0
