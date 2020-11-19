@@ -550,7 +550,7 @@ impl Teams {
         }
     }
 
-    pub fn distribute_leutenants(&mut self, pool: &mut PlayerPool, config: &Config) {
+    pub fn distribute_lieutenants(&mut self, pool: &mut PlayerPool, config: &Config) {
         let mut offset = 0;
         for _ in 0..self.teams_count() {
             offset = pool.distribute_leutenant(self, offset, config);

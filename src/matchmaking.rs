@@ -76,9 +76,9 @@ impl<'a> Mathmaking<'a> {
         self.log("Init pool");
         self.init_pool(false);
 
-        self.log("Distribute leutenants");
+        self.log("Distribute lieutenants");
         if self.disable_type.as_str() != "ex_caps" && self.disable_type.as_str() != "leut_ens" {
-            self.distribute_leutenants();
+            self.distribute_lieutenants();
         }
 
         self.log("Distribute ensigns");
@@ -106,7 +106,7 @@ impl<'a> Mathmaking<'a> {
         self.init_teams();
         self.distribute_squires();
         self.init_pool(false);
-        self.distribute_leutenants();
+        self.distribute_lieutenants();
         self.distribute_ensigns();
         self.teams.sort(Direction::ASC);
     }
@@ -418,10 +418,10 @@ impl<'a> Mathmaking<'a> {
         }
     }
 
-    fn distribute_leutenants(&mut self) {
+    fn distribute_lieutenants(&mut self) {
         self.teams.sort_by_cap(Direction::ASC);
         self.teams
-            .distribute_leutenants(&mut self.pool, &self.config);
+            .distribute_lieutenants(&mut self.pool, &self.config);
     }
 
     fn distribute_ensigns(&mut self) {
