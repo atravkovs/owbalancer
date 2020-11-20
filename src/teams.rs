@@ -1,6 +1,7 @@
 use crate::matchmaking::Config;
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::roles::{Role, RolesFilter, SimpleRole};
+
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use uuid::Uuid;
@@ -329,12 +330,25 @@ impl Team {
                     }
 
                     if config.duplicate_roles2 {
+                        let partner1 = self.get_partner(&mem.role, &mem.uuid);
+                        let partner2 = team.get_partner(&mem2.role, &mem2.uuid);
+
+                        let partner1_base = &players.0.get(partner1.uuid.as_str()).unwrap();
+                        let partner2_base = &players.0.get(partner2.uuid.as_str()).unwrap();
+
                         let mem1_class = p1_base.stats.classes.get_class(&mem.role);
                         let mem2_class = p2_base.stats.classes.get_class(&mem2.role);
 
-                        if (mem1_class.primary && mem1_class.primary == mem2_class.primary)
-                            || (mem1_class.secondary
-                                && mem1_class.secondary == mem2_class.secondary)
+                        let partner1_class = partner1_base.stats.classes.get_class(&mem.role);
+                        let partner2_class = partner2_base.stats.classes.get_class(&mem.role);
+
+                        if (partner1_class.primary && partner1_class.primary == mem2_class.primary)
+                            || (partner1_class.secondary
+                                && partner1_class.secondary == mem2_class.secondary)
+                            || (partner2_class.primary
+                                && partner2_class.primary == mem1_class.primary)
+                            || (partner2_class.secondary
+                                && partner2_class.secondary == mem1_class.secondary)
                         {
                             continue;
                         }
@@ -376,6 +390,13 @@ impl Team {
         }
 
         None
+    }
+
+    fn get_partner(&self, role: &SimpleRole, uuid: &String) -> &Member {
+        self.members
+            .iter()
+            .find(|&member| member.uuid != uuid.clone() && member.role == *role)
+            .unwrap()
     }
 
     fn total_sr(&self) -> i32 {
