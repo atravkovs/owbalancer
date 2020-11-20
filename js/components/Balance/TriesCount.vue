@@ -11,7 +11,8 @@
       min="0"
       max="2500"
       step="1"
-      v-model.number="balancerOptions.triesCount"
+      :value="balancerOptions.triesCount"
+      @input="balancerOptions.triesCount = +$event.target.value"
     />
   </div>
 </template>
