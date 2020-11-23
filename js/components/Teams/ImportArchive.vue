@@ -1,6 +1,12 @@
 <template>
   <div class="form-file form-file-sm wf">
-    <input type="file" id="importArchive" class="form-file-input d-none" @change="onChange" />
+    <input
+      type="file"
+      accept=".json"
+      id="importArchive"
+      class="form-file-input d-none"
+      @change="onChange"
+    />
     <label for="importArchive" class="form-file-label w-100">
       <span class="form-file-button">Import</span>
     </label>
@@ -21,10 +27,19 @@ export default defineComponent({
       if (!event.target) return;
 
       const source = event.target.result as string;
-      const data = JSON.parse(source);
 
-      if (data.format === 'xva-1') {
-        store.commit(MutationTypes.IMPORT_ARCHIVE, data.data);
+      try {
+        const data = JSON.parse(source);
+
+        if (data.format === 'xva-1') {
+          store.commit(MutationTypes.IMPORT_ARCHIVE, data.data);
+          return;
+        }
+
+        throw new Error('Incorrect archive exoport format');
+      } catch (e) {
+        // eslint-disable-next-line
+        alert(`Format error: ${e.message}`);
       }
     };
 

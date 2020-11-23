@@ -2,6 +2,7 @@
   <div class="form-file form-file-sm wf">
     <input
       type="file"
+      accept=".json"
       id="importBalancerOptions"
       class="form-file-input d-none"
       @change="onChange"
@@ -31,10 +32,18 @@ export default defineComponent({
       if (!event.target) return;
 
       const source = event.target.result as string;
-      const data = JSON.parse(source);
 
-      if (data.format === 'xvb-1') {
-        store.commit(MutationTypes.SET_BALANCER_OPTIONS, data.data);
+      try {
+        const data = JSON.parse(source);
+
+        if (data.format === 'xvb-1') {
+          store.commit(MutationTypes.SET_BALANCER_OPTIONS, data.data);
+        } else {
+          throw new Error('Incorrect balance options export format');
+        }
+      } catch (e) {
+        // eslint-disable-next-line
+        alert(`Format error: ${e.message}`);
       }
     };
 

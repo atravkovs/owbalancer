@@ -1,6 +1,12 @@
 <template>
   <div class="form-file form-file-sm wf">
-    <input type="file" id="importFile" class="form-file-input d-none" @change="onChange" />
+    <input
+      type="file"
+      accept=".json"
+      id="importFile"
+      class="form-file-input d-none"
+      @change="onChange"
+    />
     <label for="importFile" class="form-file-label w-100">
       <span class="form-file-button">Import</span>
     </label>
@@ -21,15 +27,24 @@ export default defineComponent({
       if (!event.target) return;
 
       const source = event.target.result as string;
-      const data = JSON.parse(source);
 
-      if (data.format === 'xv-1') {
-        store.commit(MutationTypes.IMPORT_PLAYERS, data.players);
-        return;
-      }
+      try {
+        const data = JSON.parse(source);
 
-      if (data.format_version === 9 && data.format_type === 'tournament') {
-        store.commit(MutationTypes.IMPORT_PLAYERS_OLD, source);
+        if (data.format === 'xv-1') {
+          store.commit(MutationTypes.IMPORT_PLAYERS, data.players);
+          return;
+        }
+
+        if (data.format_version === 9 && data.format_type === 'tournament') {
+          store.commit(MutationTypes.IMPORT_PLAYERS_OLD, source);
+          return;
+        }
+
+        throw new Error('Incorrect players export format');
+      } catch (e) {
+        // eslint-disable-next-line
+        alert(`Format error: ${e.message}`);
       }
     };
 
