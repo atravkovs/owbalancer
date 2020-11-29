@@ -1,6 +1,6 @@
 <template>
   <dropdown id="assign" title="♛ Extra">
-    <drop-item @drop-click="assignAuto">Assign Auto</drop-item>
+    <drop-item @drop-click="assignAuto">Distribute Auto</drop-item>
     <drop-item @drop-click="assignCaptains">Assign Captains</drop-item>
     <drop-item @drop-click="assignSquires">Assign Squires</drop-item>
     <drop-item @drop-click="clearCaptains">Clear Captains</drop-item>
@@ -24,6 +24,7 @@ export default defineComponent({
     const store = useStore();
 
     const assignAuto = () => {
+      store.commit(MutationTypes.CLEAR_ALL_EXTRA, undefined);
       store.commit(MutationTypes.ASSIGN_CAPTAINS, 0);
       store.commit(MutationTypes.ASSIGN_SQUIRES, 5500);
     };

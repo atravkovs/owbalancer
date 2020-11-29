@@ -5,6 +5,7 @@
       accept=".json"
       id="importFile"
       class="form-file-input d-none"
+      ref="inp"
       @change="onChange"
     />
     <label for="importFile" class="form-file-label w-100">
@@ -14,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 
@@ -22,6 +23,7 @@ export default defineComponent({
   name: 'Import',
   setup() {
     const store = useStore();
+    const inp = ref(null);
 
     const onReaderLoad = (event: ProgressEvent<FileReader>) => {
       if (!event.target) return;
@@ -30,6 +32,10 @@ export default defineComponent({
 
       try {
         const data = JSON.parse(source);
+
+        if (inp?.value) {
+          inp.value.value = '';
+        }
 
         if (data.format === 'xv-1') {
           store.commit(MutationTypes.IMPORT_PLAYERS, data.players);
@@ -52,13 +58,15 @@ export default defineComponent({
       const reader = new FileReader();
       const { files } = event.target as HTMLInputElement;
 
+      console.log('hi');
+
       if (files !== null && files.length) {
         reader.onload = onReaderLoad;
         reader.readAsText(files[0]);
       }
     };
 
-    return { onChange };
+    return { inp, onChange };
   },
 });
 </script>

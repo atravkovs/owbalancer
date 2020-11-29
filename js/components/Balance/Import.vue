@@ -5,6 +5,7 @@
       accept=".json"
       id="importBalancerOptions"
       class="form-file-input d-none"
+      ref="inp"
       @change="onChange"
     />
     <label for="importBalancerOptions" class="form-file-label w-100">
@@ -16,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 
@@ -27,6 +28,7 @@ export default defineComponent({
   components: { UploadIcon },
   setup() {
     const store = useStore();
+    const inp = ref(null);
 
     const onReaderLoad = (event: ProgressEvent<FileReader>) => {
       if (!event.target) return;
@@ -35,6 +37,10 @@ export default defineComponent({
 
       try {
         const data = JSON.parse(source);
+
+        if (inp?.value) {
+          inp.value.value = '';
+        }
 
         if (data.format === 'xvb-1') {
           store.commit(MutationTypes.SET_BALANCER_OPTIONS, data.data);
@@ -57,7 +63,7 @@ export default defineComponent({
       }
     };
 
-    return { onChange };
+    return { inp, onChange };
   },
 });
 </script>

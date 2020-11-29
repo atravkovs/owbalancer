@@ -5,6 +5,7 @@
       accept=".json"
       id="importArchive"
       class="form-file-input d-none"
+      ref="inp"
       @change="onChange"
     />
     <label for="importArchive" class="form-file-label w-100">
@@ -14,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
 
@@ -22,6 +23,7 @@ export default defineComponent({
   name: 'ImportArchive',
   setup() {
     const store = useStore();
+    const inp = ref(null);
 
     const onReaderLoad = (event: ProgressEvent<FileReader>) => {
       if (!event.target) return;
@@ -30,6 +32,10 @@ export default defineComponent({
 
       try {
         const data = JSON.parse(source);
+
+        if (inp?.value) {
+          inp.value.value = '';
+        }
 
         if (data.format === 'xva-1') {
           store.commit(MutationTypes.IMPORT_ARCHIVE, data.data);
@@ -53,7 +59,7 @@ export default defineComponent({
       }
     };
 
-    return { onChange };
+    return { inp, onChange };
   },
 });
 </script>
