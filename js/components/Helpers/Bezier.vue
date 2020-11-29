@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref } from 'vue';
+import { defineComponent, onMounted, PropType, ref, watch } from 'vue';
 import { Point, Points, defaultPoints } from '@/objects/bezier';
 
 const offset = 16;
@@ -212,7 +212,7 @@ export default defineComponent({
 
     let points: Points = defaultPoints();
 
-    if (props.modelValue) points = [...props.modelValue];
+    if (props.modelValue && Array.isArray(props.modelValue)) points = [...props.modelValue];
 
     let activePoint = -1;
     let activeBullet = { point: -1, bullet: 0 };
@@ -232,6 +232,14 @@ export default defineComponent({
     onMounted(() => {
       updateCanva();
     });
+
+    watch(
+      () => props.modelValue,
+      (p) => {
+        if (p && Array.isArray(p)) points = [...p];
+        updateCanva();
+      } 
+    );
 
     const dbclick = (e: MouseEvent) => {
       const dPoints = denormalizePoints(points);
