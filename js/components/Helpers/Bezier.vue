@@ -1,8 +1,8 @@
 <template>
   <canvas
     ref="canva"
-    width="250"
-    height="150"
+    :width="width"
+    :height="height"
     @dblclick="dbclick"
     @mousedown="selectActive"
     @mouseup="deselect"
@@ -16,7 +16,7 @@ import { defineComponent, onMounted, PropType, ref, watch } from 'vue';
 import { Point, Points, defaultPoints } from '@/objects/bezier';
 
 const offset = 16;
-const width = 250;
+const width = 900;
 const height = 150;
 const halfHeight = height / 2;
 
@@ -44,7 +44,7 @@ const drawGrid = (c: HTMLCanvasElement) => {
 
   const percent = 50;
   const ySteps = 10;
-  const xSteps = 10;
+  const xSteps = 50;
 
   ctx.clearRect(0, 0, width, height);
   ctx.strokeStyle = '#000';
@@ -86,15 +86,16 @@ const drawGrid = (c: HTMLCanvasElement) => {
     }
   }
 
-  for (let i = offset, j = 0; i <= width; i += (width - offset) / xSteps, j += 500) {
-    if (j % 200 === 0) {
+  ctx.lineWidth = 2;
+  for (let i = offset, j = 0; i <= width; i += (width - offset) / xSteps, j += (5000 / xSteps)) {
+    if (j % 500 === 0) {
       ctx.fillText(`${j}`, i - 6, halfHeight + 10);
+      
+      ctx.beginPath();
+      ctx.moveTo(i, halfHeight - 3);
+      ctx.lineTo(i, halfHeight + 3);
+      ctx.stroke();
     }
-
-    ctx.beginPath();
-    ctx.moveTo(i, halfHeight);
-    ctx.lineTo(i, halfHeight + 3);
-    ctx.stroke();
   }
 
   ctx.lineWidth = 0.3;
@@ -341,7 +342,7 @@ export default defineComponent({
       }
     };
 
-    return { canva, dbclick, selectActive, deselect, move };
+    return { canva, dbclick, selectActive, deselect, move, width, height };
   },
 });
 </script>

@@ -19,9 +19,21 @@ const balancerOptions: BalancerOptions = storage.balancerOptions || {
   triesCount: 25,
   adjustSr: {
     isEnabled: false,
-    tank: defaultPoints(),
-    support: defaultPoints(),
-    dps: defaultPoints(),
+    tank: {
+      any: defaultPoints(),
+      primary: defaultPoints(),
+      secondary: defaultPoints(),
+    },
+    support: {
+      any: defaultPoints(),
+      primary: defaultPoints(),
+      secondary: defaultPoints(),
+    },
+    dps: {
+      any: defaultPoints(),
+      primary: defaultPoints(),
+      secondary: defaultPoints(),
+    },
   },
   lowRankLimiter: false,
   dispersionMinimizer: false,

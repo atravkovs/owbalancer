@@ -11,6 +11,12 @@ export type Leftover = {
   roles: BalanceRole[];
 };
 
+export type RolePoints = {
+  any: Points;
+  primary: Points;
+  secondary: Points;
+};
+
 export type Balance = {
   anchors: number;
   dispersion: number;
@@ -23,9 +29,9 @@ export type BalancerOptions = {
   triesCount: number;
   adjustSr: {
     isEnabled: boolean;
-    tank: Points;
-    support: Points;
-    dps: Points;
+    tank: RolePoints;
+    support: RolePoints;
+    dps: RolePoints;
   };
   lowRankLimiter: boolean;
   dispersionMinimizer: boolean;

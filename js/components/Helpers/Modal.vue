@@ -1,6 +1,6 @@
 <template>
   <div class="modal fade" tabindex="-1" aria-hidden="true" ref="modalRef">
-    <div class="modal-dialog modal-dialog-centered" :class="{ 'modal-lg': variant === 'large' }">
+    <div class="modal-dialog modal-dialog-centered" :class="{ 'modal-xl': variant === 'large' }">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ title }}</h5>
