@@ -24,11 +24,11 @@
     <div class="form-check">
       <input
         type="checkbox"
-        id="dispersionMiminizer"
+        id="dispersionMinimizer"
         class="form-check-input"
-        v-model="options.dispersionMiminizer"
+        v-model="options.dispersionMinimizer"
       />
-      <label for="dispersionMiminizer" class="form-check-label">Enable dispersion minimizer</label>
+      <label for="dispersionMinimizer" class="form-check-label">Enable dispersion minimizer</label>
     </div>
   </div>
 </template>

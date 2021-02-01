@@ -21,10 +21,10 @@ export default class WasmWorker {
   }
 
   fullBalance(data) {
-    const { players, range, lowRankLimiter, disallowSecondaryRoles, adjustSr, disableType, dispersionMiminizer, triesCount } = JSON.parse(data);
+    const { players, range, lowRankLimiter, disallowSecondaryRoles, adjustSr, disableType, dispersionMinimizer, triesCount } = JSON.parse(data);
 
     return new Promise((resolve) => {
-      const r = this.lib.balance(players, range, lowRankLimiter, disallowSecondaryRoles, adjustSr, disableType, dispersionMiminizer, triesCount);
+      const r = this.lib.balance(players, range, lowRankLimiter, disallowSecondaryRoles, adjustSr, disableType, dispersionMinimizer, triesCount);
       resolve(r);
     });
   }

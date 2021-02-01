@@ -74,7 +74,7 @@ export default defineComponent({
 
     document.addEventListener('wasm-update', e => {
       // eslint-disable-next-line
-      console.log('Step: ', e.detail.message());
+      console.log('Step: ', (e as any).detail.message());
       progress.current += 1;
     });
 
@@ -90,7 +90,7 @@ export default defineComponent({
         disallowSecondaryRoles: sbOptions.value.disallowSecondaryRoles,
         adjustSr: sbOptions.value.adjustSr,
         disableType: disableType.value,
-        dispersionMiminizer: sbOptions.value.dispersionMiminizer,
+        dispersionMinimizer: sbOptions.value.dispersionMinimizer,
         triesCount: sbOptions.value.triesCount,
       });
 

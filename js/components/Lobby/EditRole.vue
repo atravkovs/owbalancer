@@ -23,6 +23,7 @@
         :id="`option_main_${rtype}`"
         autocomplete="off"
         v-model="mRole.primary"
+        @change="changeSpecializationPrimary"
       />
       <label class="btn btn-sm btn-outline-dark" :for="`option_main_${rtype}`">{{
         roles[rtype].primary
@@ -36,6 +37,7 @@
         :id="`option_off_${rtype}`"
         autocomplete="off"
         v-model="mRole.secondary"
+        @input="changeSpecializationSecondary"
       />
       <label class="btn btn-sm btn-outline-dark" :for="`option_off_${rtype}`">{{
         roles[rtype].secondary
@@ -88,7 +90,17 @@ export default defineComponent({
       emit('update-rank', props.rtype, value);
     };
 
-    return { roles, mRole, inpChange };
+    const specializationChange = (e: Event, specialization: 'primary' | 'secondary') => {
+      const { checked } = e.target as HTMLInputElement;
+      console.log(specialization, checked);
+    };
+
+    const changeSpecialization = (specialization: 'primary' | 'secondary') => (e: Event) => specializationChange(e, specialization);
+
+    const changeSpecializationPrimary = changeSpecialization('primary'); 
+    const changeSpecializationSecondary = changeSpecialization('secondary'); 
+
+    return { roles, mRole, inpChange, changeSpecialization, changeSpecializationPrimary, changeSpecializationSecondary };
   },
 });
 </script>

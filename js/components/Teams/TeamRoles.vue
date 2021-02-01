@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import PObj from '@/objects/player';
 import { useStore } from '@/store';
@@ -34,9 +34,9 @@ import MutationTypes from '@/store/mutation-types';
 export default defineComponent({
   name: 'TeamRoles',
   props: {
-    rtype: String,
+    rtype: String as PropType<'dps' | 'tank' | 'support'>,
     teamUuid: String,
-    members: Array,
+    members: Array as PropType<{ uuid: string; name: string; primary: boolean; secondary: boolean }[]>,
   },
   components: { RoleIcon, PlayerCard },
   setup(props) {
@@ -126,7 +126,7 @@ export default defineComponent({
             }
           }
         }
-      } else {
+      } else if (teamUuid) {
         store.commit(MutationTypes.REMOVE_FROM_TEAM, {
           teamUuid,
           playerId,

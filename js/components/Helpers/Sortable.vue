@@ -14,7 +14,7 @@ export default defineComponent({
     handle: String,
   },
   setup(props, { emit }) {
-    const container = ref(null);
+    const container= ref<HTMLElement | null>(null);
 
     const onUpdate = (e: SortableEvent) => {
       emit('update-position', e);

@@ -25,7 +25,9 @@
 <script lang="ts">
 import { defineComponent, watch, onMounted, ref } from 'vue';
 
+import { Modal as ModalType } from 'bootstrap';
 import Modal from 'bootstrap/js/src/modal';
+
 
 export default defineComponent({
   name: 'Modal',
@@ -39,11 +41,13 @@ export default defineComponent({
   setup(props, { emit }) {
     const modalRef = ref(null);
 
-    const setIsActive: (modal: Modal, isActive: boolean, isActiveP: boolean) => void = (
+    const setIsActive: (modal: ModalType | null, isActive: boolean, isActiveP: boolean) => void = (
       modal,
       isActive,
       isActiveP
     ) => {
+      if (!modal) return;
+
       if (isActive === isActiveP) {
         return;
       }
@@ -56,7 +60,7 @@ export default defineComponent({
       modal.hide();
     };
 
-    let modal: null | Modal = null;
+    let modal: null | ModalType = null;
     onMounted(() => {
       modal = new Modal(modalRef.value);
 

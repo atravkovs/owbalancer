@@ -28,7 +28,7 @@ export default defineComponent({
   components: { UploadIcon },
   setup() {
     const store = useStore();
-    const inp = ref(null);
+    const inp = ref<HTMLInputElement | null>(null);
 
     const onReaderLoad = (event: ProgressEvent<FileReader>) => {
       if (!event.target) return;

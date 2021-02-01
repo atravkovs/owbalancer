@@ -29,8 +29,7 @@ export default defineComponent({
       if (!props.balance) return;
 
       const { leftovers, teams } = props.balance;
-      // TODO leftover type
-      const ignoredUuids = leftovers.reduce((acc: string[], leftover) => {
+      const ignoredUuids = leftovers.reduce((acc: string[], leftover: { uuid: string }) => {
         acc.push(leftover.uuid);
         return acc;
       }, []);
@@ -43,7 +42,7 @@ export default defineComponent({
       if (!props.balance) return 0;
 
       const [offCount, totalCount] = props.balance.teams.reduce(
-        (acc, team: Team) => {
+        (acc: [number, number], team: Team) => {
           let off = acc[0];
           let total = acc[1];
 

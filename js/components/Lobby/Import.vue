@@ -23,7 +23,7 @@ export default defineComponent({
   name: 'Import',
   setup() {
     const store = useStore();
-    const inp = ref(null);
+    const inp = ref<HTMLInputElement | null>(null);
 
     const onReaderLoad = (event: ProgressEvent<FileReader>) => {
       if (!event.target) return;

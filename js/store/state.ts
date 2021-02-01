@@ -24,7 +24,7 @@ const balancerOptions: BalancerOptions = storage.balancerOptions || {
     dps: defaultPoints(),
   },
   lowRankLimiter: false,
-  dispersionMiminizer: false,
+  dispersionMinimizer: false,
   disallowSecondaryRoles: false,
 };
 
