@@ -2,7 +2,7 @@
   <div class="mb-3">
     <div class="form-check">
       <input type="checkbox" id="srScaling" class="form-check-input" v-model="adjustSr.isEnabled" />
-      <label for="srScaling" class="form-check-label">Adjust player SR by main class</label>
+      <label for="srScaling" class="form-check-label">Adjust player SR</label>
     </div>
     <div class="text-center mt-2">
       <adjust-role role="tank" />

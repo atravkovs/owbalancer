@@ -58,8 +58,6 @@ export default defineComponent({
       const reader = new FileReader();
       const { files } = event.target as HTMLInputElement;
 
-      console.log('hi');
-
       if (files !== null && files.length) {
         reader.onload = onReaderLoad;
         reader.readAsText(files[0]);

@@ -28,7 +28,7 @@
         class="form-check-input"
         v-model="options.dispersionMinimizer"
       />
-      <label for="dispersionMinimizer" class="form-check-label">Enable dispersion minimizer</label>
+      <label for="dispersionMinimizer" class="form-check-label">Enable role dispersion minimizer</label>
     </div>
   </div>
 </template>
