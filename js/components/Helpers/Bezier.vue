@@ -17,7 +17,7 @@ import { Point, Points, defaultPoints } from '@/objects/bezier';
 
 const offset = 16;
 const width = 900;
-const height = 150;
+const height = 300;
 const halfHeight = height / 2;
 
 const normalize = (p: Point): Point => {
