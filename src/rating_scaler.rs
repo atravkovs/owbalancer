@@ -1,15 +1,40 @@
 use flo_curves::bezier;
 use flo_curves::*;
 
-use crate::{AdjustSr, BezierPoint};
+use crate::{AdjustSr, BezierPoint, SpecializationPoints};
 
 const MAX_ADJUSTMENT: f64 = 50.0;
 const TOP_RATING: f64 = 5000.0;
 
+pub struct SpecializationScaler {
+    any: Vec<(i32, bezier::Curve<Coord2>)>,
+    primary: Vec<(i32, bezier::Curve<Coord2>)>,
+    secondary: Vec<(i32, bezier::Curve<Coord2>)>,
+}
+
+impl SpecializationScaler {
+    fn new(data: SpecializationPoints) -> Self {
+        Self {
+            any: RatingScaler::from_bezier_points(data.any),
+            primary: RatingScaler::from_bezier_points(data.primary),
+            secondary: RatingScaler::from_bezier_points(data.secondary),
+        }
+    }
+
+    fn get(&self, specialization: &str) -> Option<&Vec<(i32, bezier::Curve<Coord2>)>> {
+        match specialization {
+            "any" => Some(&self.any),
+            "primary" => Some(&self.primary),
+            "secondary" => Some(&self.secondary),
+            _ => None
+        }
+    }
+}
+
 pub struct RatingScaler {
-    dps: Vec<(i32, bezier::Curve<Coord2>)>,
-    tank: Vec<(i32, bezier::Curve<Coord2>)>,
-    support: Vec<(i32, bezier::Curve<Coord2>)>,
+    dps: SpecializationScaler,
+    tank: SpecializationScaler,
+    support: SpecializationScaler,
 }
 
 impl RatingScaler {
@@ -37,11 +62,11 @@ impl RatingScaler {
         (rating as f64 * scale).floor() as i32
     }
 
-    pub fn scale(&self, role: &str, rating: i32) -> i32 {
+    pub fn scale(&self, role: &str, specialization: &str, rating: i32) -> i32 {
         match role {
-            "dps" => self.scale_role(rating, &self.dps),
-            "tank" => self.scale_role(rating, &self.tank),
-            "support" => self.scale_role(rating, &self.support),
+            "dps" => self.scale_role(rating, self.dps.get(specialization).unwrap()),
+            "tank" => self.scale_role(rating, self.tank.get(specialization).unwrap()),
+            "support" => self.scale_role(rating, self.support.get(specialization).unwrap()),
             _ => 0,
         }
     }
@@ -86,9 +111,9 @@ impl RatingScaler {
 impl From<AdjustSr> for RatingScaler {
     fn from(adjust: AdjustSr) -> Self {
         Self {
-            dps: Self::from_bezier_points(adjust.dps),
-            tank: Self::from_bezier_points(adjust.tank),
-            support: Self::from_bezier_points(adjust.support),
+            dps: SpecializationScaler::new(adjust.dps),
+            tank: SpecializationScaler::new(adjust.tank),
+            support: SpecializationScaler::new(adjust.support),
         }
     }
 }

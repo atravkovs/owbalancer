@@ -133,14 +133,33 @@ impl Players {
 
         for (_, player) in &mut self.0 {
             if player.stats.classes.dps.is_active {
-                player.stats.classes.dps.rank = rs.scale("dps", player.stats.classes.dps.rank);
+                if player.stats.classes.dps.primary {
+                    player.stats.classes.dps.rank = rs.scale("dps", "primary", player.stats.classes.dps.rank);
+                } else if player.stats.classes.dps.secondary {
+                    player.stats.classes.dps.rank = rs.scale("dps", "secondary", player.stats.classes.dps.rank);
+                } else {
+                    player.stats.classes.dps.rank = rs.scale("dps", "any", player.stats.classes.dps.rank);
+                }
             }
+
             if player.stats.classes.tank.is_active {
-                player.stats.classes.tank.rank = rs.scale("tank", player.stats.classes.tank.rank);
+                if player.stats.classes.tank.primary {
+                    player.stats.classes.tank.rank = rs.scale("tank", "primary", player.stats.classes.tank.rank);
+                } else if player.stats.classes.tank.secondary {
+                    player.stats.classes.tank.rank = rs.scale("tank", "secondary", player.stats.classes.tank.rank);
+                } else {
+                    player.stats.classes.tank.rank = rs.scale("tank", "any", player.stats.classes.tank.rank);
+                }
             }
+
             if player.stats.classes.support.is_active {
-                player.stats.classes.support.rank =
-                    rs.scale("support", player.stats.classes.support.rank);
+                if player.stats.classes.support.primary {
+                    player.stats.classes.support.rank = rs.scale("support", "primary", player.stats.classes.support.rank);
+                } else if player.stats.classes.support.secondary {
+                    player.stats.classes.support.rank = rs.scale("support", "secondary", player.stats.classes.support.rank);
+                } else {
+                    player.stats.classes.support.rank = rs.scale("support", "any", player.stats.classes.support.rank);
+                }
             }
         }
     }

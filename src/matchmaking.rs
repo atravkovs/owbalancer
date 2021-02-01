@@ -22,7 +22,7 @@ pub struct Config {
     pub roles_avg: HashMap<String, i32>,
 }
 
-pub struct Mathmaking<'a> {
+pub struct Matchmaking<'a> {
     teams: Teams,
     config: Config,
     pool: PlayerPool,
@@ -40,16 +40,16 @@ pub struct BalancerResult {
     pub anchors: i32,
 }
 
-impl<'a> Mathmaking<'a> {
+impl<'a> Matchmaking<'a> {
     pub fn new(
         players: &'a Players,
         tolerance: u32,
         rank_limiter: bool,
         duplicate_roles: bool,
-    ) -> Mathmaking {
+    ) -> Matchmaking {
         let config = Config::new(tolerance, rank_limiter, duplicate_roles);
 
-        Mathmaking {
+        Matchmaking {
             config,
             players,
             teams: Teams::default(),

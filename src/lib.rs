@@ -4,7 +4,7 @@ pub mod rating_scaler;
 pub mod roles;
 pub mod teams;
 
-use matchmaking::{BalancerResult, Mathmaking};
+use matchmaking::{BalancerResult, Matchmaking};
 use players::Players;
 use serde::{Deserialize, Serialize};
 use teams::Teams;
@@ -29,12 +29,19 @@ pub struct BezierPoint {
     pub control: Point,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SpecializationPoints {
+    pub any: Vec<BezierPoint>,
+    pub primary: Vec<BezierPoint>,
+    pub secondary: Vec<BezierPoint>,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct AdjustSr {
-    pub dps: Vec<BezierPoint>,
-    pub tank: Vec<BezierPoint>,
-    pub support: Vec<BezierPoint>,
+    pub dps: SpecializationPoints,
+    pub tank: SpecializationPoints,
+    pub support: SpecializationPoints,
     pub is_enabled: bool,
 }
 
@@ -64,7 +71,7 @@ pub fn run_matchmaking(
     let adjust: AdjustSr = adjust_sr.into_serde().unwrap();
     players.adjust_sr(adjust);
 
-    let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
+    let mut matchmaking = Matchmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.set_disable_type(disable_type.clone());
 
     if dispersion_minimizer {
@@ -131,7 +138,7 @@ pub fn balance_half(
     let adjust: AdjustSr = adjust_sr.into_serde().unwrap();
     players.adjust_sr(adjust);
 
-    let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
+    let mut matchmaking = Matchmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.balance_half();
 
     let mut results = Vec::default();
@@ -157,7 +164,7 @@ pub fn balance_final(
     let teams: Teams = teams_data.into_serde().unwrap();
     let reserve: ReserveData = reserve_data.into_serde().unwrap();
 
-    let mut matchmaking = Mathmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
+    let mut matchmaking = Matchmaking::new(&players, tolerance, rank_limiter, duplicate_roles);
     matchmaking.add_reserve(reserve.0);
     matchmaking.add_teams(teams);
     matchmaking.balance_remaining();
