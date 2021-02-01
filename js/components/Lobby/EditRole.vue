@@ -22,7 +22,7 @@
         name="options"
         :id="`option_main_${rtype}`"
         autocomplete="off"
-        v-model="mRole.primary"
+        :checked="mRole.primary"
         @change="changeSpecializationPrimary"
       />
       <label class="btn btn-sm btn-outline-dark" :for="`option_main_${rtype}`">{{
@@ -36,7 +36,7 @@
         name="options"
         :id="`option_off_${rtype}`"
         autocomplete="off"
-        v-model="mRole.secondary"
+        :checked="mRole.secondary"
         @input="changeSpecializationSecondary"
       />
       <label class="btn btn-sm btn-outline-dark" :for="`option_off_${rtype}`">{{
@@ -92,7 +92,16 @@ export default defineComponent({
 
     const specializationChange = (e: Event, specialization: 'primary' | 'secondary') => {
       const { checked } = e.target as HTMLInputElement;
-      console.log(specialization, checked);
+
+      if (specialization === 'primary' && checked && mRole.value?.secondary) {
+        emit('update-specialization', props.rtype, 'secondary', false);
+      }
+
+      if (specialization === 'secondary' && checked && mRole.value?.primary) {
+        emit('update-specialization', props.rtype, 'primary', false);
+      }
+
+      emit('update-specialization', props.rtype, specialization, checked);
     };
 
     const changeSpecialization = (specialization: 'primary' | 'secondary') => (e: Event) => specializationChange(e, specialization);
@@ -100,7 +109,7 @@ export default defineComponent({
     const changeSpecializationPrimary = changeSpecialization('primary'); 
     const changeSpecializationSecondary = changeSpecialization('secondary'); 
 
-    return { roles, mRole, inpChange, changeSpecialization, changeSpecializationPrimary, changeSpecializationSecondary };
+    return { roles, mRole, inpChange, changeSpecializationPrimary, changeSpecializationSecondary };
   },
 });
 </script>

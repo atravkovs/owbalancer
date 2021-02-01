@@ -15,6 +15,7 @@
         :stats="player.stats"
         :uuid="player.identity.uuid"
         v-on:update-rank="updateRank"
+        @update-specialization="updateSpecialization"
       />
     </fieldset>
   </modal>
@@ -58,11 +59,21 @@ export default defineComponent({
       store.commit(MutationTypes.EDIT_RANK, {
         role,
         rank,
+
         uuid: store.state.editPlayer,
       });
     };
 
-    return { player, closeModal, saveChanges, updateRank };
+    const updateSpecialization = (role: 'dps' | 'support' | 'tank', specialization: 'primary' | 'secondary', value: boolean) => {
+      store.commit(MutationTypes.EDIT_SPECIALIZATION, {
+        role,
+        value,
+        specialization,
+        uuid: store.state.editPlayer,
+      })
+    };
+
+    return { player, closeModal, saveChanges, updateRank, updateSpecialization };
   },
 });
 </script>

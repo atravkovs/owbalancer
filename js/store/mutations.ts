@@ -52,6 +52,10 @@ export type Mutations<S = State> = {
     state: S,
     data: { uuid: string; rank: number; role: 'dps' | 'support' | 'tank' }
   ): void;
+  [MutationTypes.EDIT_SPECIALIZATION](
+    state: S,
+    data: { uuid: string; value: boolean; specialization: 'primary' | 'secondary'; role: 'dps' | 'support' | 'tank' }
+  ): void;
   [MutationTypes.ADD_TEAMPLAYER](
     state: S,
     data: {
@@ -72,6 +76,9 @@ export const mutations: MutationTree<State> & Mutations = {
   },
   [MutationTypes.EDIT_RANK](state, { uuid, rank, role }) {
     state.players[uuid].stats.classes[role].rank = rank;
+  },
+  [MutationTypes.EDIT_SPECIALIZATION](state, { uuid, value, specialization, role }) {
+    state.players[uuid].stats.classes[role][specialization] = value;
   },
   [MutationTypes.UPDATE_TEAM_NAME](state, { teamUuid, teamName }) {
     const index = state.teams.findIndex(mTeam => mTeam.uuid === teamUuid);

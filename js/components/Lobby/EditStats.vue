@@ -5,7 +5,8 @@
       :key="role.role"
       :rtype="role.role"
       :role="playerStats.classes[role.role]"
-      @update-rank="(a, b) => $emit('update-rank', a, b)"
+      @update-rank="(role, rank) => $emit('update-rank', role, rank)"
+      @update-specialization="(...data) => $emit('update-specialization', ...data)"
     />
   </sortable>
 </template>
