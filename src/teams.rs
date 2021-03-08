@@ -322,8 +322,8 @@ impl Team {
 
                 if mem.role == mem2.role {
                     if config.rank_limiter2 {
-                        if (mem.rank < 2500 && team.low_role_count(&mem.role, 2500) == 1)
-                            || (mem2.rank < 2500 && self.low_role_count(&mem2.role, 2500) == 1)
+                        if (mem.rank < config.limiter_max && team.low_role_count(&mem.role, config.limiter_max) == 1)
+                            || (mem2.rank < config.limiter_max && self.low_role_count(&mem2.role, config.limiter_max) == 1)
                         {
                             continue;
                         }
