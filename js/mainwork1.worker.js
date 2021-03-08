@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink';
 
-const wasm = import('@/../pkg/index.js');
+const wasm = import('../pkg/index.js');
 
 export default class WasmWorker {
   constructor() {

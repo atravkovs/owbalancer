@@ -333,6 +333,11 @@ impl Team {
                         let partner1 = self.get_partner(&mem.role, &mem.uuid);
                         let partner2 = team.get_partner(&mem2.role, &mem2.uuid);
 
+                        if partner1.is_none() || partner2.is_none() { continue; }
+
+                        let partner1 = partner1.unwrap();
+                        let partner2 = partner2.unwrap();
+
                         let partner1_base = &players.0.get(partner1.uuid.as_str()).unwrap();
                         let partner2_base = &players.0.get(partner2.uuid.as_str()).unwrap();
 
@@ -392,11 +397,10 @@ impl Team {
         None
     }
 
-    fn get_partner(&self, role: &SimpleRole, uuid: &String) -> &Member {
+    fn get_partner(&self, role: &SimpleRole, uuid: &String) -> Option<&Member> {
         self.members
             .iter()
             .find(|&member| member.uuid != uuid.clone() && member.role == *role)
-            .unwrap()
     }
 
     fn total_sr(&self) -> i32 {
