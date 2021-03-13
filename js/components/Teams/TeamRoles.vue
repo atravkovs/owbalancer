@@ -61,19 +61,22 @@ export default defineComponent({
         return;
       }
 
-      if (props.members && props.members[i]) {
+      if (props.members) {
         const member = props.members[i];
-        if (member.uuid === playerId) {
+
+        if (member && member.uuid === playerId) {
           return;
         }
 
         if (!teamUuid) {
-          store.commit(MutationTypes.REMOVE_FROM_TEAM, {
-            teamUuid: props.teamUuid,
-            playerId: member.uuid,
-          });
+          if (member) {
+            store.commit(MutationTypes.REMOVE_FROM_TEAM, {
+              teamUuid: props.teamUuid,
+              playerId: member.uuid,
+            });
+            store.commit(MutationTypes.ADD_RESERVE, member.uuid);
+          }
           store.commit(MutationTypes.REMOVE_FROM_RESERVE, playerId);
-          store.commit(MutationTypes.ADD_RESERVE, member.uuid);
           store.commit(MutationTypes.ADD_TEAMPLAYER, {
             teamUuid: props.teamUuid,
             playerId,
