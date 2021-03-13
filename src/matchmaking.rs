@@ -554,7 +554,7 @@ impl Config {
             total_count: 0,
             duplicate_roles,
             sec_roles: false,
-            limiter_max: 2500,
+            limiter_max: 600,
             players_average: 0,
             roles_avg: HashMap::new(),
             rank_limiter2: rank_limiter,

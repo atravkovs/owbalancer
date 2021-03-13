@@ -7,11 +7,11 @@
     @dragstart="drag"
   >
     <div class="d-flex">
-      <div class="text-center font-smaller" :class="{ 'd-flex': !!teamUuid, 'w-40p': !teamUuid }">
+      <div class="text-center lh-80" :class="{ 'd-flex': !!teamUuid, 'w-40p': !teamUuid }">
         <div>
           <rank-icon :rank="sr" />
         </div>
-        <div>{{ sr }}</div>
+        <!-- <div>{{ sr }}</div> -->
       </div>
       <div class="text-ellip" :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, wt: !!teamUuid }">
         <span class="extra-icon">
@@ -124,11 +124,11 @@ export default defineComponent({
 .lh-100 {
   line-height: 50px;
 }
+.lh-80 {
+  line-height: 40px;
+}
 .w-40p {
   width: 40px;
-}
-.font-smaller {
-  font-size: 0.9em;
 }
 .role-icons {
   line-height: 1;

@@ -38,7 +38,7 @@ export default defineComponent({
         const firstRole = getRandomInt(0, 3);
         player.stats.classes[roleSelect[firstRole]].isActive = true;
         player.stats.classes[roleSelect[firstRole]].priority = 0;
-        player.stats.classes[roleSelect[firstRole]].rank = getRandomInt(MIN_SR, MAX_SR);
+        player.stats.classes[roleSelect[firstRole]].rank = getRandomInt(MIN_SR / 100, MAX_SR / 100) * 100;
         roleSelect.splice(firstRole, 1);
 
         // Second role if needed
@@ -46,14 +46,14 @@ export default defineComponent({
           const secondRole = getRandomInt(0, 2);
           player.stats.classes[roleSelect[secondRole]].isActive = true;
           player.stats.classes[roleSelect[secondRole]].priority = 1;
-          player.stats.classes[roleSelect[secondRole]].rank = getRandomInt(MIN_SR, MAX_SR);
+          player.stats.classes[roleSelect[secondRole]].rank = getRandomInt(MIN_SR / 100, MAX_SR / 100) * 100;
 
           j += 1;
           roleSelect.splice(secondRole, 1);
           if (flipCoin()) {
             player.stats.classes[roleSelect[0]].isActive = true;
             player.stats.classes[roleSelect[0]].priority = 2;
-            player.stats.classes[roleSelect[0]].rank = getRandomInt(MIN_SR, MAX_SR);
+            player.stats.classes[roleSelect[0]].rank = getRandomInt(MIN_SR / 100, MAX_SR / 100) * 100;
 
             roleSelect.splice(0, 1);
           }

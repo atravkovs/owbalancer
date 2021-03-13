@@ -4,7 +4,7 @@ use flo_curves::*;
 use crate::{AdjustSr, BezierPoint, SpecializationPoints};
 
 const MAX_ADJUSTMENT: f64 = 50.0;
-const TOP_RATING: f64 = 5000.0;
+const TOP_RATING: f64 = 1500.0;
 
 pub struct SpecializationScaler {
     any: Vec<(i32, bezier::Curve<Coord2>)>,

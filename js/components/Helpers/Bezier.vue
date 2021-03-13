@@ -45,6 +45,8 @@ const drawGrid = (c: HTMLCanvasElement) => {
   const percent = 50;
   const ySteps = 10;
   const xSteps = 50;
+  const maxRank = 1500;
+  const labelSteps = 10;
 
   ctx.clearRect(0, 0, width, height);
   ctx.strokeStyle = '#000';
@@ -87,8 +89,8 @@ const drawGrid = (c: HTMLCanvasElement) => {
   }
 
   ctx.lineWidth = 2;
-  for (let i = offset, j = 0; i <= width; i += (width - offset) / xSteps, j += (5000 / xSteps)) {
-    if (j % 500 === 0) {
+  for (let i = offset, j = 0; i <= width; i += (width - offset) / xSteps, j += (maxRank / xSteps)) {
+    if (j % (maxRank / labelSteps) === 0) {
       ctx.fillText(`${j}`, i - 6, halfHeight + 10);
       
       ctx.beginPath();
