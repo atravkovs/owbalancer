@@ -125,7 +125,7 @@ export default defineComponent({
   line-height: 50px;
 }
 .lh-80 {
-  line-height: 40px;
+  line-height: 41px;
 }
 .w-40p {
   width: 40px;
