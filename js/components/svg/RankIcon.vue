@@ -8,7 +8,7 @@
   <img class="s-2em" v-else-if="rank <= 799" src="@/assets/sdivisions/div9.png" />
   <img class="s-2em" v-else-if="rank <= 899" src="@/assets/sdivisions/div8.png" />
   <img class="s-2em" v-else-if="rank <= 999" src="@/assets/sdivisions/div7.png" />
-  <img class="s-2em" v-else-if="rank <= 1990" src="@/assets/sdivisions/div6.png" />
+  <img class="s-2em" v-else-if="rank <= 1099" src="@/assets/sdivisions/div6.png" />
   <img class="s-2em" v-else-if="rank <= 1199" src="@/assets/sdivisions/div5.png" />
   <img class="s-2em" v-else-if="rank <= 1299" src="@/assets/sdivisions/div4.png" />
   <img class="s-2em" v-else-if="rank <= 1399" src="@/assets/sdivisions/div3.png" />
