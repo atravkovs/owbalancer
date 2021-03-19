@@ -44,9 +44,9 @@ const drawGrid = (c: HTMLCanvasElement) => {
 
   const percent = 50;
   const ySteps = 10;
-  const xSteps = 15;
-  const maxRank = 1500;
-  const labelSteps = 15;
+  const xSteps = 20;
+  const maxRank = 2000;
+  const labelSteps = 10;
 
   ctx.clearRect(0, 0, width, height);
   ctx.strokeStyle = '#000';
