@@ -1,5 +1,5 @@
 <template>
-  <div class="card c-pointer" @click="addBalance">
+  <div class="card c-pointer position-relative" :class="{ selected: isSelected }" @click="addBalance">
     <div class="card-body">
       <div>Dispersion: {{ balance.dispersion }}</div>
       <div>Unbalanced: {{ balance.leftovers.length }}</div>
@@ -7,6 +7,7 @@
       <div>Anchors: {{ balance.anchors }}</div>
       <div>Dupsecs: {{ dupsecCount }}</div>
     </div>
+    <span v-if='isSelected' class='selected-title'>Selected</span>
   </div>
 </template>
 
@@ -21,6 +22,7 @@ export default defineComponent({
   name: 'Result',
   props: {
     balance: Object,
+    isSelected: Boolean,
   },
   setup(props) {
     const store = useStore();
@@ -108,5 +110,17 @@ export default defineComponent({
 <style lang="scss" scoped>
 .c-pointer {
   cursor: pointer;
+}
+.selected {
+  background-color: aliceblue;
+}
+.selected-title {
+  position: absolute;
+  top: -5px;
+  left: 15px;
+  font-size: 12px;
+  background: white;
+  line-height: 10px;
+  color: slategray;
 }
 </style>
