@@ -1,6 +1,6 @@
 <template>
   <h3>Teams</h3>
-  <div class="d-flex justify-content-between">
+  <div class="d-flex justify-content-between align-items-top">
     <actions />
     <mode-toggler />
   </div>
@@ -41,11 +41,10 @@ export default defineComponent({
 .teams {
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: repeat(auto-fit, 275px);
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   column-gap: 1rem;
   row-gap: 1rem;
   margin-top: 2rem;
-  min-width: 700px;
 }
 .wf {
   width: 6rem;

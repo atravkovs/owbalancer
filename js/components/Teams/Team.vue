@@ -104,7 +104,7 @@ export default defineComponent({
   font-size: 0.9rem;
 }
 .mh-300 {
-  max-height: 290px;
+  max-height: 300px;
 }
 .c-pointer {
   cursor: pointer;
