@@ -17,7 +17,11 @@
     </div>
     <stats :players="state.storePlayers" :currentCount="state.players.length" />
     <player-filter :players="state.storePlayers" @filter="filter" />
-    <div class="overflow-auto h40r bg-secondary border p-1" @dragover="allowDrop" @drop="drop">
+    <div
+      class="player-cards overflow-auto  bg-secondary border p-1"
+      @dragover="allowDrop"
+      @drop="drop"
+    >
       <player-card
         class="bg-light mb-1"
         v-for="[uuid, player] in state.players"
@@ -46,7 +50,7 @@ import DeletePlayers from '@/components/Lobby/DeletePlayers.vue';
 import PObj, { Player, PlayerEntries } from '@/objects/player';
 
 export default defineComponent({
-  name: 'App',
+  name: 'PlayerList',
   components: { Assign, Sort, Stats, PlayerFilter, PlayerCard, Export, ImportFile, DeletePlayers },
   setup() {
     const store = useStore();
@@ -130,7 +134,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.h40r {
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+
+.player-cards {
   height: 40rem;
+}
+@include media-breakpoint-down(md) {
+  .player-cards {
+    height: 30rem;
+  }
 }
 </style>
