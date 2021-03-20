@@ -4,6 +4,7 @@
     variant="large"
     :isActive="isActive"
     customAction="Balance"
+    fullscreen='md-down'
     @close-modal="closeModal"
     @save-changes="balance"
   >
