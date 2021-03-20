@@ -10,11 +10,11 @@
         <a target="blank" href="https://github.com/atravkovs">s0ck3t</a>
       </span>
     </div>
-    <div class="row px-2 mx-auto">
-      <div class="w-25r">
+    <div class="row px-2 pb-2 mx-auto">
+      <div class="col-12 col-md-5 col-lg-4">
         <Lobby />
       </div>
-      <div class="col">
+      <div class="col-12 col-md-7 col-lg-8">
         <Teams />
       </div>
     </div>
