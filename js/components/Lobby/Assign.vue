@@ -1,6 +1,5 @@
 <template>
-  <dropdown id="assign" >
-    <template #title>♛ <span class="d-xs-none d-md-none d-lg-none d-xl-inline">Extra</span> </template>
+  <dropdown id="assign" title="♛ Extra">
     <drop-item @drop-click="assignAuto">Distribute Auto</drop-item>
     <drop-item @drop-click="assignCaptains">Assign Captains</drop-item>
     <drop-item @drop-click="assignSquires">Assign Squires</drop-item>
