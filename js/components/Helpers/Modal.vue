@@ -1,6 +1,9 @@
 <template>
   <div class="modal fade" tabindex="-1" aria-hidden="true" ref="modalRef">
-    <div class="modal-dialog modal-dialog-centered" :class="{ 'modal-xl': variant === 'large' }">
+    <div
+      class="modal-dialog modal-dialog-centered"
+      :class="[variant === 'large' ? 'modal-xl' : '', fullscreenClass]"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ title }}</h5>
@@ -23,11 +26,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, onMounted, ref } from 'vue';
+import { defineComponent, watch, onMounted, ref, computed } from 'vue';
 
 import { Modal as ModalType } from 'bootstrap';
 import Modal from 'bootstrap/js/src/modal';
-
 
 export default defineComponent({
   name: 'Modal',
@@ -37,6 +39,7 @@ export default defineComponent({
     isActive: Boolean,
     hideAction: Boolean,
     customAction: String,
+    fullscreen: [String, Boolean],
   },
   setup(props, { emit }) {
     const modalRef = ref(null);
@@ -76,8 +79,20 @@ export default defineComponent({
       (isActive, isActiveP) => setIsActive(modal, !!isActive, !!isActiveP)
     );
 
+    const fullscreenClass = computed(() => {
+      const baseClass = 'modal-fullscreen';
+      if (typeof props.fullscreen === 'string') {
+        return `${baseClass}-${props.fullscreen}`;
+      }
+      if (typeof props.fullscreen === 'boolean') {
+        return props.fullscreen ? baseClass : '';
+      }
+      return '';
+    });
+
     return {
       modalRef,
+      fullscreenClass,
     };
   },
 });

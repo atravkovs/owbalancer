@@ -47,7 +47,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 div {
   height: 5rem;
-  max-width: 25rem;
 }
 
 .delete-player {

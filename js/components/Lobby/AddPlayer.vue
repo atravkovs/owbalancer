@@ -1,6 +1,6 @@
 <template>
   <div class="row g-3">
-    <div class="col-auto">
+    <div class="col">
       <label for="playerTag" class="sr-only">Name</label>
       <input
         v-model.trim="playerTag"

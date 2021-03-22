@@ -4,10 +4,16 @@
     variant="large"
     :isActive="isActive"
     :hideAction="true"
+    fullscreen="md-down"
     @close-modal="closeModal"
   >
     <div v-if="results.length > 0" class="ResultSelection">
-      <result v-for="(balance, i) in results" :key="i" :balance="balance" />
+      <result
+        v-for="(balance, i) in results"
+        :key="i"
+        :balance="balance"
+        :is-selected="isActiveBalance(balance)"
+      />
     </div>
     <div v-else>
       Were unable to balance
@@ -22,6 +28,7 @@ import MutationTypes from '@/store/mutation-types';
 
 import Modal from '@/components/Helpers/Modal.vue';
 import Result from '@/components/Teams/Result.vue';
+import { Balance } from '@/objects/balance';
 
 export default defineComponent({
   name: 'ResultSelection',
@@ -44,7 +51,14 @@ export default defineComponent({
       store.commit(MutationTypes.TOGGLE_SELECTION, undefined);
     };
 
-    return { isActive, closeModal, results };
+    const storeTeams = computed(() => store.state.teams);
+    const isActiveBalance = (balance: Balance) => {
+      return (
+        storeTeams.value.map(t => t.uuid).join('|') === balance.teams.map(t => t.uuid).join('|')
+      );
+    };
+
+    return { isActive, closeModal, results, isActiveBalance };
   },
 });
 </script>
@@ -53,7 +67,7 @@ export default defineComponent({
 .ResultSelection {
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: repeat(auto-fit, 200px);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   column-gap: 1rem;
   row-gap: 1rem;
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="AdjustRole d-flex mx-auto">
-    <div>
+    <div class="d-flex flex-column">
       <button
         @click="() => changeActive('any')"
         class="btn btn-sm btn-outline-primary mr-1 mb-1"
@@ -23,7 +23,7 @@
         <specification-icon specification="secondary" :rtype="role" />
       </button>
     </div>
-    <div>
+    <div class="bezier-wrapper">
       <bezier v-model="adjustSr[role][active]" />
     </div>
   </div>
@@ -60,5 +60,12 @@ export default defineComponent({
 <style lang="scss">
 .AdjustRole {
   width: min-content;
+  max-width: 100%;
+}
+</style>
+<style scoped>
+.bezier-wrapper {
+  width: 100%;
+  overflow-x: auto;
 }
 </style>
