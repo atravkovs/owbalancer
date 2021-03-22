@@ -1,25 +1,35 @@
 <template>
-  <div class="d-flex">
-    <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
-    <button class="btn btn-sm btn-primary ml-2" @click="balance">
-      Balance
-    </button>
-    <button class="btn btn-sm btn-danger mx-2" @click="clear">Clear</button>
-    <button class="btn btn-sm btn-warning ml-2 rounded-right-0" v-if="canChange" @click="select">
-      Choose balance
-    </button>
-    <button
-      class="btn btn-sm btn-outline-warning rounded-left-0"
-      v-if="canChange"
-      @click="clearSelect"
-    >
-      <bin-icon />
-    </button>
-    <button class="btn btn-sm btn-secondary mx-2" @click="empty">
-      Empty
-    </button>
-    <export-teams />
-    <button class="btn btn-sm btn-primary mx-2" @click="archive"><archive-icon /></button>
+  <div class="row g-1 flex-auto">
+    <div class="col-auto">
+      <button class="btn btn-sm btn-secondary" @click="addNew">New</button>
+      <button class="btn btn-sm btn-primary mx-1" @click="balance">
+        Balance
+      </button>
+      <button class="btn btn-sm btn-danger mr-1" @click="clear">Clear</button>
+    </div>
+    <div class="col-auto">
+      <button
+        class="btn btn-sm btn-warning rounded-right-0 text-nowrap"
+        v-if="canChange"
+        @click="select"
+      >
+        Choose balance
+      </button>
+      <button
+        class="btn btn-sm btn-outline-warning rounded-left-0 mr-1"
+        v-if="canChange"
+        @click="clearSelect"
+      >
+        <bin-icon />
+      </button>
+      <button class="btn btn-sm btn-secondary mr-1" @click="empty">
+        Empty
+      </button>
+    </div>
+    <div class="col-auto d-flex">
+      <export-teams />
+      <button class="btn btn-sm btn-primary mx-1" @click="archive"><archive-icon /></button>
+    </div>
   </div>
 </template>
 
@@ -102,5 +112,8 @@ export default defineComponent({
 .rounded-right-0 {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+.flex-auto {
+  flex: auto;
 }
 </style>

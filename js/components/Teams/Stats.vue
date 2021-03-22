@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-2">
     <span>Min SR: {{ minSr }}</span>
     <span class="ml-2">Max SR: {{ maxSr }}</span>
     <span class="ml-2">Difference: {{ maxSr - minSr }}</span>

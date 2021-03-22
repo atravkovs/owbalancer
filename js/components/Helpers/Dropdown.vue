@@ -7,7 +7,7 @@
       aria-expanded="false"
       ref="dropdownRef"
     >
-      {{ title }}
+      <slot name='title'>{{ title }}</slot>
     </button>
     <ul class="dropdown-menu" :aria-labelledby="`dropdown_${id}`">
       <slot />

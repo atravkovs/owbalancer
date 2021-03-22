@@ -10,8 +10,8 @@
         <a target="blank" href="https://github.com/atravkovs">s0ck3t</a>
       </span>
     </div>
-    <div class="row px-2 mx-auto">
-      <div class="w-25r">
+    <div class="row px-2 pb-2 mx-auto">
+      <div class="lobby-wrapper col">
         <Lobby />
       </div>
       <div class="col">
@@ -36,9 +36,21 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+
 .w-25r {
   width: 25rem !important;
 }
+
+@include media-breakpoint-up(md) {
+  .lobby-wrapper {
+    flex: none;
+    width: 25rem !important;
+  }
+}
+
 img {
   width: 24rem;
 }
