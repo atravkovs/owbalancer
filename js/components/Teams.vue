@@ -5,7 +5,7 @@
     <mode-toggler />
   </div>
   <stats v-if="teams.length > 0" />
-  <div class="teams overflow-auto h-80vh">
+  <div class="teams overflow-auto mh-80vh">
     <team v-for="team in teams" :key="team.uuid" :team="team" />
   </div>
   <balance />
@@ -49,7 +49,7 @@ export default defineComponent({
 .wf {
   width: 6rem;
 }
-.h-80vh {
-  height: 80vh;
+.mh-80vh {
+  max-height: 80vh;
 }
 </style>
