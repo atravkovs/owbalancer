@@ -11,10 +11,10 @@
       </span>
     </div>
     <div class="row px-2 pb-2 mx-auto">
-      <div class="col-12 col-md-5 col-lg-4">
+      <div class="lobby-wrapper col">
         <Lobby />
       </div>
-      <div class="col-12 col-md-7 col-lg-8">
+      <div class="col">
         <Teams />
       </div>
     </div>
@@ -36,9 +36,21 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+
 .w-25r {
   width: 25rem !important;
 }
+
+@include media-breakpoint-up(md) {
+  .lobby-wrapper {
+    flex: none;
+    width: 25rem !important;
+  }
+}
+
 img {
   width: 24rem;
 }

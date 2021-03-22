@@ -141,7 +141,7 @@ export default defineComponent({
 .player-cards {
   height: 40rem;
 }
-@include media-breakpoint-down(md) {
+@include media-breakpoint-down(sm) {
   .player-cards {
     height: 30rem;
   }
