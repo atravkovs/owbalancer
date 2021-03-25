@@ -16,7 +16,7 @@
     "@types/lodash": "^4.14.161",
     "@types/sortablejs": "^1.10.6",
     "@types/uuid": "^8.3.0",
-    "bootstrap": "^5.0.0-alpha1",
+    "bootstrap": "^5.0.0-beta3",
     "comlink": "^4.3.0",
     "easy-table": "^1.1.1",
     "lodash": "^4.17.20",
