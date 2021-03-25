@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between w-100 py-2 mb-1 px-2 mx-auto">
       <div class="d-flex">
         <OWIcon />
-        <h3 class="ml-2">Tournament Balancer</h3>
+        <h3 class="ms-2">Tournament Balancer</h3>
       </div>
       <span>
         Created by

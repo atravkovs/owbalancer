@@ -5,24 +5,24 @@
       <button class="btn btn-sm btn-primary mx-1" @click="balance">
         Balance
       </button>
-      <button class="btn btn-sm btn-danger mr-1" @click="clear">Clear</button>
+      <button class="btn btn-sm btn-danger me-1" @click="clear">Clear</button>
     </div>
     <div class="col-auto">
       <button
-        class="btn btn-sm btn-warning rounded-right-0 text-nowrap"
+        class="btn btn-sm btn-warning rounded-end-0 text-nowrap"
         v-if="canChange"
         @click="select"
       >
         Choose balance
       </button>
       <button
-        class="btn btn-sm btn-outline-warning rounded-left-0 mr-1"
+        class="btn btn-sm btn-outline-warning rounded-start-0 me-1"
         v-if="canChange"
         @click="clearSelect"
       >
         <bin-icon />
       </button>
-      <button class="btn btn-sm btn-secondary mr-1" @click="empty">
+      <button class="btn btn-sm btn-secondary me-1" @click="empty">
         Empty
       </button>
     </div>
@@ -104,12 +104,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.rounded-left-0 {
+.rounded-start-0 {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.rounded-right-0 {
+.rounded-end-0 {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }

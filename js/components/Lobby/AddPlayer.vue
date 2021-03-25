@@ -1,7 +1,7 @@
 <template>
   <div class="row g-3">
     <div class="col">
-      <label for="playerTag" class="sr-only">Name</label>
+      <label for="playerTag" class="visually-hidden">Name</label>
       <input
         v-model.trim="playerTag"
         @keyup.enter="addPlayer"
