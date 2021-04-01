@@ -3,21 +3,21 @@
     <div class="d-flex flex-column">
       <button
         @click="() => changeActive('any')"
-        class="btn btn-sm btn-outline-primary mr-1 mb-1"
+        class="btn btn-sm btn-outline-primary me-1 mb-1"
         :class="{ active: 'any' === active }"
       >
         <specification-icon specification="any" :rtype="role" />
       </button>
       <button
         @click="() => changeActive('primary')"
-        class="btn btn-sm btn-outline-primary mr-1 mb-1"
+        class="btn btn-sm btn-outline-primary me-1 mb-1"
         :class="{ active: 'primary' === active }"
       >
         <specification-icon specification="primary" :rtype="role" />
       </button>
       <button
         @click="() => changeActive('secondary')"
-        class="btn btn-sm btn-outline-primary mr-1"
+        class="btn btn-sm btn-outline-primary me-1"
         :class="{ active: 'secondary' === active }"
       >
         <specification-icon specification="secondary" :rtype="role" />

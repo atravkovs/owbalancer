@@ -7,7 +7,7 @@
     @close-modal="closeModal"
   >
     <div class="d-flex">
-      <button class="btn btn-primary btn-sm mr-1" @click="saveCurrent">Save current</button>
+      <button class="btn btn-primary btn-sm me-1" @click="saveCurrent">Save current</button>
       <import-archive />
     </div>
     <table class="table">
@@ -25,7 +25,7 @@
           <td>
             <input
               type="text"
-              class="form-control-plaintext p-0 pl-1"
+              class="form-control-plaintext p-0 ps-1"
               :value="entry.name"
               @input="e => updateName(e, i)"
             />
@@ -35,10 +35,10 @@
             <button class="btn btn-primary btn-sm" @click="() => select(i)">
               <cloud-up-icon />
             </button>
-            <button class="btn btn-primary btn-sm ml-1" @click="() => download(i)">
+            <button class="btn btn-primary btn-sm ms-1" @click="() => download(i)">
               <download-icon />
             </button>
-            <button class="btn btn-danger btn-sm ml-1" @click="() => removeFromArchive(i)">
+            <button class="btn btn-danger btn-sm ms-1" @click="() => removeFromArchive(i)">
               <bin-icon />
             </button>
           </td>

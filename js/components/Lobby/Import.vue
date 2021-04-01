@@ -1,5 +1,5 @@
 <template>
-  <div class="form-file form-file-sm wf">
+  <div class="form-control form-control-sm rounded-0 rounded-end wf">
     <input
       type="file"
       accept=".json"
@@ -8,8 +8,8 @@
       ref="inp"
       @change="onChange"
     />
-    <label for="importFile" class="form-file-label w-100">
-      <span class="form-file-button">Import</span>
+    <label for="importFile" class="w-100">
+      <span>Import</span>
     </label>
   </div>
 </template>
@@ -70,7 +70,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+
 .wf {
   width: 4rem;
+}
+.form-control {
+  background-color: $gray-200;
 }
 </style>

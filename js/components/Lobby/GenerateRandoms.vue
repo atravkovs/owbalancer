@@ -1,5 +1,5 @@
 <template>
-  <button @click="generateRandom" class="btn btn-sm btn-secondary ml-1">+ Randoms</button>
+  <button @click="generateRandom" class="btn btn-sm btn-secondary ms-1">+ Randoms</button>
 </template>
 
 <script lang="ts">
