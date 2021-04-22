@@ -3,7 +3,7 @@
     <button
       class="btn btn-sm btn-secondary dropdown-toggle"
       :id="`dropdown_${id}`"
-      data-toggle="dropdown"
+      data-bs-toggle="dropdown"
       aria-expanded="false"
       ref="dropdownRef"
     >

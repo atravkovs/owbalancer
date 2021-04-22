@@ -1,5 +1,5 @@
 <template>
-  <div class="form-file form-file-sm wf">
+  <div class="form-control form-control-sm border-0 wf">
     <input
       type="file"
       accept=".json"
@@ -8,8 +8,8 @@
       ref="inp"
       @change="onChange"
     />
-    <label for="importBalancerOptions" class="form-file-label w-100">
-      <span class="form-file-button">
+    <label for="importBalancerOptions" class="w-100">
+      <span>
         <upload-icon />
       </span>
     </label>

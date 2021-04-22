@@ -1,10 +1,10 @@
 <template>
   <div class="mt-2">
     <span>Min SR: {{ minSr }}</span>
-    <span class="ml-2">Max SR: {{ maxSr }}</span>
-    <span class="ml-2">Difference: {{ maxSr - minSr }}</span>
-    <span class="ml-2">Average: {{ avgSr }}</span>
-    <span class="ml-2">Off roles: {{ offRolesPercentage }}%</span>
+    <span class="ms-2">Max SR: {{ maxSr }}</span>
+    <span class="ms-2">Difference: {{ maxSr - minSr }}</span>
+    <span class="ms-2">Average: {{ avgSr }}</span>
+    <span class="ms-2">Off roles: {{ offRolesPercentage }}%</span>
   </div>
 </template>
 

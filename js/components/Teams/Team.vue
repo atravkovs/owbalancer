@@ -2,11 +2,11 @@
   <div class="card mw-nb mh-300">
     <div class="card-header d-flex justify-content-between p-0">
       <div class="py-1 d-flex">
-        <u class="ml-2 c-pointer" @click="removeTeam">x</u>
-        <span class="ml-2">Team</span>
+        <u class="ms-2 c-pointer" @click="removeTeam">x</u>
+        <span class="ms-2">Team</span>
         <input
           type="text"
-          class="form-control-plaintext p-0 pl-1"
+          class="form-control-plaintext p-0 ps-1"
           :value="mTeam.name"
           @input="updateTeam"
         />

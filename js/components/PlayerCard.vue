@@ -13,7 +13,7 @@
         </div>
         <!-- <div>{{ sr }}</div> -->
       </div>
-      <div class="text-ellip" :class="{ 'lh-100': !teamUuid, 'pl-1': !!teamUuid, wt: !!teamUuid }">
+      <div class="text-ellip" :class="{ 'lh-100': !teamUuid, 'ps-1': !!teamUuid, wt: !!teamUuid }">
         <span class="extra-icon">
           <crown-icon v-if="player.identity.isCaptain" />
           <sword-icon v-if="player.identity.isSquire" />
