@@ -1,9 +1,9 @@
 <template>
-  <img class="s-2em" v-if="rank <= 199" src="@/assets/divisions/div5.png" />
-  <img class="s-2em" v-else-if="rank <= 299" src="@/assets/divisions/div4.png" />
-  <img class="s-2em" v-else-if="rank <= 399" src="@/assets/divisions/div3.png" />
-  <img class="s-2em" v-else-if="rank <= 499" src="@/assets/divisions/div2.png" />
-  <img class="s-2em" v-else-if="rank <= 599" src="@/assets/divisions/div1.png" />
+  <img class="s-2em" v-if="rank <= 199" src="@/assets/divisions/div20.png" />
+  <img class="s-2em" v-else-if="rank <= 299" src="@/assets/divisions/div19.png" />
+  <img class="s-2em" v-else-if="rank <= 399" src="@/assets/divisions/div18.png" />
+  <img class="s-2em" v-else-if="rank <= 499" src="@/assets/divisions/div17.png" />
+  <img class="s-2em" v-else-if="rank <= 599" src="@/assets/divisions/div16.png" />
   <img class="s-2em" v-else-if="rank <= 699" src="@/assets/sdivisions/div15.png" />
   <img class="s-2em" v-else-if="rank <= 799" src="@/assets/sdivisions/div14.png" />
   <img class="s-2em" v-else-if="rank <= 899" src="@/assets/sdivisions/div13.png" />
