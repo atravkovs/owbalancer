@@ -34,6 +34,19 @@
         />
       </div>
     </div>
+    <div class="row">
+      <div class="col-sm-3">
+        <label for="fullFlex" class="col-form-label">Full flex</label>
+      </div>
+      <div class="col-auto">
+        <input
+          type="checkbox"
+          id="fullFlex"
+          class="form-check-input mt-2"
+          v-model="mIdentity.isFullFlex"
+        />
+      </div>
+    </div>
   </div>
 </template>
 

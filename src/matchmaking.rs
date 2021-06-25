@@ -418,8 +418,8 @@ impl<'a> Matchmaking<'a> {
     fn distribute_remaining(&mut self) {
         self.update();
         self.pool.shuffle();
+        self.pool.sort_full_flex();
         self.teams.sort(Direction::ASC);
-
         self.sort_remaining(1);
     }
 
@@ -458,6 +458,7 @@ impl<'a> Matchmaking<'a> {
         self.calculate_players_average();
 
         self.pool.sort_by_rank(Direction::DESC);
+        self.pool.sort_full_flex();
         self.teams.distribute_fillers(&mut self.pool, &self.config);
     }
 

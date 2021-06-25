@@ -6,6 +6,7 @@ export type Identity = {
   name: string;
   isSquire: boolean;
   isCaptain: boolean;
+  isFullFlex: boolean;
 };
 
 export type ClassType = {
@@ -49,6 +50,7 @@ const createDefaultPlayer: (name: string) => Player = name => {
       uuid: uuidv4(),
       isCaptain: false,
       isSquire: false,
+      isFullFlex: false,
     },
     stats: {
       classes: {
