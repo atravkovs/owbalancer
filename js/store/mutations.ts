@@ -3,7 +3,7 @@ import { MutationTree } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { PLAYERS_IN_TEAM } from '@/constants';
-import PObj, { Player, Stats, Players, ClassType } from '@/objects/player';
+import PObj, { Player, Stats, Players, ClassType, LobbyType } from '@/objects/player';
 import TObj, { Teams, Team } from '@/objects/team';
 import { BalancerOptions, Results } from '@/objects/balance';
 import { ArchiveEntry } from '@/objects/archive';
@@ -15,6 +15,7 @@ export type Mutations<S = State> = {
   [MutationTypes.CLEAR_TEAMS](state: S, _: undefined): void;
   [MutationTypes.EMPTY_TEAMS](state: S, _: undefined): void;
   [MutationTypes.EMPTY_NO_RANK](state: S, _: undefined): void;
+  [MutationTypes.TOGGLE_BACKUP](state: S, _: undefined): void;
   [MutationTypes.TOGGLE_ARCHIVE](state: S, _: undefined): void;
   [MutationTypes.TOGGLE_BALANCE](state: S, _: undefined): void;
   [MutationTypes.SAVE_TO_ARCHIVE](state: S, _: undefined): void;
@@ -22,30 +23,31 @@ export type Mutations<S = State> = {
   [MutationTypes.TOGGLE_BALANCER_SR](state: S, _: undefined): void;
   [MutationTypes.CLEAR_SQUIRES](state: S, _: undefined): void;
   [MutationTypes.CLEAR_CAPTAINS](state: S, _: undefined): void;
-  [MutationTypes.DELETE_PLAYERS](state: S, _: undefined): void;
+  [MutationTypes.DELETE_PLAYERS](state: S, lobby?: LobbyType): void;
   [MutationTypes.CLEAR_ALL_EXTRA](state: S, _: undefined): void;
   [MutationTypes.CLEAR_EDIT_PLAYER](state: S, _: undefined): void;
   [MutationTypes.ADD_TEAM](state: S, team: Team): void;
   [MutationTypes.ADD_TEAMS](state: S, teams: Teams): void;
   [MutationTypes.ADD_RESERVE](state: S, uuid: string): void;
-  [MutationTypes.ADD_PLAYER](state: S, player: Player): void;
+  [MutationTypes.ADD_PLAYER](state: S, data: { player: Player; lobby?: LobbyType }): void;
+  [MutationTypes.SELECT_PLAYERS](state: S, data: { playerIds: string[]; lobby: LobbyType }): void;
   [MutationTypes.SELECT_ARCHIVE](state: S, id: number): void;
   [MutationTypes.REMOVE_TEAM](state: S, teamUuid: string): void;
-  [MutationTypes.EDIT_PLAYER](state: S, playerId: string): void;
+  [MutationTypes.EDIT_PLAYER](state: S, data: { playerId: string; lobby?: LobbyType }): void;
   [MutationTypes.ASSIGN_SQUIRES](state: S, maxSR: number): void;
-  [MutationTypes.ADD_PLAYERS](state: S, players: Players): void;
+  [MutationTypes.ADD_PLAYERS](state: S, data: { players: Players; lobby?: LobbyType }): void;
   [MutationTypes.ASSIGN_CAPTAINS](state: S, minSR: number): void;
   [MutationTypes.REMOVE_FROM_ARCHIVE](state: S, id: number): void;
-  [MutationTypes.DELETE_PLAYER](state: S, playerId: string): void;
+  [MutationTypes.DELETE_PLAYER](state: S, data: { playerId: string; lobby?: LobbyType }): void;
   [MutationTypes.SET_RESULTS](state: S, results: Results): void;
-  [MutationTypes.IMPORT_PLAYERS](state: S, players: Players): void;
+  [MutationTypes.IMPORT_PLAYERS](state: S, data: { players: Players; lobby?: LobbyType }): void;
   [MutationTypes.IMPORT_ARCHIVE](state: S, data: ArchiveEntry): void;
   [MutationTypes.IMPORT_PLAYERS_OLD](state: S, data: string): void;
   [MutationTypes.RESERVE_PLAYERS](state: S, players: string[]): void;
   [MutationTypes.REMOVE_FROM_RESERVE](state: S, playerId: string): void;
   [MutationTypes.SET_BALANCER_OPTIONS](state: S, options: BalancerOptions): void;
-  [MutationTypes.UPDATE_STATS](state: S, udpate: { uuid: string; stats: Stats }): void;
-  [MutationTypes.UPDATE_ARCHIVE_NAME](state: S, udpate: { id: number; name: string }): void;
+  [MutationTypes.UPDATE_STATS](state: S, update: { uuid: string; stats: Stats; lobby?: LobbyType }): void;
+  [MutationTypes.UPDATE_ARCHIVE_NAME](state: S, update: { id: number; name: string }): void;
   [MutationTypes.REMOVE_FROM_TEAM](state: S, data: { teamUuid: string; playerId: string }): void;
   [MutationTypes.UPDATE_TEAM_NAME](state: S, data: { teamUuid: string; teamName: string }): void;
   [MutationTypes.EDIT_RANK](
@@ -75,10 +77,12 @@ export const mutations: MutationTree<State> & Mutations = {
     state.balancerResults = results;
   },
   [MutationTypes.EDIT_RANK](state, { uuid, rank, role }) {
-    state.players[uuid].stats.classes[role].rank = rank;
+    if (state.players[uuid]) state.players[uuid].stats.classes[role].rank = rank;
+    if (state.backup[uuid]) state.backup[uuid].stats.classes[role].rank = rank;
   },
   [MutationTypes.EDIT_SPECIALIZATION](state, { uuid, value, specialization, role }) {
-    state.players[uuid].stats.classes[role][specialization] = value;
+    if (state.players[uuid]) state.players[uuid].stats.classes[role][specialization] = value;
+    if (state.backup[uuid]) state.backup[uuid].stats.classes[role][specialization] = value;
   },
   [MutationTypes.UPDATE_TEAM_NAME](state, { teamUuid, teamName }) {
     const index = state.teams.findIndex(mTeam => mTeam.uuid === teamUuid);
@@ -91,23 +95,38 @@ export const mutations: MutationTree<State> & Mutations = {
     state.archive[id].name = name;
   },
   [MutationTypes.EMPTY_NO_RANK](state) {
-    if (state.editPlayer === '') return;
+    if (state.editPlayer.playerId === '') return;
 
-    if (state.players[state.editPlayer].stats.classes.dps.rank === 0) {
-      state.players[state.editPlayer].stats.classes.dps.isActive = false;
+    if (state[state.editPlayer.lobby][state.editPlayer.playerId].stats.classes.dps.rank === 0) {
+      state[state.editPlayer.lobby][state.editPlayer.playerId].stats.classes.dps.isActive = false;
     }
-    if (state.players[state.editPlayer].stats.classes.tank.rank === 0) {
-      state.players[state.editPlayer].stats.classes.tank.isActive = false;
+    if (state[state.editPlayer.lobby][state.editPlayer.playerId].stats.classes.tank.rank === 0) {
+      state[state.editPlayer.lobby][state.editPlayer.playerId].stats.classes.tank.isActive = false;
     }
-    if (state.players[state.editPlayer].stats.classes.support.rank === 0) {
-      state.players[state.editPlayer].stats.classes.support.isActive = false;
+    if (state[state.editPlayer.lobby][state.editPlayer.playerId].stats.classes.support.rank === 0) {
+      state[state.editPlayer.lobby][state.editPlayer.playerId].stats.classes.support.isActive = false;
     }
   },
   [MutationTypes.CLEAR_EDIT_PLAYER](state) {
-    state.editPlayer = '';
+    /* Sync Backup Identity with Players */
+    const { playerId, lobby } = state.editPlayer;
+    const to = lobby === 'players' ? 'backup' : 'players';
+
+    if (state[to][playerId]) {
+      state[to][playerId].identity = { ...state[lobby][playerId].identity }; 
+    }
+    /* ------------------------------ */
+
+    state.editPlayer = {
+      playerId: '',
+      lobby: 'players'
+    };
   },
   [MutationTypes.TOGGLE_ARCHIVE](state) {
     state.isArchive = !state.isArchive;
+  },
+  [MutationTypes.TOGGLE_BACKUP](state) {
+    state.showBackup = !state.showBackup;
   },
   [MutationTypes.TOGGLE_BALANCE](state) {
     state.isBalance = !state.isBalance;
@@ -133,6 +152,9 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.TOGGLE_BALANCER_SR](state) {
     state.showBalancerSR = !state.showBalancerSR;
   },
+  [MutationTypes.SELECT_PLAYERS](state, { playerIds, lobby }) {
+    playerIds.forEach((player) => { state.selectPlayers[lobby][player] = !state.selectPlayers[lobby][player]; });
+  },
   [MutationTypes.SELECT_ARCHIVE](state, id) {
     const players = cloneDeep(state.archive[id].players);
     const teams = cloneDeep(state.archive[id].teams);
@@ -142,14 +164,16 @@ export const mutations: MutationTree<State> & Mutations = {
     state.players = players;
     state.reservedPlayers = reservedPlayers;
   },
-  [MutationTypes.ADD_PLAYER](state, player) {
-    state.players[player.identity.uuid] = player;
+  [MutationTypes.ADD_PLAYER](state, { player, lobby = 'players' }) {
+    state[lobby][player.identity.uuid] = player;
   },
   [MutationTypes.ADD_RESERVE](state, uuid) {
     state.reservedPlayers.push(uuid);
   },
-  [MutationTypes.ADD_PLAYERS](state, players) {
-    state.players = { ...state.players, ...players };
+  [MutationTypes.ADD_PLAYERS](state, { players, lobby = 'players' }) {
+    
+    state[lobby] = { ...state[lobby], ...players };
+    console.log('asdfg', JSON.stringify(state[lobby]));
   },
   [MutationTypes.ADD_TEAM](state, team) {
     state.teams.push(team);
@@ -180,8 +204,8 @@ export const mutations: MutationTree<State> & Mutations = {
       state.teams[i].members = [];
     }
   },
-  [MutationTypes.IMPORT_PLAYERS](state, players) {
-    state.players = { ...players, ...state.players };
+  [MutationTypes.IMPORT_PLAYERS](state, { players, lobby = 'players' }) {
+    state[lobby] = { ...players, ...state[lobby] };
   },
   [MutationTypes.SET_BALANCER_OPTIONS](state, options) {
     state.balancerOptions = options;
@@ -189,17 +213,20 @@ export const mutations: MutationTree<State> & Mutations = {
   [MutationTypes.IMPORT_ARCHIVE](state, data) {
     state.archive.push(data);
   },
-  [MutationTypes.UPDATE_STATS](state, { uuid, stats }) {
-    state.players[uuid].stats = stats;
+  [MutationTypes.UPDATE_STATS](state, { uuid, stats, lobby = 'players' }) {
+    state[lobby][uuid].stats = stats;
   },
-  [MutationTypes.EDIT_PLAYER](state, playerId) {
-    state.editPlayer = playerId;
+  [MutationTypes.EDIT_PLAYER](state, { playerId, lobby = 'players' }) {
+    state.editPlayer = {
+      playerId,
+      lobby
+    };
   },
-  [MutationTypes.DELETE_PLAYER](state, playerId) {
-    delete state.players[playerId];
+  [MutationTypes.DELETE_PLAYER](state, { playerId, lobby = 'players' }) {
+    delete state[lobby][playerId];
   },
-  [MutationTypes.DELETE_PLAYERS](state) {
-    state.players = {};
+  [MutationTypes.DELETE_PLAYERS](state, lobby = 'players') {
+    state[lobby] = {};
   },
   [MutationTypes.REMOVE_FROM_RESERVE](state, playerId) {
     const index = state.reservedPlayers.indexOf(playerId);

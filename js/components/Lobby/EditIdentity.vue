@@ -47,6 +47,19 @@
         />
       </div>
     </div>
+    <div class="row">
+      <div class="col-sm-3">
+        <label for="fullFlex" class="col-form-label">Is Locked</label>
+      </div>
+      <div class="col-auto">
+        <input
+          type="checkbox"
+          id="fullFlex"
+          class="form-check-input mt-2"
+          v-model="mIdentity.isLocked"
+        />
+      </div>
+    </div>
   </div>
 </template>
 

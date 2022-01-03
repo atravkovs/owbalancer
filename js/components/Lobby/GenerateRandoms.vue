@@ -67,7 +67,7 @@ export default defineComponent({
         players[player.identity.uuid] = player;
       }
 
-      store.commit(MutationTypes.ADD_PLAYERS, players);
+      store.commit(MutationTypes.ADD_PLAYERS, { players });
     };
 
     return { generateRandom };

@@ -11,7 +11,6 @@
         <div>
           <rank-icon :rank="sr" />
         </div>
-        <!-- <div>{{ sr }}</div> -->
       </div>
       <div class="text-ellip" :class="{ 'lh-100': !teamUuid, 'ps-1': !!teamUuid, wt: !!teamUuid }">
         <span class="extra-icon">
@@ -22,6 +21,7 @@
       </div>
     </div>
     <div class="role-icons">
+      <lock-icon v-if="player.identity.isLocked" />
       <role-icon v-for="role in state.icons" :rtype="role" :key="role" />
     </div>
   </div>
@@ -31,9 +31,10 @@
 import { defineComponent, PropType, reactive, computed } from 'vue';
 
 import { useStore } from '@/store';
-import PObj, { Player } from '@/objects/player';
+import PObj, { LobbyType, Player } from '@/objects/player';
 import MutationTypes from '@/store/mutation-types';
 
+import LockIcon from '@/components/svg/LockIcon.vue';
 import RoleIcon from '@/components/svg/RoleIcon.vue';
 import RankIcon from '@/components/svg/RankIcon.vue';
 import CrownIcon from '@/components/svg/CrownIcon.vue';
@@ -47,8 +48,12 @@ export default defineComponent({
     prefferedRole: String,
     prefferedRank: Number,
     rankRole: String,
+    lobby: {
+      type: String as PropType<LobbyType>,
+      default: 'players'
+    }
   },
-  components: { RoleIcon, RankIcon, CrownIcon, SwordIcon },
+  components: { RoleIcon, RankIcon, CrownIcon, SwordIcon, LockIcon },
   setup(props) {
     const store = useStore();
 
@@ -56,7 +61,8 @@ export default defineComponent({
       let a = null;
       if (ev?.dataTransfer) {
         a = ev.dataTransfer.setData('playerTag', props.player?.identity.uuid || '');
-        a = ev.dataTransfer?.setData('team', props.teamUuid || '');
+        a = ev.dataTransfer.setData('team', props.teamUuid || '');
+        a = ev.dataTransfer.setData('from', props.lobby || '');
       }
 
       return a;
@@ -69,7 +75,7 @@ export default defineComponent({
         return;
       }
 
-      store.commit(MutationTypes.EDIT_PLAYER, props.player.identity.uuid);
+      store.commit(MutationTypes.EDIT_PLAYER, { playerId: props.player.identity.uuid, lobby: props.lobby });
     };
 
     const icons = computed(() => {

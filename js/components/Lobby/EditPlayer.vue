@@ -9,7 +9,7 @@
       <h3>Identity</h3>
       <edit-identity :identity="player.identity" />
     </fieldset>
-    <fieldset class="EditPlayer-Block">
+    <fieldset class="EditPlayer-Block" :disabled="player.identity.isLocked">
       <h3>Stats</h3>
       <edit-stats
         :stats="player.stats"
@@ -39,7 +39,7 @@ export default defineComponent({
     const store = useStore();
     const emptyPlayer = PlayerEditor.createDefaultPlayer('');
 
-    const playerData = computed(() => store.state.players[store.state.editPlayer] || emptyPlayer);
+    const playerData = computed(() => store.state[store.state.editPlayer.lobby][store.state.editPlayer.playerId] || emptyPlayer);
 
     const player = ref(playerData);
 
@@ -51,7 +51,7 @@ export default defineComponent({
     const saveChanges = () => {
       store.commit(MutationTypes.EMPTY_NO_RANK, undefined);
       // By executing mutation changes are being synchronized from object to local storage
-      store.commit(MutationTypes.EDIT_PLAYER, player.value.identity.uuid);
+      store.commit(MutationTypes.EDIT_PLAYER, { playerId: player.value.identity.uuid, lobby: store.state.editPlayer.lobby });
     };
 
     // eslint-ignore-next-line
@@ -60,7 +60,7 @@ export default defineComponent({
         role,
         rank,
 
-        uuid: store.state.editPlayer,
+        uuid: store.state.editPlayer.playerId,
       });
     };
 
@@ -69,7 +69,7 @@ export default defineComponent({
         role,
         value,
         specialization,
-        uuid: store.state.editPlayer,
+        uuid: store.state.editPlayer.playerId,
       })
     };
 

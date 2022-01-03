@@ -51,8 +51,9 @@ export default defineComponent({
       const i = index - 1;
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
+      const source = ev?.dataTransfer?.getData('from');
 
-      if (!playerId || !props.rtype || !props.teamUuid) return;
+      if (!playerId || !props.rtype || !props.teamUuid || source === 'backup') return;
 
       const player = players.value[playerId];
       const role = PObj.getRole(player.stats.classes, props.rtype);

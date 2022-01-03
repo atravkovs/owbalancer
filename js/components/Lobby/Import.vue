@@ -15,13 +15,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
+import { LobbyType } from '@/objects/player';
 
 export default defineComponent({
   name: 'Import',
-  setup() {
+  props: {
+    lobby: {
+      type: String as PropType<LobbyType>,
+      default: 'players',
+    }
+  },
+  setup(props) {
     const store = useStore();
     const inp = ref<HTMLInputElement | null>(null);
 
@@ -38,7 +45,7 @@ export default defineComponent({
         }
 
         if (data.format === 'xv-1') {
-          store.commit(MutationTypes.IMPORT_PLAYERS, data.players);
+          store.commit(MutationTypes.IMPORT_PLAYERS, { players: data.players, lobby: props.lobby });
           return;
         }
 
