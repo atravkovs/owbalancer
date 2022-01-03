@@ -73,9 +73,6 @@ export default defineComponent({
         .filter(([uuid]) => selectedPlayers.includes(uuid))
         .reduce((acc, [uuid, player]) => ({ ...acc, [uuid]: player }), {});
 
-      console.log('Add Players', JSON.stringify(addPlayers));
-      
-
       store.commit(MutationTypes.ADD_PLAYERS, {
         players: addPlayers,
         lobby: 'players',
