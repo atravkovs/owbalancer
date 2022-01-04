@@ -94,7 +94,7 @@ export const state = {
   isBalance: false,
   isSelection: false,
   showBalancerSR: false,
-  showBackup: false,
+  showBackup: storage.showBackup ?? false,
 };
 
 export type State = typeof state;

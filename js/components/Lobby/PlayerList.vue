@@ -8,12 +8,8 @@
         <assign />
       </div>
       <div class="d-flex">
-        <export
-          :lobby="lobby"
-        />
-        <import-file
-          :lobby="lobby"
-        />
+        <export :lobby="lobby" />
+        <import-file :lobby="lobby" />
       </div>
       <div>
         <delete-players :lobby="lobby" />
@@ -28,7 +24,10 @@
     >
       <player-card
         class="bg-light mb-1"
-        :class="{ selected: !!marked[uuid] }"
+        :class="{
+          selected: !!marked[uuid],
+          duplicate: duplicates.includes(player.identity.name),
+        }"
         v-for="[uuid, player] in state.players"
         :player="player"
         :key="uuid"
@@ -161,7 +160,9 @@ export default defineComponent({
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
-      const from: LobbyType | undefined = ev?.dataTransfer?.getData('from') as LobbyType;
+      const from: LobbyType | undefined = ev?.dataTransfer?.getData(
+        'from'
+      ) as LobbyType;
 
       if (from !== undefined && playerId !== undefined) {
         const to = from === 'players' ? 'backup' : 'players';
@@ -169,7 +170,10 @@ export default defineComponent({
         if (from === props.lobby) return;
 
         if (!store.state[to][playerId] && store.state[from][playerId]) {
-          store.commit(MutationTypes.ADD_PLAYER, { player: store.state[from][playerId], lobby: to });
+          store.commit(MutationTypes.ADD_PLAYER, {
+            player: store.state[from][playerId],
+            lobby: to,
+          });
 
           if (to === 'players' && store.state.teams.length > 0) {
             store.commit(MutationTypes.ADD_RESERVE, playerId);
@@ -187,16 +191,32 @@ export default defineComponent({
     };
 
     const marked = computed(() => store.state.selectPlayers[props.lobby]);
+    const duplicates = computed(() =>
+      Object.entries(
+        Object.values(store.state[props.lobby]).reduce(
+          (acc: { [key: string]: number }, player) => ({
+            ...acc,
+            [player.identity.name]: (acc[player.identity.name] ?? 0) + 1,
+          }),
+          {}
+        )
+      )
+        .filter(([, count]) => count > 1)
+        .map(([name]) => name)
+    );
 
     const click = (ev: MouseEvent, uuid: string) => {
       ev.preventDefault();
 
       if (ev.ctrlKey) {
-        store.commit(MutationTypes.SELECT_PLAYERS, { playerIds: [uuid], lobby: props.lobby });
+        store.commit(MutationTypes.SELECT_PLAYERS, {
+          playerIds: [uuid],
+          lobby: props.lobby,
+        });
       }
     };
 
-    return { state, sort, filter, allowDrop, drop, click, marked };
+    return { state, sort, filter, allowDrop, drop, click, marked, duplicates };
   },
 });
 </script>
@@ -213,6 +233,10 @@ export default defineComponent({
   .player-cards {
     height: 30rem;
   }
+}
+
+.duplicate {
+  background-color: $red-300 !important;
 }
 
 .selected {
