@@ -3,12 +3,12 @@
     <input
       type="file"
       accept=".json"
-      id="importFile"
+      :id="`importFile${lobby}`"
       class="form-file-input d-none"
       ref="inp"
       @change="onChange"
     />
-    <label for="importFile" class="w-100">
+    <label :for="`importFile${lobby}`" class="w-100">
       <span>Import</span>
     </label>
   </div>
