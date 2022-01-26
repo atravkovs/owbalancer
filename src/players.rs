@@ -7,6 +7,7 @@ use crate::AdjustSr;
 use rand::rngs::OsRng;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -16,6 +17,7 @@ pub struct Identity {
     pub name: String,
     pub is_squire: bool,
     pub is_captain: bool,
+    pub is_full_flex: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -55,6 +57,7 @@ pub struct Players(pub HashMap<String, Player>);
 pub struct Candidate {
     pub uuid: String,
     pub name: String,
+    pub is_full_flex: bool,
     pub roles: Roles,
 }
 
@@ -174,8 +177,8 @@ impl Candidate {
         self.roles.count()
     }
 
-    fn new(uuid: String, name: String, roles: Roles) -> Candidate {
-        Candidate { uuid, name, roles }
+    fn new(uuid: String, name: String, roles: Roles, is_full_flex: bool) -> Candidate {
+        Candidate { uuid, name, roles, is_full_flex }
     }
 }
 
@@ -191,13 +194,14 @@ impl From<&Player> for Candidate {
             player.identity.uuid.clone(),
             player.identity.name.clone(),
             Roles::from(&player.stats.classes),
+            player.identity.is_full_flex.eq(&Some(true)),
         )
     }
 }
 
 impl PlayerPool {
     pub fn sort_by_rank(&mut self, direction: Direction) {
-        self.0.sort_by(|a, b| {
+        self.0.sort_by(|a, b| {          
             let ordering = b.roles.get_primary_rank().cmp(&a.roles.get_primary_rank());
 
             if direction == Direction::DESC {
@@ -206,6 +210,20 @@ impl PlayerPool {
 
             ordering
         })
+    }
+
+    pub fn sort_full_flex(&mut self) {
+        self.0.sort_by(|a, b| {
+            if a.is_full_flex && !b.is_full_flex {
+                return Ordering::Greater;
+            }
+
+            if b.is_full_flex && !a.is_full_flex {
+                return Ordering::Less;
+            }
+
+            return Ordering::Equal;
+        });
     }
 
     pub fn size(&self) -> usize {

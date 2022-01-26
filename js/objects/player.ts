@@ -4,8 +4,10 @@ import { Entries } from '@/objects/common';
 export type Identity = {
   uuid: string;
   name: string;
+  isLocked: boolean;
   isSquire: boolean;
   isCaptain: boolean;
+  isFullFlex: boolean;
 };
 
 export type ClassType = {
@@ -38,6 +40,8 @@ export type Players = {
   [tag: string]: Player;
 };
 
+export type LobbyType = 'players' | 'backup';
+
 export type PlayerEntries = Entries<Players>;
 
 export type ReservedPlayers = string[];
@@ -47,8 +51,10 @@ const createDefaultPlayer: (name: string) => Player = name => {
     identity: {
       name,
       uuid: uuidv4(),
+      isLocked: false,
       isCaptain: false,
       isSquire: false,
+      isFullFlex: false,
     },
     stats: {
       classes: {

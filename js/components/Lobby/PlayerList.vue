@@ -4,36 +4,49 @@
       <div>
         <sort @sort="sort" />
       </div>
-      <div>
+      <div v-if="enableExtra">
         <assign />
       </div>
       <div class="d-flex">
-        <export />
-        <import-file />
+        <export :lobby="lobby" />
+        <import-file :lobby="lobby" />
       </div>
       <div>
-        <delete-players />
+        <delete-players :lobby="lobby" />
       </div>
     </div>
     <stats :players="state.storePlayers" :currentCount="state.players.length" />
     <player-filter :players="state.storePlayers" @filter="filter" />
     <div
-      class="player-cards overflow-auto  bg-secondary border p-1"
+      class="player-cards overflow-auto bg-secondary border p-1"
       @dragover="allowDrop"
       @drop="drop"
     >
       <player-card
         class="bg-light mb-1"
+        :class="{
+          selected: !!marked[uuid],
+          duplicate: duplicates.includes(player.identity.name),
+        }"
         v-for="[uuid, player] in state.players"
         :player="player"
         :key="uuid"
+        :lobby="lobby"
+        @click="(e) => click(e, uuid)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  PropType,
+  reactive,
+  watch,
+} from 'vue';
 import orderBy from 'lodash/orderBy';
 
 import { useStore } from '@/store';
@@ -47,19 +60,45 @@ import PlayerCard from '@/components/PlayerCard.vue';
 import Export from '@/components/Lobby/Export.vue';
 import ImportFile from '@/components/Lobby/Import.vue';
 import DeletePlayers from '@/components/Lobby/DeletePlayers.vue';
-import PObj, { Player, PlayerEntries } from '@/objects/player';
+import PObj, { Player, PlayerEntries, LobbyType } from '@/objects/player';
 
 export default defineComponent({
   name: 'PlayerList',
-  components: { Assign, Sort, Stats, PlayerFilter, PlayerCard, Export, ImportFile, DeletePlayers },
-  setup() {
+  components: {
+    Assign,
+    Sort,
+    Stats,
+    PlayerFilter,
+    PlayerCard,
+    Export,
+    ImportFile,
+    DeletePlayers,
+  },
+  props: {
+    enableExtra: {
+      type: Boolean,
+      default: true,
+    },
+    lobby: {
+      type: String as PropType<LobbyType>,
+      default: 'players',
+    },
+    showAll: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
     const store = useStore();
     const teamsLen = computed(() => store.state.teams.length);
+    const lobby = computed<LobbyType>(() => props.lobby);
     const storePlayers = computed(() =>
-      Object.entries(store.state.players).filter(([, p]) =>
-        store.state.reservedPlayers.length > 0
-          ? store.state.reservedPlayers.includes(p.identity.uuid)
-          : teamsLen.value <= 0
+      Object.entries(store.state[lobby.value]).filter(
+        ([, p]) =>
+          props.showAll ||
+          (store.state.reservedPlayers.length > 0
+            ? store.state.reservedPlayers.includes(p.identity.uuid)
+            : teamsLen.value <= 0)
       )
     );
     const activeSort: { rule: string; order: 'asc' | 'desc' } = {
@@ -73,7 +112,11 @@ export default defineComponent({
       players: storePlayers.value,
     });
 
-    const sort = (rule: string, order: 'asc' | 'desc', pl?: [string, Player][]) => {
+    const sort = (
+      rule: string,
+      order: 'asc' | 'desc',
+      pl?: [string, Player][]
+    ) => {
       const mPlayers = pl || state.players;
 
       const sortedPlayers = orderBy(
@@ -112,14 +155,33 @@ export default defineComponent({
     const allowDrop = (ev: DragEvent) => {
       ev.preventDefault();
     };
+
     const drop = (ev: DragEvent) => {
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
+      const from: LobbyType | undefined = ev?.dataTransfer?.getData(
+        'from'
+      ) as LobbyType;
 
-      if (playerId === undefined || teamUuid === undefined) return;
+      if (from !== undefined && playerId !== undefined) {
+        const to = from === 'players' ? 'backup' : 'players';
 
-      if (store.state.teams.length > 0) {
+        if (from === props.lobby) return;
+
+        if (!store.state[to][playerId] && store.state[from][playerId]) {
+          store.commit(MutationTypes.ADD_PLAYER, {
+            player: store.state[from][playerId],
+            lobby: to,
+          });
+
+          if (to === 'players' && store.state.teams.length > 0) {
+            store.commit(MutationTypes.ADD_RESERVE, playerId);
+          }
+        }
+      }
+
+      if (playerId !== undefined && teamUuid && store.state.teams.length > 0) {
         store.commit(MutationTypes.ADD_RESERVE, playerId);
         store.commit(MutationTypes.REMOVE_FROM_TEAM, {
           teamUuid,
@@ -128,7 +190,33 @@ export default defineComponent({
       }
     };
 
-    return { state, sort, filter, allowDrop, drop };
+    const marked = computed(() => store.state.selectPlayers[props.lobby]);
+    const duplicates = computed(() =>
+      Object.entries(
+        Object.values(store.state[props.lobby]).reduce(
+          (acc: { [key: string]: number }, player) => ({
+            ...acc,
+            [player.identity.name]: (acc[player.identity.name] ?? 0) + 1,
+          }),
+          {}
+        )
+      )
+        .filter(([, count]) => count > 1)
+        .map(([name]) => name)
+    );
+
+    const click = (ev: MouseEvent, uuid: string) => {
+      ev.preventDefault();
+
+      if (ev.ctrlKey) {
+        store.commit(MutationTypes.SELECT_PLAYERS, {
+          playerIds: [uuid],
+          lobby: props.lobby,
+        });
+      }
+    };
+
+    return { state, sort, filter, allowDrop, drop, click, marked, duplicates };
   },
 });
 </script>
@@ -145,5 +233,13 @@ export default defineComponent({
   .player-cards {
     height: 30rem;
   }
+}
+
+.duplicate {
+  background-color: $red-300 !important;
+}
+
+.selected {
+  background-color: $cyan-100 !important;
 }
 </style>

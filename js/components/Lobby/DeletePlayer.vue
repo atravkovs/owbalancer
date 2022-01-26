@@ -5,14 +5,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 import { useStore } from '@/store';
 import MutationTypes from '@/store/mutation-types';
+import { LobbyType } from '@/objects/player';
 
 export default defineComponent({
   name: 'DeletePlayer',
-  setup() {
+  props: {
+    lobby: {
+      type: String as PropType<LobbyType>,
+      default: 'players'
+    }
+  },
+  setup(props) {
     const store = useStore();
 
     const allowDrop = (ev: DragEvent) => {
@@ -26,7 +33,7 @@ export default defineComponent({
 
       if (playerId === undefined) return;
 
-      store.commit(MutationTypes.DELETE_PLAYER, playerId);
+      store.commit(MutationTypes.DELETE_PLAYER, { playerId, lobby: props.lobby });
 
       if (teamUuid) {
         store.commit(MutationTypes.REMOVE_FROM_TEAM, {

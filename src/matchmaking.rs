@@ -418,8 +418,8 @@ impl<'a> Matchmaking<'a> {
     fn distribute_remaining(&mut self) {
         self.update();
         self.pool.shuffle();
+        self.pool.sort_full_flex();
         self.teams.sort(Direction::ASC);
-
         self.sort_remaining(1);
     }
 
@@ -458,6 +458,7 @@ impl<'a> Matchmaking<'a> {
         self.calculate_players_average();
 
         self.pool.sort_by_rank(Direction::DESC);
+        self.pool.sort_full_flex();
         self.teams.distribute_fillers(&mut self.pool, &self.config);
     }
 
@@ -554,7 +555,7 @@ impl Config {
             total_count: 0,
             duplicate_roles,
             sec_roles: false,
-            limiter_max: 2500,
+            limiter_max: 600,
             players_average: 0,
             roles_avg: HashMap::new(),
             rank_limiter2: rank_limiter,
