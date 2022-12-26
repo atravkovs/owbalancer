@@ -188,7 +188,7 @@ impl Team {
             return Some(SimpleRole::Dps);
         }
 
-        if self.tank_count() < 2 {
+        if self.tank_count() < 1 {
             return Some(SimpleRole::Tank);
         }
 
@@ -196,7 +196,7 @@ impl Team {
     }
 
     pub fn get_range(&self, config: &Config) -> (i32, i32) {
-        let players_count = 6;
+        let players_count = 5;
         let tolerance_range = config.tolerance * players_count;
 
         let target_sr = if self.members_count() as u32 != players_count {
@@ -295,7 +295,7 @@ impl Team {
     pub fn fits_sr(&self, player_sr: i32, new_average: f32, tolerance: u32) -> bool {
         let team_size = self.members_count();
         let new_sr = (self.total_sr + player_sr) as f32 / (team_size + 1) as f32;
-        ((new_sr - new_average).abs().floor() as u32) <= tolerance * (6 - team_size as u32)
+        ((new_sr - new_average).abs().floor() as u32) <= tolerance * (5 - team_size as u32)
     }
 
     pub fn can_swap(
@@ -510,7 +510,7 @@ impl Teams {
             .iter()
             .enumerate()
             .filter_map(|(id, team)| {
-                if team.members_count() < 6 {
+                if team.members_count() < 5 {
                     Some(id)
                 } else {
                     None
@@ -677,7 +677,7 @@ impl Teams {
             .filter_map(|(index, team)| {
                 let team_size = team.members_count();
 
-                if (team_size + 1) <= 6
+                if (team_size + 1) <= 5
                     && target_role.fits_team(team, config)
                     && team.fits_sr(player_sr, new_average, config.tolerance)
                 {

@@ -4,6 +4,7 @@ const WorkerPlugin = require('worker-plugin');
 const { DefinePlugin } = require('webpack');
 
 module.exports = {
+  publicPath: '/ow2',
   configureWebpack: {
     entry: './js/main.ts',
     resolve: {

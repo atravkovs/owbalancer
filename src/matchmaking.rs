@@ -211,7 +211,7 @@ impl<'a> Matchmaking<'a> {
         );
         self.config.roles_avg.insert(
             "tank".to_string(),
-            self.teams.total_role_sr(&SimpleRole::Tank) / role_players as i32,
+            self.teams.total_role_sr(&SimpleRole::Tank) / (role_players / 2) as i32,
         );
     }
 
@@ -323,23 +323,17 @@ impl<'a> Matchmaking<'a> {
             .iter()
             .enumerate()
             .filter(|(_, team)| {
-                team.members_count() == 6 && team.low_support_count(self.config.limiter_max) == 2
+                team.members_count() == 5 && team.low_support_count(self.config.limiter_max) == 2
             })
             .collect();
 
-        let low_tanks: Vec<(usize, &Team)> =
-            cl.0.iter()
-                .enumerate()
-                .filter(|(_, team)| {
-                    team.members_count() == 6 && team.low_tank_count(self.config.limiter_max) == 2
-                })
-                .collect();
+        let low_tanks: Vec<(usize, &Team)> = Vec::new();
 
         let low_dps: Vec<(usize, &Team)> =
             cl.0.iter()
                 .enumerate()
                 .filter(|(_, team)| {
-                    team.members_count() == 6 && team.low_dps_count(self.config.limiter_max) == 2
+                    team.members_count() == 5 && team.low_dps_count(self.config.limiter_max) == 2
                 })
                 .collect();
 
@@ -378,7 +372,7 @@ impl<'a> Matchmaking<'a> {
             .iter()
             .enumerate()
             .filter(|(_, team)| {
-                team.members_count() == 6 && team.low_support_count(self.config.limiter_max) == 0
+                team.members_count() == 5 && team.low_support_count(self.config.limiter_max) == 0
             })
             .collect();
 
@@ -399,8 +393,8 @@ impl<'a> Matchmaking<'a> {
                     .filter(|&member| member.1.role == role)
                     .collect();
                 for hm in hs_members {
-                    let new_sr_l = (ls.total_sr - lm.1.rank + hm.1.rank) / 6;
-                    let new_sr_h = (hs.total_sr - hm.1.rank + lm.1.rank) / 6;
+                    let new_sr_l = (ls.total_sr - lm.1.rank + hm.1.rank) / 5;
+                    let new_sr_h = (hs.total_sr - hm.1.rank + lm.1.rank) / 5;
                     if (new_sr_l - average).abs() <= self.config.tolerance as i32
                         && (new_sr_h - average).abs() <= self.config.tolerance as i32
                     {

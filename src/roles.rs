@@ -107,7 +107,7 @@ impl Role {
                 true
             }
             Role::Tank(rank) => {
-                if (team.tank_count() + 1) > 2 {
+                if (team.tank_count() + 1) > 1 {
                     return false;
                 }
 
