@@ -1,6 +1,6 @@
 <template>
   <li
-    v-for="i in 2"
+    v-for="i in teamSize[rtype ?? 'dps']"
     :key="i"
     @dragover="allowDrop"
     @drop="e => drop(e, i)"
@@ -36,12 +36,20 @@ export default defineComponent({
   props: {
     rtype: String as PropType<'dps' | 'tank' | 'support'>,
     teamUuid: String,
-    members: Array as PropType<{ uuid: string; name: string; primary: boolean; secondary: boolean }[]>,
+    members: Array as PropType<
+      { uuid: string; name: string; primary: boolean; secondary: boolean }[]
+    >,
   },
   components: { RoleIcon, PlayerCard },
   setup(props) {
     const store = useStore();
     const players = computed(() => store.state.players);
+
+    const teamSize = {
+      tank: 1,
+      dps: 2,
+      support: 2,
+    };
 
     const allowDrop = (ev: DragEvent) => {
       ev.preventDefault();
@@ -150,7 +158,7 @@ export default defineComponent({
 
     const showBalancerSR = computed(() => store.state.showBalancerSR);
 
-    return { players, allowDrop, drop, showBalancerSR };
+    return { players, allowDrop, drop, showBalancerSR, teamSize };
   },
 });
 </script>

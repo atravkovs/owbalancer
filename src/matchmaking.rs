@@ -422,6 +422,7 @@ impl<'a> Matchmaking<'a> {
         squires.sort_by_rank(Direction::ASC);
         self.preserve_players(&squires);
 
+        self.teams.distribute_squires_to_tanks(&mut squires);
         self.teams.distribute_squires_to_dps(&mut squires);
         self.teams.update();
         self.teams.sort(Direction::DESC);

@@ -4,6 +4,7 @@ use crate::roles::{Role, RolesFilter, SimpleRole};
 
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use std::collections::VecDeque;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -60,6 +61,14 @@ impl Member {
     fn is_dps(&self) -> bool {
         self.role == SimpleRole::Dps
     }
+
+    fn is_tank(&self) -> bool {
+        self.role == SimpleRole::Tank
+    }
+
+    fn is_support(&self) -> bool {
+        self.role == SimpleRole::Support
+    }
 }
 
 impl Team {
@@ -87,6 +96,14 @@ impl Team {
 
     pub fn get_leutenant(&self) -> &Member {
         self.members.get(2).unwrap()
+    }
+
+    pub fn fits_role(&self, role: &Role) -> bool {
+        match role {
+            Role::Tank(_) => self.tank_count() < 1,
+            Role::Dps(_) => self.dps_count() < 2,
+            Role::Support(_) => self.support_count() < 2,
+        }
     }
 
     pub fn add_primary_player(&mut self, candidate: &Candidate) {
@@ -322,8 +339,10 @@ impl Team {
 
                 if mem.role == mem2.role {
                     if config.rank_limiter2 {
-                        if (mem.rank < config.limiter_max && team.low_role_count(&mem.role, config.limiter_max) == 1)
-                            || (mem2.rank < config.limiter_max && self.low_role_count(&mem2.role, config.limiter_max) == 1)
+                        if (mem.rank < config.limiter_max
+                            && team.low_role_count(&mem.role, config.limiter_max) == 1)
+                            || (mem2.rank < config.limiter_max
+                                && self.low_role_count(&mem2.role, config.limiter_max) == 1)
                         {
                             continue;
                         }
@@ -333,7 +352,9 @@ impl Team {
                         let partner1 = self.get_partner(&mem.role, &mem.uuid);
                         let partner2 = team.get_partner(&mem2.role, &mem2.uuid);
 
-                        if partner1.is_none() || partner2.is_none() { continue; }
+                        if partner1.is_none() || partner2.is_none() {
+                            continue;
+                        }
 
                         let partner1 = partner1.unwrap();
                         let partner2 = partner2.unwrap();
@@ -574,6 +595,33 @@ impl Teams {
             .iter_mut()
             .filter(|team| team.get_captain().is_dps())
             .collect()
+    }
+
+    pub fn filter_tank_captains(&mut self) -> Vec<&mut Team> {
+        self.0
+            .iter_mut()
+            .filter(|team| team.get_captain().is_tank())
+            .collect()
+    }
+
+    pub fn distribute_squires_to_tanks(&mut self, squires: &mut PlayerPool) {
+        let roles_filter = RolesFilter(vec![SimpleRole::Dps, SimpleRole::Support]);
+
+        let tank_teams = self.filter_tank_captains();
+        let mut worthy_squires = squires.filter_by_roles(roles_filter);
+        let mut cache_squires = Vec::default();
+
+        for team in tank_teams {
+            if worthy_squires.is_empty() {
+                break;
+            }
+
+            let candidate = worthy_squires.pop().unwrap();
+            cache_squires.push(candidate);
+            team.add_primary_player(squires.0.get(candidate).unwrap());
+        }
+
+        squires.dispose_of(cache_squires);
     }
 
     pub fn distribute_squires_to_dps(&mut self, squires: &mut PlayerPool) {

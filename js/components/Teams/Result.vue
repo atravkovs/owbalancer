@@ -72,7 +72,6 @@ export default defineComponent({
       const c = props.balance.teams.reduce((acc: number, team: Team) => {
         let accCount = acc;
         const dps = team.members.filter((member: TeamMembers) => member.role === 'dps');
-        const tank = team.members.filter((member: TeamMembers) => member.role === 'tank');
         const support = team.members.filter((member: TeamMembers) => member.role === 'support');
 
         if (
@@ -85,13 +84,6 @@ export default defineComponent({
         if (
           support.every((member: TeamMembers) => member.primary) ||
           support.every((member: TeamMembers) => member.secondary)
-        ) {
-          accCount += 1;
-        }
-
-        if (
-          tank.every((member: TeamMembers) => member.primary) ||
-          tank.every((member: TeamMembers) => member.secondary)
         ) {
           accCount += 1;
         }
