@@ -125,7 +125,7 @@ export default defineComponent({
   overflow: hidden;
 }
 .wt {
-  width: 100px;
+  width: 175px;
 }
 .lh-100 {
   line-height: 50px;
