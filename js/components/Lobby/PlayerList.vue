@@ -23,8 +23,10 @@
       @drop="drop"
     >
       <player-card
-        class="bg-light mb-1"
+        class="mb-1"
         :class="{
+          'bg-locked': player.identity.isLocked,
+          'bg-light': !player.identity.isLocked,
           selected: !!marked[uuid],
           duplicate: duplicates.includes(player.identity.name),
         }"
@@ -32,21 +34,14 @@
         :player="player"
         :key="uuid"
         :lobby="lobby"
-        @click="(e) => click(e, uuid)"
+        @click="e => click(e, uuid)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  PropType,
-  reactive,
-  watch,
-} from 'vue';
+import { computed, defineComponent, onMounted, PropType, reactive, watch } from 'vue';
 import orderBy from 'lodash/orderBy';
 
 import { useStore } from '@/store';
@@ -112,11 +107,7 @@ export default defineComponent({
       players: storePlayers.value,
     });
 
-    const sort = (
-      rule: string,
-      order: 'asc' | 'desc',
-      pl?: [string, Player][]
-    ) => {
+    const sort = (rule: string, order: 'asc' | 'desc', pl?: [string, Player][]) => {
       const mPlayers = pl || state.players;
 
       const sortedPlayers = orderBy(
@@ -160,9 +151,7 @@ export default defineComponent({
       ev.preventDefault();
       const playerId = ev?.dataTransfer?.getData('playerTag');
       const teamUuid = ev?.dataTransfer?.getData('team');
-      const from: LobbyType | undefined = ev?.dataTransfer?.getData(
-        'from'
-      ) as LobbyType;
+      const from: LobbyType | undefined = ev?.dataTransfer?.getData('from') as LobbyType;
 
       if (from !== undefined && playerId !== undefined) {
         const to = from === 'players' ? 'backup' : 'players';
@@ -241,5 +230,9 @@ export default defineComponent({
 
 .selected {
   background-color: $cyan-100 !important;
+}
+
+.bg-locked {
+  background-color: $yellow-100 !important;
 }
 </style>

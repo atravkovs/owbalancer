@@ -3,7 +3,7 @@
     <div class="card-header d-flex justify-content-between p-0">
       <div class="py-1 d-flex">
         <u class="ms-2 c-pointer" @click="removeTeam">x</u>
-        <span class="ms-2">Team</span>
+        <span class="ms-2 fw-bold">#{{ teamId }}</span>&nbsp;
         <input
           type="text"
           class="form-control-plaintext p-0 ps-1"
@@ -35,6 +35,7 @@ import MutationTypes from '@/store/mutation-types';
 export default defineComponent({
   name: 'Team',
   props: {
+    teamId: Number,
     team: Object as PropType<Team>,
   },
   components: { TeamRoles },

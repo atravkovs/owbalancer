@@ -6,7 +6,7 @@
   </div>
   <stats v-if="teams.length > 0" />
   <div class="teams overflow-auto mh-80vh">
-    <team v-for="team in teams" :key="team.uuid" :team="team" />
+    <team v-for="(team, i) in teams" :key="team.uuid" :team="team" :team-id="i + 1" />
   </div>
   <balance />
   <archive />
