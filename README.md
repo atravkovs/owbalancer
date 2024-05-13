@@ -1,6 +1,6 @@
 # owbalancer
 
-You can try balancer on Github Pages: [Tournament Balancer](https://atravkovs.github.io/balancer/).
+You can try balancer on Github Pages: [Tournament Balancer](https://atravkovs.github.io/ow2/).
 
 ## Project setup
 
