@@ -1,10 +1,14 @@
 import * as Comlink from 'comlink';
 
-const instance = new Worker('./mainwork1.worker.js', { name: 'cutie', type: 'module' });
+// const MyWorker = new Worker('./mainwork1.worker.js', { name: 'cutie', type: 'module' });
+import BalancerWorker from './balancer.worker?worker';
+
+const instance = new BalancerWorker();
+
 // eslint-disable-next-line
 const Wrap: any = Comlink.wrap(instance);
 
-instance.addEventListener('message', m => {
+instance.addEventListener('message', (m) => {
   if (m.data?.type === 'pop') {
     document.dispatchEvent(
       new CustomEvent('wasm-update', { detail: { message: () => m.data.message } })

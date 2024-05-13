@@ -113,7 +113,7 @@ export const mutations: MutationTree<State> & Mutations = {
     const to = lobby === 'players' ? 'backup' : 'players';
 
     if (state[to][playerId]) {
-      state[to][playerId].identity = { ...state[lobby][playerId].identity }; 
+      state[to][playerId].identity = { ...state[lobby][playerId].identity };
     }
     /* ------------------------------ */
 
@@ -171,9 +171,8 @@ export const mutations: MutationTree<State> & Mutations = {
     state.reservedPlayers.push(uuid);
   },
   [MutationTypes.ADD_PLAYERS](state, { players, lobby = 'players' }) {
-    
+
     state[lobby] = { ...state[lobby], ...players };
-    console.log('asdfg', JSON.stringify(state[lobby]));
   },
   [MutationTypes.ADD_TEAM](state, team) {
     state.teams.push(team);

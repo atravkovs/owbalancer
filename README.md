@@ -3,29 +3,23 @@
 You can try balancer on Github Pages: [Tournament Balancer](https://atravkovs.github.io/balancer/).
 
 ## Project setup
+
+Tested on Node 20, npm 10.1.0 and Rust 1.75.0, so make sure that at least these versions are installed.
+
 ```
 npm install
 ```
 
+```
+cargo install rsw
+```
+
+```
+cargo install wasm-pack
+```
+
 ### Compiles and hot-reloads for development
-```
-npm run serve
-```
 
-### Compiles and minifies for production
 ```
-npm run build
+npm start
 ```
-
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
