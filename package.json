@@ -8,6 +8,7 @@
     "rsw:b": "rsw build",
     "preview": "vite preview",
     "build-only": "vite build",
+    "build": "rsw build && vite build",
     "start": "concurrently \"rsw watch\" \"npm run dev\""
   },
   "dependencies": {
@@ -34,8 +35,6 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.11",
     "vite-plugin-rsw": "^2.0.11",
-    "vite-plugin-wasm": "^3.3.0",
-    "vite-plugin-wasm-pack": "^0.1.12",
     "vue-tsc": "^2.0.17"
   }
 }

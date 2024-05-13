@@ -15,6 +15,7 @@ import { useStore } from '@/store';
 import Dropdown from '@/components/Helpers/Dropdown.vue';
 import DropItem from '@/components/Helpers/DropItem.vue';
 import ExportModal from '@/components/Teams/ExportModal.vue';
+import { Player } from '@/objects/player';
 
 export default defineComponent({
   name: 'ExportTeams',
@@ -40,10 +41,10 @@ export default defineComponent({
 
         let teamText = `Team ${team.name} - ${teamAvgSr}\n=============================\n`;
 
-        ['tank', 'dps', 'support'].forEach(role => {
+        ['tank', 'dps', 'support'].forEach((role) => {
           team.members
-            .filter(member => member.role === role)
-            .forEach(member => {
+            .filter((member) => member.role === role)
+            .forEach((member) => {
               const { isSquire, isCaptain } = store.state.players[member.uuid].identity;
               const { rank } = store.state.players[member.uuid].stats.classes[member.role];
               const name = `${isSquire ? '⚔ ' : ''}${isCaptain ? '♛ ' : ''}${member.name}`;
@@ -70,10 +71,10 @@ export default defineComponent({
 
       const extendText = teams.reduce((acc, team) => {
         let teamText = '';
-        ['tank', 'dps', 'support'].forEach(role => {
+        ['tank', 'dps', 'support'].forEach((role) => {
           team.members
-            .filter(member => member.role === role)
-            .forEach(member => {
+            .filter((member) => member.role === role)
+            .forEach((member) => {
               const { isSquire, isCaptain } = store.state.players[member.uuid].identity;
               teamText = `${teamText}"${team.name}";"${member.role}";"${member.rank}";"${
                 member.name
@@ -91,11 +92,26 @@ export default defineComponent({
 
     const exportCaptains = () => {
       const { players } = store.state;
-      const text = Object.entries(players)
-        .filter(([, player]) => player.identity.isCaptain)
-        .reduce((acc, [, player]) => {
-          return `${acc}${player.identity.name}\n`;
-        }, '');
+      const captainNames: string[] = Object.values<Player>(players)
+        .filter((player: Player) => player.identity.isCaptain)
+        .map((player) => player.identity.name);
+
+      captainNames.sort((a, b) => {
+        const nameA = a.toUpperCase();
+        const nameB = b.toUpperCase();
+
+        if (nameA < nameB) {
+          return -1;
+        }
+
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        return 0;
+      });
+
+      const text = captainNames.join('\n');
 
       modalText.value = text;
       isModalActive.value = true;

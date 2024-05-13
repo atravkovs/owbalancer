@@ -1,11 +1,6 @@
 import * as Comlink from 'comlink';
 import init, { balance, balance_half, balance_final } from '@rust/owbalancer';
-
-// eslint-disable-next-line import/extensions
-// const wasm = import('../pkg/index.js');
-// import wasm from 'owbalancer';
-// import wasm from './assets/owbalancer_bg.wasm';
-// import * as wasm from './assets/owbalancer_bg.wasm';
+import wasmFileUrl from '@rust/owbalancer/owbalancer_bg.wasm?url';
 
 export default class WasmWorker {
   private ok: string = '';
@@ -18,7 +13,7 @@ export default class WasmWorker {
 
   async loadWasm() {
     this.ok = 'ok';
-    await init();
+    await init(wasmFileUrl);
   }
 
   test() {

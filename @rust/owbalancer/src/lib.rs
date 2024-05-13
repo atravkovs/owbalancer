@@ -45,10 +45,10 @@ pub struct AdjustSr {
     pub is_enabled: bool,
 }
 
-// #[wasm_bindgen(module = "/logger.js")]
-// extern "C" {
-//     pub fn wasm_log(message: String);
-// }
+#[wasm_bindgen(module = "/logger.js")]
+extern "C" {
+    pub fn wasm_log(message: String);
+}
 
 #[wasm_bindgen(start)]
 pub fn main_js() -> Result<(), JsValue> {

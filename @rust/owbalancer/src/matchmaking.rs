@@ -1,7 +1,7 @@
 use crate::players::{Candidate, Direction, PlayerPool, Players};
 use crate::roles::SimpleRole;
 use crate::teams::{Member, Team, Teams};
-// use crate::wasm_log;
+use crate::wasm_log;
 use serde::{Deserialize, Serialize};
 use std::cmp;
 use std::collections::HashMap;
@@ -155,9 +155,9 @@ impl<'a> Matchmaking<'a> {
 
     #[allow(unused_unsafe)]
     fn log(&self, message: &str) {
-        // unsafe {
-        //     wasm_log(String::from(message));
-        // }
+        unsafe {
+            wasm_log(String::from(message));
+        }
     }
 
     fn preserve_players(&mut self, players: &PlayerPool) {
